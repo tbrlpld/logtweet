@@ -1,0 +1,11 @@
+[LogTweet]
+url = https://www.example.com
+
+[Twitter]
+api_key = xyz
+api_secret = xyz
+access_token = xyz
+access_secret = xyz
+
+[Bitly]
+api_key = xyz
