@@ -53,7 +53,12 @@ def main():
     link = get_first_link(today_heading)
     # Create shortened link to first link of the day.
     if link:
-        link = get_short_link(link, config["Bitly"]["api_key"])
+        bitly_api_key = config.get(
+            section="Bitly",
+            option="api_key",
+            fallback=None
+        )
+        link = get_short_link(link, bitly_api_key)
 
     # Calculate max message length. This needs to be the maximum tweet
     # length, reduced by the preamble and the link.
@@ -230,14 +235,19 @@ def get_first_link(today_heading: Tag) -> str:
     return link_heading.find_next_sibling("ol").li.a["href"]
 
 
-def get_short_link(long_link: str, bitly_api_key: str) -> str:
+def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
     """
-    Create short link using the Bit.ly service.
+    Create short link.
+
+    If a Bitly API key is passed, then the Bitly service is used to generate
+    the short link. Otherwise it defaults to the URL shortener at
+    `https://s.lpld.io`.
 
     Arguments:
         long_link (str): Long link to shorten.
-        bitly_api_key (str): API key for the Bit.ly service. See the
-            `Bitly API documentation`_ on how to retrieve an API key.
+        bitly_api_key (Optional[str]): API key for the Bit.ly service. See the
+            `Bitly API documentation`_ on how to retrieve an API key. Default
+            is `None`.
 
     Returns:
         str: Shortened link pointing to the same resource as the long link.
@@ -246,12 +256,17 @@ def get_short_link(long_link: str, bitly_api_key: str) -> str:
         https://dev.bitly.com/v4/#section/Application-using-a-single-account
 
     """
-    shortener_url = "https://api-ssl.bitly.com/v4/shorten"
-    headers = {"Authorization": f"Bearer {bitly_api_key}"}
+    shortener_url = "https://s.lpld.io/create"
+    headers = {}
+    shortlink_key = "short"
+    if bitly_api_key:
+        shortener_url = "https://api-ssl.bitly.com/v4/shorten"
+        headers["Authorization"] = f"Bearer {bitly_api_key}"
+        shortlink_key = "link"
     payload = {"long_url": long_link}
     response = requests.post(shortener_url, json=payload, headers=headers)
     response.raise_for_status()
-    return response.json()["link"]
+    return response.json()[shortlink_key]
 
 
 def get_tweet_message(today_heading: Tag, max_len: int) -> str:
