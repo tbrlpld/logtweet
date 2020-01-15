@@ -13,7 +13,14 @@ Have created a little Flask app that converts my log to an HTML site using the `
 Once you have an HTML document with `h2` day headers and `h3` sections for "Today's Progress" and "Link(s)", you can point the tool at that URL and generate a Tweet from it. 
 
 To actually enable the tweeting, you need to create a Twitter developer account and get an API key, API secret, Access Token and Access Token Secret. 
-Also, because the tool creates shortened links via the Bit.ly service, you need an account there and an API key.
+
+The tweet will also contain the first link that you define in the "Link(s)" section under today's log. 
+To save some space the link is shortened. 
+By default, I use my own link shortener. 
+
+If you want to, you can also use the Bit.ly service. 
+Their links might be a bit shorter and provide some engagement/tracking info.
+To use the Bitly service, you need to generate an API key through them and add it to the config (see below). 
 
 
 ### Options
