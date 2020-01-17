@@ -209,11 +209,14 @@ def get_todays_subheading(
     current_element = today_heading
     while True:
         next_sibling = current_element.next_sibling
-        if next_sibling.name == "h2":
+        if next_sibling:
+            if next_sibling.name == "h2":
+                break
+            if next_sibling.name == "h3" and next_sibling.text == subheading_text:
+                return next_sibling
+            current_element = next_sibling
+        else:
             break
-        if next_sibling.name == "h3" and next_sibling.text == subheading_text:
-            return next_sibling
-        current_element = next_sibling
     return None
 
 
