@@ -300,8 +300,8 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
     while True:
         possible_content = tweet_message
         next_sibling = current_element.find_next_sibling()
-        if next_sibling.name != "p":
-            # Leave loop if not a paragraph.
+        if not next_sibling or next_sibling.name != "p":
+            # Leave loop if no more siblings (end of page) or not a paragraph.
             break
         current_element = next_sibling
 
