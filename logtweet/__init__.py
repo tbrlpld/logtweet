@@ -179,7 +179,12 @@ def build_preamble(today_heading: Tag) -> str:
         str: Preamble for the tweet message.
 
     """
-    day = re.sub(r"(.*)(.[0-9])(:.*)", r"\2", today_heading.text)
+    day_with_leading_whitespace = re.sub(
+        r"(.*)(\s\d+)(:.*)",
+        r"\2",
+        today_heading.text,
+    )
+    day = day_with_leading_whitespace.strip()
     return f"{day}/#100DaysOfCode"
 
 
