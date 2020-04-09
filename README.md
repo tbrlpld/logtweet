@@ -7,9 +7,12 @@ Command line tool to create a tweet based on a #100DaysOfCode log message.
 The log from which the tweet will be generated has to have a format like my log.
 You can find my log at [https://log100days.lpld.io/log.md](https://log100days.lpld.io/log.md).
 My log is based on the [original #100DaysOfCode log repo](https://github.com/kallaway/100-days-of-code/blob/master/log.md).
+But I am diverting from that format a little.
+Specifically, I am using sub-headings (of the third level `### ...`) instead of strong text `**...**` to delimit the daily sub-sections ("Today's Progress", "Thoughts", "Links").
+Check out [my raw log](https://raw.githubusercontent.com/tbrlpld/100-days-of-code/master/log.md) for details.
 
 This is a markdown log, that is converted into an HTML page.
-Have created a little Flask app that converts my log to an HTML site using the `markdown2` package.
+I have created a little [Quart/Flask app that converts my log to an HTML site](https://github.com/tbrlpld/log100days) using the `markdown2` package.
 But other Markdown converters should work similar.
 
 Once you have an HTML document with `h2` day headers and `h3` sections for "Today's Progress" and "Link(s)", you can point the tool at the URL of your HTML log page and generate a Tweet from it.
