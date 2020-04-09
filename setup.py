@@ -18,6 +18,7 @@ develop_requires = [
     # "twine" to upload to pypi in secure way.
     # See: https://packaging.python.org/tutorials/packaging-projects/
     "twine",
+    "pytest",
 ]
 
 setup(
