@@ -158,3 +158,18 @@ class TestGetTodayHeading(object):
         assert isinstance(heading, Tag)
         assert heading.name == "h2"
         assert heading.string == "Day 1: October 16, 2019, Wednesday"
+
+    def test_exception_if_is_today_always_false(
+        self,
+        monkeypatch,
+        example_soup,
+    ):
+        import logtweet
+        def mock_is_today(*args, **kwargs):
+            return False
+        monkeypatch.setattr(logtweet, "is_today", mock_is_today)
+
+        with pytest.raises(LookupError, match="No heading found"):
+            from logtweet import get_today_heading
+            get_today_heading(example_soup)
+
