@@ -49,7 +49,7 @@ def main():
     today_heading = get_today_heading(soup, offset)
 
     # Generate tweet preamble (E.g. 77/#100DaysOfCode)
-    preamble = build_preamble(today_heading)
+    preamble = build_preamble(today_heading.text)
 
     # Extract first link from list of links for the day.
     link = get_first_link(today_heading)
@@ -171,24 +171,26 @@ def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
     raise LookupError("No heading found for today!")
 
 
-def build_preamble(today_heading: Tag) -> str:
+def build_preamble(heading_string: str) -> str:
     """
     Build preamble for tweet.
 
     The preamble for e.g. day 77 would look like: "77/#100DaysOfCode".
 
     Arguments:
-        today_heading (Tag): Today's log header from which the day can be
-            extracted.
+        heading_string (str): Day's log header string from which the day can be
+            extracted. Expected format is something like
+            `Day 1: October 16, 2019, Wednesday`.
 
     Returns:
         str: Preamble for the tweet message.
 
     """
+    # TODO: Create separate function for the extraction of the day.
     day_with_leading_whitespace = re.sub(
         r"(.*)(\s\d+)(:.*)",
         r"\2",
-        today_heading.text,
+        heading_string,
     )
     day = day_with_leading_whitespace.strip()
     return f"{day}/#100DaysOfCode"
