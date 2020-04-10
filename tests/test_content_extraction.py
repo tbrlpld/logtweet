@@ -3,6 +3,7 @@
 """Test functions regarding content extraction."""
 
 from datetime import date
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 import pytest
@@ -80,57 +81,76 @@ class TestGetTodayHeading(object):
     def example_soup(self):
         """Create soup object for example page."""
         page_content = """<html>
-    <body>
-    <h1>100 Days Of Code - Log</h1>
-    <h2>Day 1: October 16, 2019, Wednesday</h2>
-    <h3>Today&#39;s Progress</h3>
-    <p>Gone through first bit of Flask introduction and set up the basic project structure in #100DayOfWebInPython.
-    Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested in the &#34;Keep Developing&#34; section of the Flask tutorial).</p>
-    <h3>Thoughts</h3>
-    <p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
-    <p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>
-    <h3>Link(s) to work</h3>
-    <ol>
-      <li><a href="http://example.com/1">Example Link 1</a></li>
-      <li><a href="http://example.com/2">Example Link 2</a></li>
-      <li><a href="http://example.com/3">Example Link 3</a></li>
-    </ol>
-    </body>
-    </html>"""
+<body>
+<h1>100 Days Of Code - Log</h1>
+<h2>Day 1: October 16, 2019, Wednesday</h2>
+<h3>Today&#39;s Progress</h3>
+<p>Gone through first bit of Flask introduction and set up the basic project structure in #100DayOfWebInPython.
+Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested in the &#34;Keep Developing&#34; section of the Flask tutorial).</p>
+<h3>Thoughts</h3>
+<p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
+<p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>
+<h3>Link(s) to work</h3>
+<ol>
+  <li><a href="http://example.com/1">Example Link 1</a></li>
+  <li><a href="http://example.com/2">Example Link 2</a></li>
+  <li><a href="http://example.com/3">Example Link 3</a></li>
+</ol>
+<h2>Day 2: October 17, 2019, Thursday</h2>
+<h3>Today&#39;s Progress</h3>
+<p>Gone through first bit of Flask introduction and set up the basic project structure in #100DayOfWebInPython.
+Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested in the &#34;Keep Developing&#34; section of the Flask tutorial).</p>
+<h3>Thoughts</h3>
+<p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
+<p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>
+<h3>Link(s) to work</h3>
+<ol>
+  <li><a href="http://example.com/4">Example Link 4</a></li>
+  <li><a href="http://example.com/5">Example Link 5</a></li>
+  <li><a href="http://example.com/6">Example Link 6</a></li>
+</ol>
+
+</body>
+</html>"""
         return BeautifulSoup(page_content, "html.parser")
 
-    def test_extraction_of_first_heading(self, monkeypatch, example_soup):
-        """Returns Tag object with the expected string content."""
-        import logtweet
-        def always_true(*args, **kwargs):
-            return True
-        monkeypatch.setattr(logtweet, "heading_matches_date", always_true)
+    def test_extraction_of_first_heading(self, example_soup):
+        """Return Tag object with the expected string content."""
+        with patch("logtweet.date") as mock_date:
+            mock_date.today.return_value = date(2019, 10, 16)
+            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
 
-        from logtweet import get_today_heading
-        heading = get_today_heading(example_soup)
-
-        from bs4.element import Tag
-        assert isinstance(heading, Tag)
-        assert heading.name == "h2"
-        assert heading.string == "Day 1: October 16, 2019, Wednesday"
-
-    def test_exception_if_is_today_always_false(
-        self,
-        monkeypatch,
-        example_soup,
-    ):
-        """
-        In case that `heading_matches_date` returns false on every heading (this is mocked
-        here) the function should raise an exception that no heading was found.
-        """
-        import logtweet
-        def always_false(*args, **kwargs):
-            return False
-        monkeypatch.setattr(logtweet, "heading_matches_date", always_false)
-
-        with pytest.raises(LookupError, match=r"^No heading found.*$"):
             from logtweet import get_today_heading
-            get_today_heading(example_soup)
+            heading = get_today_heading(example_soup)
+
+            from bs4.element import Tag
+            assert isinstance(heading, Tag)
+            assert heading.name == "h2"
+            assert heading.string == "Day 1: October 16, 2019, Wednesday"
+
+    def test_extraction_of_second_heading(self, example_soup):
+        """Return Tag object with the expected string content."""
+        with patch("logtweet.date") as mock_date:
+            mock_date.today.return_value = date(2019, 10, 17)
+            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
+
+            from logtweet import get_today_heading
+            heading = get_today_heading(example_soup)
+
+            from bs4.element import Tag
+            assert isinstance(heading, Tag)
+            assert heading.name == "h2"
+            assert heading.string == "Day 2: October 17, 2019, Thursday"
+
+    def test_exception_if_no_heading_for_today(self, example_soup):
+        """Raises exception if heading for today not in soup."""
+        with patch("logtweet.date") as mock_date:
+            mock_date.today.return_value = date(2019, 10, 18)
+            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
+
+            with pytest.raises(LookupError, match=r"^No heading found.*$"):
+                from logtweet import get_today_heading
+                get_today_heading(example_soup)
 
 
 # Just for reference
