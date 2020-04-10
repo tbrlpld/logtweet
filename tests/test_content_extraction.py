@@ -2,8 +2,120 @@
 
 """Test functions regarding content extraction."""
 
+from datetime import date
+
 from bs4 import BeautifulSoup
 import pytest
+
+
+class TestIsToday(object):
+    """Tests for the `is_today` function."""
+
+    @pytest.mark.parametrize(
+        "heading_text, mock_today, expected_return",
+        [
+            (
+                "Day 1: October 16, 2019, Wednesday",
+                date(year=2019, month=10, day=16),
+                True,
+            ),
+            (
+                # What's before the colon should not matter
+                "Day 2: October 16, 2019, Wednesday",
+                date(year=2019, month=10, day=16),
+                True,
+            ),
+            (
+                # What's before the colon should not matter
+                "Day 10: October 16, 2019, Wednesday",
+                date(year=2019, month=10, day=16),
+                True,
+            ),
+            (
+                # What's before the colon should not matter
+                "Day 100: October 16, 2019, Wednesday",
+                date(year=2019, month=10, day=16),
+                True,
+            ),
+            (
+                "Day 1: October 16, 2019, Wednesday",
+                date(year=2018, month=10, day=16),  # Year is off
+                False,
+            ),
+            (
+                "Day 1: October 16, 2019, Wednesday",
+                date(year=2019, month=9, day=16),  # Month is off
+                False,
+            ),
+            (
+                "Day 1: October 16, 2019, Wednesday",
+                date(year=2019, month=10, day=17),  # Day is off
+                False,
+            ),
+
+        ],
+    )
+    def test_valid_inputs(
+        self,
+        heading_text,
+        mock_today,
+        expected_return,
+        monkeypatch,
+    ):
+        import logtweet
+        monkeypatch.setattr(logtweet, "TODAY", mock_today)
+
+        from logtweet import is_today
+        is_today_return = is_today(heading_text)
+
+        assert is_today_return == expected_return
+
+    @pytest.mark.parametrize(
+        "mock_today, offset, expected_return",
+        [
+            (
+                date(year=2019, month=10, day=17),
+                -1,
+                True,
+            ),
+            (
+                date(year=2019, month=10, day=15),
+                1,
+                True,
+            ),
+            (
+                date(year=2018, month=10, day=16),
+                365,
+                True,
+            ),
+            (
+                date(year=2020, month=10, day=16),
+                -366,  # 2020 is a leap year
+                True,
+            ),
+            (
+                date(year=2019, month=10, day=15),
+                0,
+                False,
+            ),
+        ],
+    )
+    def test_different_offsets(
+        self,
+        mock_today,
+        offset,
+        expected_return,
+        monkeypatch,
+    ):
+        heading_text = "Day 1: October 16, 2019, Wednesday"
+
+        import logtweet
+        monkeypatch.setattr(logtweet, "TODAY", mock_today)
+
+        from logtweet import is_today
+        is_today_return = is_today(heading_text, offset)
+
+        assert is_today_return == expected_return
 
 
 @pytest.fixture
