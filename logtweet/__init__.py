@@ -140,15 +140,15 @@ def is_today(day_heading_text: str, offset: int = None) -> bool:
     return date_obj == today
 
 
-def get_today_heading(soup: BeautifulSoup, offset: int) -> Tag:
+def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
     """
     Return today's heading element or None.
 
     Arguments:
         soup (BeautifulSoup): Soup object of log page parsed with
             BeautifulSoup.
-        offset (int): Number of days by which to offset the value of today.
-            E.g. yesterday is `offset = -1`.
+        offset (int): *Optional* Number of days by which to offset the value of
+            today. E.g. yesterday is `offset = -1`. Default = 0.
 
     Returns:
         Tag: Heading element representing today.
