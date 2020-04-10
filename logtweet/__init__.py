@@ -233,7 +233,7 @@ def build_preamble(heading_string: str) -> str:
     return f"{day}/#100DaysOfCode"
 
 
-def get_days_subheading_by_text(
+def get_day_subheading_by_text(
     day_heading: Tag,
     subheading_text: str,
 ) -> Optional[Tag]:
@@ -279,7 +279,7 @@ def get_first_link(today_heading: Tag) -> str:
         str: First link found in the list of links or empty if no links found.
 
     """
-    link_heading = get_days_subheading_by_text(today_heading, "Link(s)")
+    link_heading = get_day_subheading_by_text(today_heading, "Link(s)")
     if not link_heading:
         return ""
     return link_heading.find_next_sibling("ol").li.a["href"]
@@ -336,7 +336,7 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
 
     """
     # Grab today's content heading
-    content_heading = get_days_subheading_by_text(
+    content_heading = get_day_subheading_by_text(
         today_heading,
         "Today's Progress",
     )

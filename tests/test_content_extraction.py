@@ -99,7 +99,6 @@ class TestGetDayHeading(object):
 
     def test_exception_if_no_heading_for_today(self, example_soup):
         """Raises exception if heading for today not in soup."""
-
         with pytest.raises(LookupError, match=r"^No heading found.*$"):
             from logtweet import get_day_heading
             get_day_heading(
@@ -151,12 +150,49 @@ class TestExtractDayNumberFromHeadingString(object):
             extract_day_number_from_heading_string(heading_string)
 
 
-class TestGetDaysSubheadingByText(object):
-    """Test `get_days_subheading_by_text` function."""
+class TestGetDaySubheadingByText(object):
+    """Test `get_day_subheading_by_text` function."""
 
-    def test_existing_subheader(example_soup):
-        # TODO: Refactor the function to retrieve a todays header so that it
-        #       can be reused here.
+    @pytest.fixture
+    def day_1_heading(self, example_soup):
+        from logtweet import get_day_heading
+        return get_day_heading(example_soup, date(2019, 10, 16))
 
-        from logtweet import get_days_subheading_by_text
-        pass
+    @pytest.mark.parametrize(
+        "subheading_text",
+        [
+            "Today's Progress",
+            "Thoughts",
+            "Link(s) to work",
+        ],
+    )
+    def test_existing_subheaders(self, day_1_heading, subheading_text):
+        """Extract existing progress sub-header."""
+        from logtweet import get_day_subheading_by_text
+        progress_subheading = get_day_subheading_by_text(
+            day_1_heading,
+            subheading_text,
+        )
+
+        from bs4.element import Tag
+        assert isinstance(progress_subheading, Tag)
+        assert progress_subheading.name == "h3"
+        assert progress_subheading.text == subheading_text
+
+    @pytest.mark.parametrize(
+        "subheading_text",
+        [
+            "Todays Progress",  # Missing apostrophe.
+            "thoughts",  # Not capitalized.
+            "Links to work",  # Missing parenthesis.
+        ],
+    )
+    def test_not_existing_subheaders(self, day_1_heading, subheading_text):
+        """Extract existing progress sub-header."""
+        from logtweet import get_day_subheading_by_text
+        progress_subheading = get_day_subheading_by_text(
+            day_1_heading,
+            subheading_text,
+        )
+
+        assert progress_subheading is None
