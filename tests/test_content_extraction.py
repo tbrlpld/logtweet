@@ -68,46 +68,44 @@ class TestHeadingMatchesDate(object):
         assert actual_return == expected_return
 
 
-class TestGetTodayHeading(object):
-    """Tests for get_today_heding function."""
+class TestGetDayHeading(object):
+    """Tests for `get_day_heading`` function."""
 
     def test_extraction_of_first_heading(self, example_soup):
         """Return Tag object with the expected string content."""
-        with patch("logtweet.date") as mock_date:
-            mock_date.today.return_value = date(2019, 10, 16)
-            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
+        from logtweet import get_day_heading
+        heading = get_day_heading(
+            example_soup,
+            heading_date=date(2019, 10, 16),
+        )
 
-            from logtweet import get_today_heading
-            heading = get_today_heading(example_soup)
-
-            from bs4.element import Tag
-            assert isinstance(heading, Tag)
-            assert heading.name == "h2"
-            assert heading.string == "Day 1: October 16, 2019, Wednesday"
+        from bs4.element import Tag
+        assert isinstance(heading, Tag)
+        assert heading.name == "h2"
+        assert heading.string == "Day 1: October 16, 2019, Wednesday"
 
     def test_extraction_of_second_heading(self, example_soup):
         """Return Tag object with the expected string content."""
-        with patch("logtweet.date") as mock_date:
-            mock_date.today.return_value = date(2019, 10, 17)
-            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
+        from logtweet import get_day_heading
+        heading = get_day_heading(
+            example_soup,
+            heading_date=date(2019, 10, 17),
+        )
 
-            from logtweet import get_today_heading
-            heading = get_today_heading(example_soup)
-
-            from bs4.element import Tag
-            assert isinstance(heading, Tag)
-            assert heading.name == "h2"
-            assert heading.string == "Day 2: October 17, 2019, Thursday"
+        from bs4.element import Tag
+        assert isinstance(heading, Tag)
+        assert heading.name == "h2"
+        assert heading.string == "Day 2: October 17, 2019, Thursday"
 
     def test_exception_if_no_heading_for_today(self, example_soup):
         """Raises exception if heading for today not in soup."""
-        with patch("logtweet.date") as mock_date:
-            mock_date.today.return_value = date(2019, 10, 18)
-            mock_date.side_effect = lambda *args, **kwargs: date(*args, **kwargs)
 
-            with pytest.raises(LookupError, match=r"^No heading found.*$"):
-                from logtweet import get_today_heading
-                get_today_heading(example_soup)
+        with pytest.raises(LookupError, match=r"^No heading found.*$"):
+            from logtweet import get_day_heading
+            get_day_heading(
+                example_soup,
+                heading_date=date(2019, 10, 18),
+            )
 
 
 class TestExtractDayNumberFromHeadingString(object):
@@ -151,3 +149,14 @@ class TestExtractDayNumberFromHeadingString(object):
             match=r"^Could not extract day number.*$",
         ):
             extract_day_number_from_heading_string(heading_string)
+
+
+class TestGetDaysSubheadingByText(object):
+    """Test `get_days_subheading_by_text` function."""
+
+    def test_existing_subheader(example_soup):
+        # TODO: Refactor the function to retrieve a todays header so that it
+        #       can be reused here.
+
+        from logtweet import get_days_subheading_by_text
+        pass

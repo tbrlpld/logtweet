@@ -46,7 +46,8 @@ def main():
     soup = BeautifulSoup(response.text, "html.parser")
 
     # Get today's heading
-    today_heading = get_today_heading(soup, offset)
+    today_date = date.today() + timedelta(days=offset)
+    today_heading = get_day_heading(soup, heading_date=today_date)
 
     # Generate tweet preamble (E.g. 77/#100DaysOfCode)
     preamble = build_preamble(today_heading.text)
@@ -144,15 +145,15 @@ def heading_matches_date(day_heading_text: str, given_date: date) -> bool:
     return date_obj == given_date
 
 
-def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
+def get_day_heading(soup: BeautifulSoup, heading_date: date) -> Tag:
     """
     Return today's heading element or None.
 
     Arguments:
         soup (BeautifulSoup): Soup object of log page parsed with
             BeautifulSoup.
-        offset (int): *Optional* Number of days by which to offset the value of
-            today. E.g. yesterday is `offset = -1`. Default = 0.
+        heading_date (date): ``datetime.date`` object for which the heading
+            shall be extracted.
 
     Returns:
         Tag: Heading element representing today.
@@ -163,10 +164,8 @@ def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
 
     """
     day_headings = soup.find_all("h2")
-    today = date.today()
-    reference_date = today + timedelta(days=offset)
     for day in day_headings[::]:
-        if heading_matches_date(day.text, reference_date):
+        if heading_matches_date(day.text, heading_date):
             return day
     raise LookupError("No heading found for today!")
 
