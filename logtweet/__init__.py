@@ -2,6 +2,8 @@
 
 """Module to post tweet based on today's #100DaysOfCode log."""
 
+# TODO: Refactor this into multiple modules. This is way to long right now.
+
 import argparse
 from datetime import date, datetime, timedelta
 import logging
@@ -20,7 +22,7 @@ from logtweet.conf import get_config
 config = get_config()
 
 URL = config["LogTweet"]["url"]
-TODAY = date.today()
+# TODAY = date.today()
 DATE_FORMAT = "%B %d, %Y"
 MAX_TWEET_LEN = 240
 LOG_FORMAT = "%(asctime)s %(name)-10.10s %(levelname)-4.4s %(message)s"
@@ -113,19 +115,24 @@ def create_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def is_today(day_heading_text: str, offset: int = None) -> bool:
+def heading_matches_date(day_heading_text: str, given_date: date) -> bool:
     """
-    Check if given day heading represents today.
+    Check if given day heading represents the given date.
 
     Arguments:
-        day_heading_text (str): Text content of the day's heading.
-        offset (int): Number of days by which to offset the value of today.
+        day_heading_text (str): String to extract the date from. Expected
+            format like this: "Day 1: October 16, 2019, Wednesday"
+        given_date (datetime.date): datetime.date object to check the heading
+            text against.
 
     Returns:
-        bool: Expresses if the given day heading text represents today.
+        bool: Expresses if the given day heading text represents the given
+            date.
 
     """
     # Extract the date string
+    # TODO: Create separate function for the date_string extraction.
+    # A separate function makes this easier to test.
     date_string = re.sub(
         r"(.*: )(.*)(, .*day.*)",  # pattern to create groups
         r"\2",  # Return only second group
@@ -133,11 +140,8 @@ def is_today(day_heading_text: str, offset: int = None) -> bool:
     )
     # Convert to date object
     date_obj = datetime.strptime(date_string, DATE_FORMAT).date()
-    # Check if today
-    today = TODAY
-    if offset is not None:
-        today = TODAY + timedelta(days=offset)
-    return date_obj == today
+
+    return date_obj == given_date
 
 
 def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
@@ -159,8 +163,10 @@ def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
 
     """
     day_headings = soup.find_all("h2")
+    today = date.today()
+    reference_date = today + timedelta(days=offset)
     for day in day_headings[::]:
-        if is_today(day.text, offset):
+        if heading_matches_date(day.text, reference_date):
             return day
     raise LookupError("No heading found for today!")
 
