@@ -122,7 +122,7 @@ class TestGetTodayHeading(object):
     """Tests for get_today_heding function."""
 
     @pytest.fixture
-    def example_soup():
+    def example_soup(self):
         """Create soup object for example page."""
         page_content = """<html>
     <body>
@@ -144,24 +144,17 @@ class TestGetTodayHeading(object):
     </html>"""
         return BeautifulSoup(page_content, "html.parser")
 
-    def test_get_today_heading(monkeypatch, example_soup):
+    def test_get_today_heading(self, monkeypatch, example_soup):
+        """Returns Tag object with the expected string content."""
         import logtweet
         def mock_is_today(*args, **kwargs):
-            """
-            Return true.
-
-            Because the example soup only contains one day, this patch can be used
-            to override the usually used test to see if the date matches today.
-
-            Returns:
-                bool: Always True.
-
-            """
             return True
         monkeypatch.setattr(logtweet, "is_today", mock_is_today)
 
         from logtweet import get_today_heading
         heading = get_today_heading(example_soup)
 
+        from bs4.element import Tag
+        assert isinstance(heading, Tag)
         assert heading.name == "h2"
         assert heading.string == "Day 1: October 16, 2019, Wednesday"
