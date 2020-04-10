@@ -234,18 +234,18 @@ def build_preamble(heading_string: str) -> str:
     return f"{day}/#100DaysOfCode"
 
 
-def get_todays_subheading(
-    today_heading: Tag,
+def get_days_subheading_by_text(
+    day_heading: Tag,
     subheading_text: str,
 ) -> Optional[Tag]:
     """
     Retrieve the next subheader (h3) element with the given text.
 
-    This function only iterates over the following sibling's of the
-    ``today_heading`` until the next day heading level (h2) is found.
+    This function only iterates over the following sibling's of the given
+    ``day_heading`` until the next day heading (h2) is found.
 
     Arguments:
-        today_heading (Tag): Tag element of today's header. This is the
+        day_heading (Tag): Tag element of a day's header. This is the
             starting point to look for following sibling subheaders.
         subheading_text (str): Content string for the searched subheader, which
             can be retrieved from the subheader element with
@@ -257,7 +257,7 @@ def get_todays_subheading(
 
     """
     # Go over the next siblings until the next day heading is found
-    current_element = today_heading
+    current_element = day_heading
     while True:
         next_sibling = current_element.next_sibling
         if not next_sibling or next_sibling.name == "h2":
@@ -280,7 +280,7 @@ def get_first_link(today_heading: Tag) -> str:
         str: First link found in the list of links or empty if no links found.
 
     """
-    link_heading = get_todays_subheading(today_heading, "Link(s)")
+    link_heading = get_days_subheading_by_text(today_heading, "Link(s)")
     if not link_heading:
         return ""
     return link_heading.find_next_sibling("ol").li.a["href"]
@@ -337,7 +337,10 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
 
     """
     # Grab today's content heading
-    content_heading = get_todays_subheading(today_heading, "Today's Progress")
+    content_heading = get_days_subheading_by_text(
+        today_heading,
+        "Today's Progress",
+    )
     if content_heading is None:
         raise LookupError("No content heading found for today!")
     # Loop over the next siblings until you find something
