@@ -223,7 +223,14 @@ def build_preamble(heading_string: str) -> str:
         str: Preamble for the tweet message.
 
     """
-    day = extract_day_number_from_heading_string(heading_string)
+    # TODO: Allow days being marked as `Off-Day` in the heading.
+    try:
+        day = extract_day_number_from_heading_string(heading_string)
+    except ValueError:
+        raise ValueError(
+            "Could not build preamble."
+            + " Check the formatting of the given heading_string.",
+        )
     return f"{day}/#100DaysOfCode"
 
 

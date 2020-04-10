@@ -37,9 +37,6 @@ class TestBuildPreamble(object):
     )
     def test_exception_invalid_heading_string_format(self, heading_string):
         """Raise exception for invalid formatted heading strings."""
-        # heading_string = "Off-Day: November 2, 2019, Saturday"  # No day number
-        # heading_string = "Day 1, October 16, 2019, Wednesday"  # Comma instead of colon.
-
         from logtweet import build_preamble
-        with pytest.raises(ValueError, match=r"^Could not build preamble .*$"):
+        with pytest.raises(ValueError, match=r"^Could not build preamble.*$"):
             build_preamble(heading_string)
