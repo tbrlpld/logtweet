@@ -110,3 +110,44 @@ class TestGetTodayHeading(object):
                 get_today_heading(example_soup)
 
 
+class TestExtractDayNumberFromHeadingString(object):
+    """Tests for `extract_day_number_from_heading_string` function."""
+
+    @pytest.mark.parametrize(
+        "heading_string, expected_return",
+        [
+            ("Day 1: October 16, 2019, Wednesday", 1),
+            ("Day 2: October 16, 2019, Wednesday", 2),
+            ("Day 10: October 16, 2019, Wednesday", 10),
+            ("Day 99: October 16, 2019, Wednesday", 99),
+            ("Day 100: October 16, 2019, Wednesday", 100),
+            ("Day 999: October 16, 2019, Wednesday", 999),
+        ],
+    )
+    def test_valid_heading(self, heading_string, expected_return):
+        """Return the correct preamble for a given heading string."""
+        from logtweet import extract_day_number_from_heading_string
+        actual_return = extract_day_number_from_heading_string(heading_string)
+
+        assert actual_return == expected_return
+
+    @pytest.mark.parametrize(
+        "heading_string",
+        [
+            "Off-Day: November 2, 2019, Saturday",  # No day number.
+            "Day 1, October 16, 2019, Wednesday",  # Comma instead of colon.
+            "Day 1, October 16: 2019, Wednesday",  # Colon in wrong place.
+            "Day 1, October 16, 2019: Wednesday",  # Colon in wrong place.
+        ],
+    )
+    def test_exception_invalid_heading_string_format(self, heading_string):
+        """Raise exception for invalid formatted heading strings."""
+        # heading_string = "Off-Day: November 2, 2019, Saturday"  # No day number
+        # heading_string = "Day 1, October 16, 2019, Wednesday"  # Comma instead of colon.
+
+        from logtweet import extract_day_number_from_heading_string
+        with pytest.raises(
+            ValueError,
+            match=r"^Could not extract day number.*$",
+        ):
+            extract_day_number_from_heading_string(heading_string)
