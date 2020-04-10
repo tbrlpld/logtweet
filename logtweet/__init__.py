@@ -162,7 +162,7 @@ def get_today_heading(soup: BeautifulSoup, offset: int = 0) -> Tag:
     for day in day_headings[::]:
         if is_today(day.text, offset):
             return day
-    raise LookupError("No heading for found for today!")
+    raise LookupError("No heading found for today!")
 
 
 def build_preamble(today_heading: Tag) -> str:

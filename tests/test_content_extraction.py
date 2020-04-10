@@ -164,12 +164,15 @@ class TestGetTodayHeading(object):
         monkeypatch,
         example_soup,
     ):
+        """
+        In case that `is_today` returns false on every heading (this is mocked
+        here) the function should raise an exception that no heading was found.
+        """
         import logtweet
         def mock_is_today(*args, **kwargs):
             return False
         monkeypatch.setattr(logtweet, "is_today", mock_is_today)
 
-        with pytest.raises(LookupError, match="No heading found"):
+        with pytest.raises(LookupError, match=r"^No heading found.*$"):
             from logtweet import get_today_heading
             get_today_heading(example_soup)
-
