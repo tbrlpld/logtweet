@@ -69,6 +69,13 @@ python -m pip install -e ".[develop]"
 
 This installs the app dependencies as well as tools to develop and distribute the package.
 
+## Testing
+
+Run tests with
+```sh
+$ pytest
+```
+
 ## Distribution
 
 To distribute the package on PyPi, first create the latest build with:
