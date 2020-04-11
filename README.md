@@ -76,6 +76,15 @@ Run tests with
 $ pytest
 ```
 
+## Linting
+
+This project makes use of code linters to keep the code quality consistent.
+
+Run `flake8` for general code quality check.
+Run `mypy .` to check type hints in the code.
+
+To keep an eye on the current code quality, I would suggest installing the appropriate plugin for you editor/IDE to show the lints while working on it.
+
 ## Distribution
 
 To distribute the package on PyPi, first create the latest build with:
