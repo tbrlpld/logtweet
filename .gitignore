@@ -1,6 +1,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.mypy_cache
 
 # C extensions
 *.so
@@ -26,6 +27,7 @@ MANIFEST
 config.py
 config/
 config.ini
+
 
 # Virtual Environments
 venv/
