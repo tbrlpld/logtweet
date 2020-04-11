@@ -2,6 +2,8 @@
 
 """Fixtures shared among the tests."""
 
+from datetime import date
+
 from bs4 import BeautifulSoup
 import pytest
 
@@ -9,6 +11,16 @@ import pytest
 @pytest.fixture
 def example_soup():
     """Create soup object for example page."""
+
+    # Does it make sense to pull the actual formatting from a template?
+    # I keep referencing my own log. It would be good to create an actual
+    # template that can easily be reused.
+    # This makes more sense once I base the input on markdown and not on html.
+    # The problem would be that the tests have an outside dependency, that
+    # could fail for any reason (network, URL change, etc. )
+    # I could try this with a git submodule. Including the template repo as a
+    # submodule would make it available locally. They would still be connected.
+
     page_content = """<html>
 <body>
 <h1>100 Days Of Code - Log</h1>
@@ -19,7 +31,7 @@ Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested
 <h3>Thoughts</h3>
 <p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
 <p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>
-<h3>Link(s) to work</h3>
+<h3>Link(s)</h3>
 <ol>
 <li><a href="http://example.com/1">Example Link 1</a></li>
 <li><a href="http://example.com/2">Example Link 2</a></li>
@@ -32,7 +44,7 @@ Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested
 <h3>Thoughts</h3>
 <p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
 <p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>
-<h3>Link(s) to work</h3>
+<h3>Link(s)</h3>
 <ol>
 <li><a href="http://example.com/4">Example Link 4</a></li>
 <li><a href="http://example.com/5">Example Link 5</a></li>
@@ -42,6 +54,13 @@ Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested
 </body>
 </html>"""
     return BeautifulSoup(page_content, "html.parser")
+
+
+@pytest.fixture
+def day_1_heading(example_soup):
+    from logtweet import get_day_heading
+    return get_day_heading(example_soup, date(2019, 10, 16))
+
 
 # Page content for reference
 # <html>

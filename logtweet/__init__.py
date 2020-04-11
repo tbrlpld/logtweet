@@ -267,7 +267,7 @@ def get_day_subheading_by_text(
     return None
 
 
-def get_first_link(today_heading: Tag) -> str:
+def get_first_link(today_heading: Tag) -> Optional[str]:
     """
     Extract the first link  URL from the list of the day's links.
 
@@ -281,7 +281,7 @@ def get_first_link(today_heading: Tag) -> str:
     """
     link_heading = get_day_subheading_by_text(today_heading, "Link(s)")
     if not link_heading:
-        return ""
+        return None
     return link_heading.find_next_sibling("ol").li.a["href"]
 
 

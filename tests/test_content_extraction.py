@@ -153,17 +153,12 @@ class TestExtractDayNumberFromHeadingString(object):
 class TestGetDaySubheadingByText(object):
     """Test `get_day_subheading_by_text` function."""
 
-    @pytest.fixture
-    def day_1_heading(self, example_soup):
-        from logtweet import get_day_heading
-        return get_day_heading(example_soup, date(2019, 10, 16))
-
     @pytest.mark.parametrize(
         "subheading_text",
         [
             "Today's Progress",
             "Thoughts",
-            "Link(s) to work",
+            "Link(s)",
         ],
     )
     def test_existing_subheaders(self, day_1_heading, subheading_text):
@@ -184,7 +179,7 @@ class TestGetDaySubheadingByText(object):
         [
             "Todays Progress",  # Missing apostrophe.
             "thoughts",  # Not capitalized.
-            "Links to work",  # Missing parenthesis.
+            "Links",  # Missing parenthesis.
         ],
     )
     def test_not_existing_subheaders(self, day_1_heading, subheading_text):
@@ -196,3 +191,76 @@ class TestGetDaySubheadingByText(object):
         )
 
         assert progress_subheading is None
+
+
+class TestGetFirstLink(object):
+    """Tests for `get_first_link` function."""
+
+    @pytest.fixture
+    def link_variation_soup(self):
+        """Create soup object for example page."""
+        from bs4 import BeautifulSoup
+        page_content = """<html>
+<body>
+<h1>100 Days Of Code - Log</h1>
+<h2>Day 1: October 16, 2019, Wednesday</h2>
+<h3>Link(s)</h3>
+<ol>
+  <li><a href="http://example.com/1">Example Link 1</a></li>
+  <li><a href="http://example.com/2">Example Link 2</a></li>
+</ol>
+<h2>Day 2: October 17, 2019, Thursday</h2>
+<h3>Link(s)</h3>
+<ol>
+  <li><a href="">Example Link 3</a></li>
+</ol>
+<h2>Day 3: October 18, 2019, Friday</h2>
+<h3>Link(s)</h3>
+<ol>
+  <li>Example Link 4</li>
+</ol>
+<h2>Day 4: October 19, 2019, Sunday</h2>
+<h3>Link(s)</h3>
+<ol>
+</ol>
+<h2>Day 5: October 20, 2019, Monday</h2>
+<h3>Link(s)</h3>
+<h2>Day 6: October 21, 2019, Tuesday</h2>
+</body>
+</html>"""
+        return BeautifulSoup(page_content, "html.parser")
+
+    @pytest.mark.parametrize(
+        "heading_date, expected_link",
+        [
+            (date(2019, 10, 16), "http://example.com/1"),  # Valid link
+            (date(2019, 10, 17), None),  # Empty link address (href).
+            (date(2019, 10, 18), None),  # List item but no actual link
+            (date(2019, 10, 19), None),  # Missing list items
+            (date(2019, 10, 20), None),  # Missing list element
+            (date(2019, 10, 21), None),  # Missing link subheader
+        ],
+    )
+    def test_link_variations(
+        self,
+        link_variation_soup,
+        heading_date,
+        expected_link,
+    ):
+        """
+        Test extraction of first link from the list of links.
+
+        Different cases are provided by parametrization.
+        """
+        from logtweet import get_day_heading
+        day_heading = get_day_heading(
+            link_variation_soup,
+            heading_date,
+        )
+
+        from logtweet import get_first_link
+        extracted_link = get_first_link(day_heading)
+
+        assert extracted_link == expected_link
+
+
