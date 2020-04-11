@@ -20,6 +20,7 @@ develop_requires = [
     "twine",
     "pytest",
     "wemake-python-styleguide",
+    "mypy",
 ]
 
 setup(
