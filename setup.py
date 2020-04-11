@@ -19,6 +19,7 @@ develop_requires = [
     # See: https://packaging.python.org/tutorials/packaging-projects/
     "twine",
     "pytest",
+    "wemake-python-styleguide",
 ]
 
 setup(
