@@ -267,22 +267,43 @@ def get_day_subheading_by_text(
     return None
 
 
-def get_first_link(today_heading: Tag) -> Optional[str]:
+def get_first_link(day_heading: Tag) -> Optional[str]:
     """
     Extract the first link  URL from the list of the day's links.
 
+    Expects the following structure after the day header:
+
+        <h2>Day 1: October 16, 2019, Wednesday</h2>
+        ...
+        <h3>Link(s)</h3>
+        <ol>
+          <li><a href="http://example.com/1">Example Link 1</a></li>
+          <li><a href="http://example.com/2">Example Link 2</a></li>
+        </ol>
+
+    For the given example, it would return "http://example.com/1"
+
     Arguments:
-        today_heading (Tag): Today's log header from which the day can be
-            extracted.
+        day_heading (Tag): Day's log header element which is followed by the
+            subheadings. The ``Link(s)`` subheading in turn needs to be
+            followed by an ordered list. The link address (``href``) found in
+            the anchor element of the first list item is returned.
 
     Returns:
-        str: First link found in the list of links or empty if no links found.
+        str: First link address found in the first list item.
+        None: is returned if no link address could be found in the first list
+            item.
 
     """
-    link_heading = get_day_subheading_by_text(today_heading, "Link(s)")
-    if not link_heading:
+    link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
+    link_address = None
+    try:
+        link_address = link_heading.find_next_sibling("ol").li.a.get("href")
+    except AttributeError:
+        pass
+    if not link_address:  # Catches empty link addresses and None
         return None
-    return link_heading.find_next_sibling("ol").li.a["href"]
+    return link_address
 
 
 def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
