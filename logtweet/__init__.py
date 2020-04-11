@@ -11,10 +11,10 @@ import os
 import re
 from typing import Optional
 
-from bs4 import BeautifulSoup
-from bs4.element import Tag
+from bs4 import BeautifulSoup  # type: ignore
+from bs4.element import Tag  # type: ignore
 import requests
-import tweepy
+import tweepy  # type: ignore
 
 from logtweet.conf import get_config
 
@@ -22,10 +22,9 @@ from logtweet.conf import get_config
 config = get_config()
 
 URL = config["LogTweet"]["url"]
-# TODAY = date.today()
-DATE_FORMAT = "%B %d, %Y"
+DATE_FORMAT = "%B %d, %Y"  # noqa: WPS323
 MAX_TWEET_LEN = 240
-LOG_FORMAT = "%(asctime)s %(name)-10.10s %(levelname)-4.4s %(message)s"
+LOG_FORMAT = "%(asctime)s %(name)-10.10s %(levelname)-4.4s %(message)s"  # noqa: WPS323, E501
 LOG_FILE = os.path.expanduser("~/.config/logtweet/tweet.log")
 
 logging.basicConfig(
@@ -59,7 +58,7 @@ def main():
         bitly_api_key = config.get(
             section="Bitly",
             option="api_key",
-            fallback=None
+            fallback=None,
         )
         link = get_short_link(link, bitly_api_key)
 
@@ -121,9 +120,9 @@ def heading_matches_date(day_heading_text: str, given_date: date) -> bool:
     Check if given day heading represents the given date.
 
     Arguments:
-        day_heading_text (str): String to extract the date from. Expected
-            format like this: "Day 1: October 16, 2019, Wednesday"
-        given_date (datetime.date): datetime.date object to check the heading
+        day_heading_text (str) : String to extract the date from. Expected
+            format like this: "Day 1: October 16, 2019, Wednesday".
+        given_date (date): datetime.date object to check the heading
             text against.
 
     Returns:
@@ -221,6 +220,9 @@ def build_preamble(heading_string: str) -> str:
     Returns:
         str: Preamble for the tweet message.
 
+    Raises:
+        ValueError: if the preamble could not be build.
+
     """
     # TODO: Allow days being marked as `Off-Day` in the heading.
     try:
@@ -273,6 +275,8 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
 
     Expects the following structure after the day header:
 
+    ::
+
         <h2>Day 1: October 16, 2019, Wednesday</h2>
         ...
         <h3>Link(s)</h3>
@@ -281,7 +285,7 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
           <li><a href="http://example.com/2">Example Link 2</a></li>
         </ol>
 
-    For the given example, it would return "http://example.com/1"
+    For the given example, it would return "http://example.com/1".
 
     Arguments:
         day_heading (Tag): Day's log header element which is followed by the
@@ -291,6 +295,7 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
 
     Returns:
         str: First link address found in the first list item.
+
         None: is returned if no link address could be found in the first list
             item.
 
@@ -298,7 +303,11 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
     link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
     link_address = None
     try:
-        link_address = link_heading.find_next_sibling("ol").li.a.get("href")
+        link_address = (
+            link_heading.find_next_sibling(  # type: ignore
+                "ol",
+            ).li.a.get("href")
+        )
     except AttributeError:
         pass
     if not link_address:  # Catches empty link addresses and None
@@ -316,9 +325,9 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
 
     Arguments:
         long_link (str): Long link to shorten.
-        bitly_api_key (Optional[str]): API key for the Bit.ly service. See the
-            `Bitly API documentation`_ on how to retrieve an API key. Default
-            is `None`.
+        bitly_api_key (Optional[str]): API key for the Bit.ly service.
+            See the `Bitly API documentation`_ on how to retrieve an API key.
+            Default is `None`.
 
     Returns:
         str: Shortened link pointing to the same resource as the long link.
@@ -416,7 +425,7 @@ def twitter_authenticate(
     return tweepy.API(auth)
 
 
-def send_tweet(tweet_content: str, test_mode=False) -> None:
+def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     """
     Send tweet with given content.
 
@@ -425,6 +434,8 @@ def send_tweet(tweet_content: str, test_mode=False) -> None:
 
     Arguments:
         tweet_content (str): Content of the tweet.
+        test_mode (bool): If ``True``, prints the tweet only to stdout but does
+            not really send it to the Twitter API. Default is ``False``.
 
     Raises:
         RuntimeError: Raised if the defined tweet content was posted before.
@@ -432,8 +443,8 @@ def send_tweet(tweet_content: str, test_mode=False) -> None:
     """
     # Check log before sending tweet to prevent duplication.
     log_tweet = tweet_content.replace("\n", " ")
-    with open(LOG_FILE, "r") as f:
-        tweeted = any(log_tweet in line for line in f.readlines())
+    with open(LOG_FILE, "r") as log_file:
+        tweeted = any(log_tweet in line for line in log_file.readlines())
     if tweeted:
         warn_msg = "Tweet with this content already exists!"
         logging.warning(warn_msg)
@@ -450,4 +461,4 @@ def send_tweet(tweet_content: str, test_mode=False) -> None:
         # Log tweet
         logging.info(log_tweet)
     else:
-        print(tweet_content)
+        print(tweet_content)  # noqa: WPS421
