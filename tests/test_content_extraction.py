@@ -230,10 +230,24 @@ class TestGetFirstLink(object):
 </html>"""
         return BeautifulSoup(page_content, "html.parser")
 
+    def test_valid_link(self, link_variation_soup):
+        """Test extraction of a valid link."""
+        heading_date = date(2019, 10, 16)
+        expected_link = "http://example.com/1"  # Valid link
+        from logtweet import get_day_heading
+        day_heading = get_day_heading(
+            link_variation_soup,
+            heading_date,
+        )
+
+        from logtweet import get_first_link
+        extracted_link = get_first_link(day_heading)
+
+        assert extracted_link == expected_link
+
     @pytest.mark.parametrize(
         "heading_date, expected_link",
         [
-            (date(2019, 10, 16), "http://example.com/1"),  # Valid link
             (date(2019, 10, 17), None),  # Empty link address (href).
             (date(2019, 10, 18), None),  # List item but no actual link
             (date(2019, 10, 19), None),  # Missing list items
@@ -241,7 +255,7 @@ class TestGetFirstLink(object):
             (date(2019, 10, 21), None),  # Missing link subheader
         ],
     )
-    def test_link_variations(
+    def test_invalid_links(
         self,
         link_variation_soup,
         heading_date,
@@ -259,8 +273,5 @@ class TestGetFirstLink(object):
         )
 
         from logtweet import get_first_link
-        extracted_link = get_first_link(day_heading)
-
-        assert extracted_link == expected_link
-
-
+        with pytest.raises(LookupError):
+            get_first_link(day_heading)

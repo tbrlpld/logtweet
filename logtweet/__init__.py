@@ -52,9 +52,12 @@ def main():
     preamble = build_preamble(today_heading.text)
 
     # Extract first link from list of links for the day.
-    link = get_first_link(today_heading)
-    # Create shortened link to first link of the day.
-    if link:
+    try:
+        link = get_first_link(today_heading)
+    except LookupError:
+        pass
+    else:
+        # Create shortened link to first link of the day.
         bitly_api_key = config.get(
             section="Bitly",
             option="api_key",
@@ -296,8 +299,10 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
     Returns:
         str: First link address found in the first list item.
 
-        None: is returned if no link address could be found in the first list
-            item.
+    Raises:
+        LookupError: is raised if no link could be found under the day's
+            heading. This also includes anchor element for empty ``href``
+            attribute.
 
     """
     link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
@@ -311,7 +316,10 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
     except AttributeError:
         pass
     if not link_address:  # Catches empty link addresses and None
-        return None
+        raise LookupError(
+            "No link extracted."
+            + " Please check that a link list exists under the day's heading.",
+        )
     return link_address
 
 
@@ -358,10 +366,10 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
         max_len (int): Maximum length of tweet message.
 
     Returns:
-        str: Tweet message with a maximum length of MAX_TWEET_LEN
+        str: Tweet message with a maximum length of max_len
 
     Raises:
-        LookupError: This error is raised if no content heading is found or the
+        LookupError: is raised if no content heading is found or the extracted
             message is empty.
 
     """
