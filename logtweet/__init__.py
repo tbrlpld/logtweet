@@ -241,7 +241,7 @@ def build_preamble(heading_string: str) -> str:
 def get_day_subheading_by_text(
     day_heading: Tag,
     subheading_text: str,
-) -> Optional[Tag]:
+) -> Tag:
     """
     Retrieve the next subheader (h3) element with the given text.
 
@@ -257,7 +257,11 @@ def get_day_subheading_by_text(
 
     Returns:
         Tag: Found subheader element with given ``.text`` attribute.
-        None: If no subheader was found, None is returned.
+
+    Raises:
+        LookupError: if no subheader with the given ``.text`` attribute could
+            be found after the given ``day_heading`` element and before the
+            next.
 
     """
     # Go over the next siblings until the next day heading is found
@@ -269,7 +273,10 @@ def get_day_subheading_by_text(
         if next_sibling.name == "h3" and next_sibling.text == subheading_text:
             return next_sibling
         current_element = next_sibling
-    return None
+    raise LookupError(
+        "No subheading with text '{0}' could be found".format(subheading_text)
+        + " after the day heading '{0}'!".format(day_heading)
+    )
 
 
 def get_first_link(day_heading: Tag) -> Optional[str]:
@@ -305,8 +312,8 @@ def get_first_link(day_heading: Tag) -> Optional[str]:
             attribute.
 
     """
-    link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
     link_address = None
+    link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
     try:
         link_address = (
             link_heading.find_next_sibling(  # type: ignore
@@ -378,8 +385,6 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
         today_heading,
         "Today's Progress",
     )
-    if content_heading is None:
-        raise LookupError("No content heading found for today!")
     # Loop over the next siblings until you find something
     # that is not a paragraph. Extract content from the paragraphs until
     # maximum tweet length is reached.

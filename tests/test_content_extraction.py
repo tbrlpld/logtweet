@@ -162,7 +162,7 @@ class TestGetDaySubheadingByText(object):
         ],
     )
     def test_existing_subheaders(self, day_1_heading, subheading_text):
-        """Extract existing progress sub-header."""
+        """Extract existing sub-headers."""
         from logtweet import get_day_subheading_by_text
         progress_subheading = get_day_subheading_by_text(
             day_1_heading,
@@ -183,14 +183,14 @@ class TestGetDaySubheadingByText(object):
         ],
     )
     def test_not_existing_subheaders(self, day_1_heading, subheading_text):
-        """Extract existing progress sub-header."""
-        from logtweet import get_day_subheading_by_text
-        progress_subheading = get_day_subheading_by_text(
-            day_1_heading,
-            subheading_text,
-        )
+        """Extract not-existing sub-headers."""
 
-        assert progress_subheading is None
+        from logtweet import get_day_subheading_by_text
+        with pytest.raises(LookupError):
+            get_day_subheading_by_text(
+                day_1_heading,
+                subheading_text,
+            )
 
 
 class TestGetFirstLink(object):
