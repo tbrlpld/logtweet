@@ -39,8 +39,7 @@ def example_soup():
 </ol>
 <h2>Day 2: October 17, 2019, Thursday</h2>
 <h3>Today&#39;s Progress</h3>
-<p>Gone through first bit of Flask introduction and set up the basic project structure in #100DayOfWebInPython.
-Also, enabled Markdown formatting for posts in the Flaskr blog app (as suggested in the &#34;Keep Developing&#34; section of the Flask tutorial).</p>
+<p></p>
 <h3>Thoughts</h3>
 <p>I have used Flask before, but the <code>.flaskenv</code> file for the <code>python-dotenv</code> package to set the environment variable automatically is a nice addition to simplify the setup (and distribution I guess).</p>
 <p><code>markupsafe.escape()</code> can be used to sanitize user input on the sever side.</p>

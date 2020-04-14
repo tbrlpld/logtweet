@@ -364,13 +364,13 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
     return response.json()[shortlink_key]
 
 
-def get_tweet_message(today_heading: Tag, max_len: int) -> str:
+def get_tweet_message(day_heading: Tag, max_len: int) -> str:
     """
     Extract the tweet content from the paragraphs after content heading.
 
     Arguments:
         today_heading (Tag): Heading tag element for today.
-        max_len (int): Maximum length of tweet content.
+        max_len (int): Maximum length of tweet message.
 
     Returns:
         str: Tweet message with a maximum length of max_len
@@ -382,7 +382,7 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
     """
     # Grab today's content heading
     content_heading = get_day_subheading_by_text(
-        today_heading,
+        day_heading,
         "Today's Progress",
     )
     # Loop over the next siblings until you find something
@@ -404,6 +404,16 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
         ).strip()
 
         if len(possible_content) > max_len:
+            # When possible content is longer than maximum before any thing is
+            # extracted, a special error is raised to allow explicit handling
+            # of this issue. This can go unhandled so that the user becomes
+            # aware of this issue and can adjust the content in the log.
+            if not tweet_message:
+                raise ValueError(
+                    "The first paragraph is too long!"
+                    + " Maximum length: {}".format(max_len)
+                    + " Extracted content: '{}'".format(possible_content)
+                )
             break
         tweet_message = possible_content
 

@@ -313,3 +313,28 @@ class TestGetTweetMessage(object):
         actual_tweet_msg = get_tweet_message(day_1_heading, max_len=112)
 
         assert actual_tweet_msg == expected_tweet_msg
+
+    def test_exception_when_first_pargraph_too_long(self, day_1_heading):
+        """
+        Raise exception when first paragraph is too long to extract a message.
+        """
+        from logtweet import get_tweet_message
+
+        with pytest.raises(
+            ValueError,
+            match=r"^The first paragraph is too long.*",
+        ):
+            get_tweet_message(day_1_heading, max_len=40)
+
+    def test_exception_when_no_content(self, example_soup):
+        """Raise exception when no paragraph content found."""
+        from logtweet import get_day_heading
+        day_heading = get_day_heading(example_soup, date(2019, 10, 17))
+        from logtweet import get_tweet_message
+
+        with pytest.raises(
+            LookupError,
+            match=r"^No message found.*",
+        ):
+            get_tweet_message(day_heading, max_len=50)
+
