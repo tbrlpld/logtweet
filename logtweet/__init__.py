@@ -370,7 +370,7 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
 
     Arguments:
         today_heading (Tag): Heading tag element for today.
-        max_len (int): Maximum length of tweet message.
+        max_len (int): Maximum length of tweet content.
 
     Returns:
         str: Tweet message with a maximum length of max_len

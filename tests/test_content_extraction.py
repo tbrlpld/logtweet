@@ -278,3 +278,9 @@ class TestGetFirstLink(object):
         from logtweet import get_first_link
         with pytest.raises(LookupError):
             get_first_link(day_heading)
+
+
+class TestGetTweetMessage(object):
+    """Tests for the `get_tweet_message` function."""
+
+
