@@ -275,7 +275,7 @@ def get_day_subheading_by_text(
         current_element = next_sibling
     raise LookupError(
         "No subheading with text '{0}' could be found".format(subheading_text)
-        + " after the day heading '{0}'!".format(day_heading)
+        + " after the day heading '{0}'!".format(day_heading),
     )
 
 
@@ -455,6 +455,7 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
 
     """
     # Check log before sending tweet to prevent duplication.
+    # TODO: Move check for existing tweet to separate function.
     log_tweet = tweet_content.replace("\n", " ")
     with open(LOG_FILE, "r") as log_file:
         tweeted = any(log_tweet in line for line in log_file.readlines())
@@ -462,16 +463,19 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
         warn_msg = "Tweet with this content already exists!"
         logging.warning(warn_msg)
         raise RuntimeError(warn_msg)
+    # TODO: Move authentication. Authentication only needed when not test mode.
     tweepy_api = twitter_authenticate(
         config["Twitter"]["api_key"],
         config["Twitter"]["api_secret"],
         config["Twitter"]["access_token"],
         config["Twitter"]["access_secret"],
     )
+    # TODO: Flip this to handle the test case first.
     if test_mode is False:
         # Send tweet
         tweepy_api.update_status(tweet_content)
         # Log tweet
         logging.info(log_tweet)
+        # TODO: Add success message to user.
     else:
         print(tweet_content)  # noqa: WPS421
