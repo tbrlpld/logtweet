@@ -186,7 +186,10 @@ class TestGetDaySubheadingByText(object):
         """Extract not-existing sub-headers."""
 
         from logtweet import get_day_subheading_by_text
-        with pytest.raises(LookupError):
+        with pytest.raises(
+            LookupError,
+            match=r"^No subheading with text '{0}'.*".format(subheading_text),
+        ):
             get_day_subheading_by_text(
                 day_1_heading,
                 subheading_text,
