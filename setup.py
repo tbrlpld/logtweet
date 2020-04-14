@@ -25,7 +25,7 @@ develop_requires = [
 
 setup(
     name="logtweet",
-    version="0.1.4",
+    version="0.1.5dev",
     author="Tibor Leupold",
     author_email="tibor@lpld.io",
     description="Create a tweet based on a #100DaysOfCode log message",
