@@ -283,4 +283,33 @@ class TestGetFirstLink(object):
 class TestGetTweetMessage(object):
     """Tests for the `get_tweet_message` function."""
 
+    def test_extract_first_paragraph_only(self, day_1_heading):
+        """Extract only the first paragraph, due to max_len."""
+        expected_tweet_msg = (
+            "It's the first paragraph. It's 50 characters long."
+        )
+        from logtweet import get_tweet_message
 
+        actual_tweet_msg = get_tweet_message(day_1_heading, max_len=50)
+
+        assert actual_tweet_msg == expected_tweet_msg
+
+    def test_extract_both_paragraphs(self, day_1_heading):
+        """
+        Extract both paragraphs of the first day progress section.
+
+        ``max_len`` needs to be 2 characters longer than the paragraphs
+        together, to account for the two new line characters that are
+        added between the paragraphs.
+
+        """
+        expected_tweet_msg = (
+            "It's the first paragraph. It's 50 characters long."
+            + "\n\nThe second paragraph."
+            + " This is one that's 60 characters long."
+        )
+        from logtweet import get_tweet_message
+
+        actual_tweet_msg = get_tweet_message(day_1_heading, max_len=112)
+
+        assert actual_tweet_msg == expected_tweet_msg
