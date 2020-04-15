@@ -67,6 +67,8 @@ def main():
 
     # Calculate max message length. This needs to be the maximum tweet
     # length, reduced by the preamble and the link.
+    # TODO: Create separate function to build tweet. The tweet template only
+    #       needs to be available in that function.
     tweet_content_template = "{preamble} {tweet_message}\n\n{link}"
     tweet_length_wo_message = len(tweet_content_template.format(
         preamble=preamble,
@@ -351,6 +353,7 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
         https://dev.bitly.com/v4/#section/Application-using-a-single-account
 
     """
+    # TODO: Split into separate functions for default and Bit.ly shortener.
     shortener_url = "https://s.lpld.io/create"
     headers = {}
     shortlink_key = "short"
@@ -369,7 +372,7 @@ def get_tweet_message(day_heading: Tag, max_len: int) -> str:
     Extract the tweet content from the paragraphs after content heading.
 
     Arguments:
-        today_heading (Tag): Heading tag element for today.
+        day_heading (Tag): Heading tag element for today.
         max_len (int): Maximum length of tweet message.
 
     Returns:
@@ -398,6 +401,7 @@ def get_tweet_message(day_heading: Tag, max_len: int) -> str:
             break
         current_element = next_sibling
 
+        # TODO: Separate function to concatenate message content
         possible_content = "{existing_content}\n\n{new_content}".format(
             existing_content=possible_content,
             new_content=current_element.text,
