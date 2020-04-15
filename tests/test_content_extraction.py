@@ -3,7 +3,6 @@
 """Test functions regarding content extraction."""
 
 from datetime import date
-from unittest.mock import patch
 
 import pytest
 
@@ -59,7 +58,6 @@ class TestHeadingMatchesDate(object):
         heading_text,
         given_date,
         expected_return,
-        monkeypatch,
     ):
 
         from logtweet import heading_matches_date
