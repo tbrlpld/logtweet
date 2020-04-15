@@ -468,6 +468,27 @@ def create_tweet_logging_msg(tweet_content: str) -> str:
     return tweet_content.replace("\n", " ")
 
 
+def is_string_in_filelines(search_string: str, filepath: str) -> bool:
+    """
+    Check if string can be found in file.
+
+    File is checked line by line. Thus, strings spanning multiple lines are not
+    supported.
+
+    Arguments:
+        search_string (str): String to lookup in the lines of the file.
+        filepath (str): String path of the file to check.
+
+    Returns:
+        bool: Expresses if the ``search_string`` was found in the file.
+
+    """
+    with open(filepath, "r") as file_obj:
+        return any(
+            search_string in line for line in file_obj.readlines()
+        )
+
+
 def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     """
     Send tweet with given content.
@@ -487,10 +508,7 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     # Check log before sending tweet to prevent duplication.
     # TODO: Move check for existing tweet to separate function.
     tweet_logging_msg = create_tweet_logging_msg(tweet_content)
-    with open(LOG_FILE, "r") as log_file:
-        tweeted = any(
-            tweet_logging_msg in line for line in log_file.readlines()
-        )
+    tweeted = is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
     if tweeted:
         warn_msg = "Tweet with this content already exists!"
         logging.warning(warn_msg)

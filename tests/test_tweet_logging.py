@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import pytest
+
 
 class TestCreateTweetLoggingMsg(object):
     """Tests for ``create_tweet_logging_msg`` function."""
@@ -13,4 +15,56 @@ class TestCreateTweetLoggingMsg(object):
 
         assert actual_msg == expected_msg
 
+
+class TestIsStringInFile(object):
+    """Tests for ``is_string_in_filelines`` function."""
+
+    @pytest.fixture
+    def test_file(self, tmp_path):
+        return tmp_path / "test.txt"
+
+    def test_finds_string_alone_in_line(self, test_file):
+        search_string = "This is what I am looking for."
+        file_content = f"""This is some thing.
+{search_string}
+This is something else."""
+        test_file.write_text(file_content)
+        from logtweet import is_string_in_filelines
+
+        found = is_string_in_filelines(
+            search_string,
+            filepath=test_file.as_posix(),
+        )
+
+        assert found is True
+
+    def test_finds_string_with_prefix_in_line(self, test_file):
+        search_string = "This is what I am looking for."
+        file_content = f"""This is some thing.
+Here is something, but '{search_string}' is in this line too.
+This is something else."""
+        test_file.write_text(file_content)
+        from logtweet import is_string_in_filelines
+
+        found = is_string_in_filelines(
+            search_string,
+            filepath=test_file.as_posix(),
+        )
+
+        assert found is True
+
+    def test_false_for_string_not_in_file(self, test_file):
+        search_string = "This is what I am looking for."
+        file_content = f"""This is some thing.
+This is NOT what I am looking for.
+This is something else."""
+        test_file.write_text(file_content)
+        from logtweet import is_string_in_filelines
+
+        found = is_string_in_filelines(
+            search_string,
+            filepath=test_file.as_posix(),
+        )
+
+        assert found is False
 
