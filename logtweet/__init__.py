@@ -452,6 +452,22 @@ def twitter_authenticate(
     return tweepy.API(auth)
 
 
+def create_tweet_logging_msg(tweet_content: str) -> str:
+    """
+    Create logging message based on tweet content.
+
+    Arguments:
+        tweet_content (str): Content string of the tweet.
+
+    Returns:
+        str: Single line log message for the tweet. Log messages should be
+            single line for readability and extraction. Therefore, newline
+            characters are replaced with spaces.
+
+    """
+    return tweet_content.replace("\n", " ")
+
+
 def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     """
     Send tweet with given content.
@@ -470,9 +486,11 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     """
     # Check log before sending tweet to prevent duplication.
     # TODO: Move check for existing tweet to separate function.
-    log_tweet = tweet_content.replace("\n", " ")
+    tweet_logging_msg = create_tweet_logging_msg(tweet_content)
     with open(LOG_FILE, "r") as log_file:
-        tweeted = any(log_tweet in line for line in log_file.readlines())
+        tweeted = any(
+            tweet_logging_msg in line for line in log_file.readlines()
+        )
     if tweeted:
         warn_msg = "Tweet with this content already exists!"
         logging.warning(warn_msg)
@@ -489,7 +507,7 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
         # Send tweet
         tweepy_api.update_status(tweet_content)
         # Log tweet
-        logging.info(log_tweet)
+        logging.info(tweet_logging_msg)
         # TODO: Add success message to user.
     else:
         print(tweet_content)  # noqa: WPS421
