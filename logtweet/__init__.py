@@ -489,6 +489,22 @@ def is_string_in_filelines(search_string: str, filepath: str) -> bool:
         )
 
 
+def was_tweet_sent_before(tweet_content: str) -> bool:
+    """
+    Check if the history contains a message representing the tweet_content.
+
+    Arguments:
+        tweet_content (str): Tweet content string.
+
+    Returns:
+        bool: Expresses if the tweet was sent before (and therefore is in the
+            history).
+
+    """
+    tweet_logging_msg = create_tweet_logging_msg(tweet_content)
+    return is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
+
+
 def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
     """
     Send tweet with given content.
