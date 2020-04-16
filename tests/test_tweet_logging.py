@@ -69,6 +69,50 @@ This is something else."""
         assert found is False
 
 
+class TestAddTweetToHistory(object):
+    """Tests for ``add_tweet_to_history`` function."""
+
+    def test_adding_tweet_as_one_line_to_history_file(
+        self,
+        monkeypatch,
+        test_file,
+    ):
+        test_filepath = test_file.as_posix()
+        import logtweet
+        monkeypatch.setattr(logtweet, "LOG_FILE", test_filepath)
+        tweet_content = "This is a\n\nmultiline\n\ntweet."
+
+        from logtweet import add_tweet_to_history
+        add_tweet_to_history(tweet_content)
+
+        # Can be tested with ``create_tweet_logging_msg`` and ``is_string_in_filelines``
+        from logtweet import create_tweet_logging_msg, is_string_in_filelines
+        tweet_history_msg = create_tweet_logging_msg(tweet_content)
+        assert is_string_in_filelines(tweet_history_msg, filepath=test_filepath)
+
+    def test_after_multiple_execution_all_tweets_in_history(
+        self,
+        monkeypatch,
+        test_file,
+    ):
+        test_filepath = test_file.as_posix()
+        import logtweet
+        monkeypatch.setattr(logtweet, "LOG_FILE", test_filepath)
+        tweet_1_content = "This is a\n\nmultiline\n\ntweet."
+        tweet_2_content = "This is another tweet."
+
+        from logtweet import add_tweet_to_history
+        add_tweet_to_history(tweet_1_content)
+        add_tweet_to_history(tweet_2_content)
+
+        # Can be tested with ``create_tweet_logging_msg`` and ``is_string_in_filelines``
+        from logtweet import create_tweet_logging_msg, is_string_in_filelines
+        tweet_1_history_msg = create_tweet_logging_msg(tweet_1_content)
+        tweet_2_history_msg = create_tweet_logging_msg(tweet_2_content)
+        assert is_string_in_filelines(tweet_1_history_msg, filepath=test_filepath)
+        assert is_string_in_filelines(tweet_2_history_msg, filepath=test_filepath)
+
+
 class TestWasTweetSentBefore(object):
     """Test for ``was_tweet_sent_before`` function."""
 

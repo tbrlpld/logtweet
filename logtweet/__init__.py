@@ -58,6 +58,7 @@ def main():
         pass
     else:
         # Create shortened link to first link of the day.
+        # TODO: Move the link API handling into the link function/module.
         bitly_api_key = config.get(
             section="Bitly",
             option="api_key",
@@ -86,7 +87,10 @@ def main():
         link=link,
     )
 
-    send_tweet(tweet_content, test_mode=args.testmode)
+    if args.testmode:
+        print(tweet_content)
+    else:
+        send_tweet(tweet_content)
 
 
 def create_arg_parser() -> argparse.ArgumentParser:
@@ -505,7 +509,24 @@ def was_tweet_sent_before(tweet_content: str) -> bool:
     return is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
 
 
-def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
+def add_tweet_to_history(tweet_content: str) -> None:
+    """
+    Add tweet to history file.
+
+    The history file can be checked for previously sent tweets.
+
+    Arguments:
+        tweet_content (str): Tweet content string for which an entry shall be
+            created in the history file.
+
+    """
+    tweet_history_msg = create_tweet_logging_msg(tweet_content)
+    full_line = "{0} - Sent : {1}".format(datetime.now(), tweet_history_msg)
+    with open(LOG_FILE, "a") as history_file:
+        history_file.writelines(full_line)
+
+
+def send_tweet(tweet_content: str) -> None:
     """
     Send tweet with given content.
 
@@ -514,34 +535,24 @@ def send_tweet(tweet_content: str, test_mode: bool = False) -> None:
 
     Arguments:
         tweet_content (str): Content of the tweet.
-        test_mode (bool): If ``True``, prints the tweet only to stdout but does
-            not really send it to the Twitter API. Default is ``False``.
 
     Raises:
         RuntimeError: Raised if the defined tweet content was posted before.
 
     """
     # Check log before sending tweet to prevent duplication.
-    # TODO: Move check for existing tweet to separate function.
-    tweet_logging_msg = create_tweet_logging_msg(tweet_content)
-    tweeted = is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
-    if tweeted:
-        warn_msg = "Tweet with this content already exists!"
-        logging.warning(warn_msg)
-        raise RuntimeError(warn_msg)
-    # TODO: Move authentication. Authentication only needed when not test mode.
+    tweeted_before = was_tweet_sent_before(tweet_content)
+    if tweeted_before:
+        err_msg = "Tweet with this content already exists!"
+        raise RuntimeError(err_msg)
+    # Get tweepy API for
     tweepy_api = twitter_authenticate(
         config["Twitter"]["api_key"],
         config["Twitter"]["api_secret"],
         config["Twitter"]["access_token"],
         config["Twitter"]["access_secret"],
     )
-    # TODO: Flip this to handle the test case first.
-    if test_mode is False:
-        # Send tweet
-        tweepy_api.update_status(tweet_content)
-        # Log tweet
-        logging.info(tweet_logging_msg)
-        # TODO: Add success message to user.
-    else:
-        print(tweet_content)  # noqa: WPS421
+    # Send tweet
+    tweepy_api.update_status(tweet_content)
+    add_tweet_to_history(tweet_content)
+    # TODO: Add success message to user.

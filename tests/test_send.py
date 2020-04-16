@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
+# The number of test cases if doubled, because the test mode is handled in the
+# send function. This is a bit odd. The function should really only be for
+# sending. Not sending should be handled on the caller level.
+
 # TODO: Test sending in test mode does not create a history entry.
 # TODO: Test sending in test mode shows a console message.
 # TODO: Test sending in test mode shows the console message even if tweet already in history.
