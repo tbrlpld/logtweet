@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+# TODO: Rename this and the actual module from "tweet_logging" to "history".
+#       The fact that I am using the logging module is an implementation
+#       detail. This should be hidden. Also "tweet_logging" is a little
+#       confusing because the tweet is generated from a "log".
 
-import pytest
+import pytest  # type: ignore
 
 
 class TestCreateTweetLoggingMsg(object):
@@ -18,10 +22,6 @@ class TestCreateTweetLoggingMsg(object):
 
 class TestIsStringInFile(object):
     """Tests for ``is_string_in_filelines`` function."""
-
-    @pytest.fixture
-    def test_file(self, tmp_path):
-        return tmp_path / "test.txt"
 
     def test_finds_string_alone_in_line(self, test_file):
         search_string = "This is what I am looking for."
@@ -67,4 +67,5 @@ This is something else."""
         )
 
         assert found is False
+
 
