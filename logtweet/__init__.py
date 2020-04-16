@@ -6,7 +6,6 @@
 
 import argparse
 from datetime import date, datetime, timedelta
-import logging
 import os
 import re
 from typing import Optional
@@ -24,15 +23,8 @@ config = get_config()
 URL = config["LogTweet"]["url"]
 DATE_FORMAT = "%B %d, %Y"  # noqa: WPS323
 MAX_TWEET_LEN = 240
-LOG_FORMAT = "%(asctime)s %(name)-10.10s %(levelname)-4.4s %(message)s"  # noqa: WPS323, E501
 LOG_FILE = os.path.expanduser("~/.config/logtweet/tweet.log")
 
-logging.basicConfig(
-    level=logging.INFO,
-    format=LOG_FORMAT,
-    filename=LOG_FILE,
-    filemode="a",  # append
-)
 
 
 def main():
@@ -509,20 +501,24 @@ def was_tweet_sent_before(tweet_content: str) -> bool:
     return is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
 
 
-def add_tweet_to_history(tweet_content: str) -> None:
+def add_tweet_to_history(
+    tweet_content: str,
+    history_filepath: str = LOG_FILE,
+) -> None:
     """
     Add tweet to history file.
 
-    The history file can be checked for previously sent tweets.
-
     Arguments:
         tweet_content (str): Tweet content string for which an entry shall be
-            created in the history file.
+            created in the history file. The tweet is converted into a single
+            line by calling the ``create_tweet_logging_msg()`` on it.
+        history_filepath (str): Optional path string to the history file to
+            append the tweet to. Default is ``logtweet.LOG_FILE``.
 
     """
     tweet_history_msg = create_tweet_logging_msg(tweet_content)
-    full_line = "{0} - Sent : {1}".format(datetime.now(), tweet_history_msg)
-    with open(LOG_FILE, "a") as history_file:
+    full_line = "{0} - Sent : {1}\n".format(datetime.now(), tweet_history_msg)
+    with open(history_filepath, "a") as history_file:
         history_file.writelines(full_line)
 
 
