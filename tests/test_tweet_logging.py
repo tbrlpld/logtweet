@@ -130,8 +130,8 @@ class TestAddTweetToHistory(object):
         assert len(lines) == 2
 
 
-class TestWasTweetSentBefore(object):
-    """Test for ``was_tweet_sent_before`` function."""
+class TestIsTweetInHistory(object):
+    """Test for ``is_tweet_in_history`` function."""
 
     def test_finds_multiline_tweet_if_in_history_as_one_line(
         self,
@@ -148,9 +148,9 @@ This is some more."""
         # mock log file
         import logtweet
         monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
-        from logtweet import was_tweet_sent_before
+        from logtweet import is_tweet_in_history
 
-        found = was_tweet_sent_before(tweet_content)
+        found = is_tweet_in_history(tweet_content)
 
         assert found == True
 
@@ -170,9 +170,9 @@ This is some more."""
         # mock log file
         import logtweet
         monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
-        from logtweet import was_tweet_sent_before
+        from logtweet import is_tweet_in_history
 
-        found = was_tweet_sent_before(tweet_content)
+        found = is_tweet_in_history(tweet_content)
 
         assert found == True
 
@@ -191,8 +191,8 @@ This is some more."""
         # mock log file
         import logtweet
         monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
-        from logtweet import was_tweet_sent_before
+        from logtweet import is_tweet_in_history
 
-        found = was_tweet_sent_before(tweet_content)
+        found = is_tweet_in_history(tweet_content)
 
         assert found == False

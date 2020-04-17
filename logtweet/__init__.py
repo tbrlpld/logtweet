@@ -485,7 +485,7 @@ def is_string_in_filelines(search_string: str, filepath: str) -> bool:
         )
 
 
-def was_tweet_sent_before(tweet_content: str) -> bool:
+def is_tweet_in_history(tweet_content: str) -> bool:
     """
     Check if the history contains a message representing the tweet_content.
 
@@ -537,7 +537,7 @@ def send_tweet(tweet_content: str) -> None:
 
     """
     # Check log before sending tweet to prevent duplication.
-    tweeted_before = was_tweet_sent_before(tweet_content)
+    tweeted_before = is_tweet_in_history(tweet_content)
     if tweeted_before:
         err_msg = "Tweet with this content already exists!"
         raise RuntimeError(err_msg)
