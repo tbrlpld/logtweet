@@ -485,12 +485,17 @@ def is_string_in_filelines(search_string: str, filepath: str) -> bool:
         )
 
 
-def is_tweet_in_history(tweet_content: str) -> bool:
+def is_tweet_in_history(
+    tweet_content: str,
+    history_filepath: str = LOG_FILE,
+) -> bool:
     """
     Check if the history contains a message representing the tweet_content.
 
     Arguments:
         tweet_content (str): Tweet content string.
+        history_filepath (str): Path string to the history file that is to be
+            checked for the tweet content representation.
 
     Returns:
         bool: Expresses if the tweet was sent before (and therefore is in the
@@ -498,7 +503,7 @@ def is_tweet_in_history(tweet_content: str) -> bool:
 
     """
     tweet_logging_msg = create_tweet_logging_msg(tweet_content)
-    return is_string_in_filelines(tweet_logging_msg, filepath=LOG_FILE)
+    return is_string_in_filelines(tweet_logging_msg, filepath=history_filepath)
 
 
 def add_tweet_to_history(

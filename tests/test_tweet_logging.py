@@ -136,7 +136,6 @@ class TestIsTweetInHistory(object):
     def test_finds_multiline_tweet_if_in_history_as_one_line(
         self,
         test_file,
-        monkeypatch,
     ):
         tweet_content = "This is a\n\nmultiline\n\ntweet."
         from logtweet import create_tweet_logging_msg
@@ -145,19 +144,18 @@ class TestIsTweetInHistory(object):
 {tweet_logging_msg}
 This is some more."""
         test_file.write_text(test_file_content)
-        # mock log file
-        import logtweet
-        monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
         from logtweet import is_tweet_in_history
 
-        found = is_tweet_in_history(tweet_content)
+        found = is_tweet_in_history(
+            tweet_content,
+            history_filepath=test_file.as_posix(),
+        )
 
         assert found == True
 
     def test_finds_tweet_if_in_history_with_prefix(
         self,
         test_file,
-        monkeypatch,
     ):
         """Test history message with prefix in file."""
         tweet_content = "This is a\n\nmultiline\n\ntweet."
@@ -167,12 +165,12 @@ This is some more."""
 Here is something. But '{tweet_logging_msg}' is here too.
 This is some more."""
         test_file.write_text(test_file_content)
-        # mock log file
-        import logtweet
-        monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
         from logtweet import is_tweet_in_history
 
-        found = is_tweet_in_history(tweet_content)
+        found = is_tweet_in_history(
+            tweet_content,
+            history_filepath=test_file.as_posix(),
+        )
 
         assert found == True
 
@@ -188,11 +186,11 @@ This is some more."""
         test_file_content = f"""This is something.
 This is some more."""
         test_file.write_text(test_file_content)
-        # mock log file
-        import logtweet
-        monkeypatch.setattr(logtweet, "LOG_FILE", test_file.as_posix())
         from logtweet import is_tweet_in_history
 
-        found = is_tweet_in_history(tweet_content)
+        found = is_tweet_in_history(
+            tweet_content,
+            history_filepath=test_file.as_posix(),
+        )
 
         assert found == False
