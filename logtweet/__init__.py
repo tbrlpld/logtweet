@@ -89,7 +89,16 @@ def main():
     if args.testmode:
         print(tweet_content)
     else:
-        send_tweet(tweet_content)
+        # Check log before sending tweet to prevent duplication.
+        tweeted_before = is_tweet_in_history(tweet_content)
+        if tweeted_before:
+            err_msg = "Tweet with this content already exists!"
+            raise RuntimeError(err_msg)
+        # Send the tweet
+        send_tweet(tweet_content, config["Twitter"])
+        # Create history record of sent tweet for future lookup.
+        add_tweet_to_history(tweet_content)
+        # TODO: Add success message to user.
 
 
 def create_arg_parser() -> argparse.ArgumentParser:
@@ -429,7 +438,7 @@ def get_tweet_message(day_heading: Tag, max_len: int) -> str:
     return tweet_message
 
 
-def twitter_authenticate(
+def get_tweepy_api(
     api_key: str,
     api_secret: str,
     access_token: str,
@@ -452,7 +461,9 @@ def twitter_authenticate(
     """
     auth = tweepy.OAuthHandler(api_key, api_secret)
     auth.set_access_token(access_token, access_secret)
-    return tweepy.API(auth)
+    api = tweepy.API(auth)
+    api.verify_credentials()  # Raises exception if not valid
+    return api
 
 
 def create_tweet_logging_msg(tweet_content: str) -> str:
@@ -534,33 +545,28 @@ def add_tweet_to_history(
         history_file.writelines(full_line)
 
 
-def send_tweet(tweet_content: str) -> None:
+def send_tweet(tweet_content: str, twitter_config: dict) -> None:
     """
     Send tweet with given content.
 
-    For this to work, the config needs to contain valid Twitter API key and
-    access token.
+    The sending requires valid Twitter access. Pass the twitter config as a
+    dict-like object with the following keys:
+
+    * "api_key",
+    * "api_secret",
+    * "access_token",
+    * "access_secret".
 
     Arguments:
         tweet_content (str): Content of the tweet.
-
-    Raises:
-        RuntimeError: Raised if the defined tweet content was posted before.
+        twitter_config (dict): Dict-like object with above keys.
 
     """
-    # Check log before sending tweet to prevent duplication.
-    tweeted_before = is_tweet_in_history(tweet_content)
-    if tweeted_before:
-        err_msg = "Tweet with this content already exists!"
-        raise RuntimeError(err_msg)
-    # Get tweepy API for
-    tweepy_api = twitter_authenticate(
-        config["Twitter"]["api_key"],
-        config["Twitter"]["api_secret"],
-        config["Twitter"]["access_token"],
-        config["Twitter"]["access_secret"],
+    tweepy_api = get_tweepy_api(
+        twitter_config["api_key"],
+        twitter_config["api_secret"],
+        twitter_config["access_token"],
+        twitter_config["access_secret"],
     )
     # Send tweet
     tweepy_api.update_status(tweet_content)
-    add_tweet_to_history(tweet_content)
-    # TODO: Add success message to user.

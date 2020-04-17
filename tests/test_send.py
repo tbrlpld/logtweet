@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# The send function is reduced to two lines. How can I test this.
+# It only requests a validated API and then calls a certain function of that
+# API object. Does this make sense to test?
 
-# The number of test cases if doubled, because the test mode is handled in the
-# send function. This is a bit odd. The function should really only be for
-# sending. Not sending should be handled on the caller level.
-
-
-
-
-# TODO: Test sending in normal mode triggers the tweepy API to send.
-# TODO: Test issue to send shows error to user.
-# TODO: Test sending in normal mode creates an tweepy API instance.
-# TODO: Test issue to create a tweepy API instance shows error to user.
+# How can I test the successful case? I do not want to store my actual
+# twitter credentials in the repo. Do I need a testing account? Even for that
+# I would not want it's credentials to be public.
