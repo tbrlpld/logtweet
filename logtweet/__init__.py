@@ -26,13 +26,20 @@ MAX_TWEET_LEN = 240
 LOG_FILE = os.path.expanduser("~/.config/logtweet/tweet.log")
 
 
-
 def main():
     """Create a tweet based on today's log message."""
+    # TODO: Create tests for main function.
     parser = create_arg_parser()
     args = parser.parse_args()
     offset = args.offset
 
+    # TODO: Move every thing that is related to generating the tweet content to
+    #       a separate function. All that the app is doing on the highest
+    #       level, which is what the main is concerned with, is generating a
+    #       tweet message from some source for a given date and then send it
+    #       (or print if in test mode). It also wants to prevent duplicate
+    #       tweets -- which is a high level decision in the app design.
+    #       All other details should be abstracted into lower functions.
     response = requests.get(URL)
     soup = BeautifulSoup(response.text, "html.parser")
 
