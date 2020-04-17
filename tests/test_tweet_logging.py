@@ -90,27 +90,25 @@ class TestAddTweetToHistory(object):
 
     def test_after_multiple_execution_all_tweets_in_history(
         self,
-        monkeypatch,
         test_file,
     ):
         test_filepath = test_file.as_posix()
-        tweet_1_content = "This is a\n\nmultiline\n\ntweet."
-        tweet_2_content = "This is another tweet."
+        tweet1_content = "This is a\n\nmultiline\n\ntweet."
+        tweet2_content = "This is another tweet."
 
         from logtweet import add_tweet_to_history
-        add_tweet_to_history(tweet_1_content, history_filepath=test_filepath)
-        add_tweet_to_history(tweet_2_content, history_filepath=test_filepath)
+        add_tweet_to_history(tweet1_content, history_filepath=test_filepath)
+        add_tweet_to_history(tweet2_content, history_filepath=test_filepath)
 
         # Can be tested with ``create_tweet_logging_msg`` and ``is_string_in_filelines``
         from logtweet import create_tweet_logging_msg, is_string_in_filelines
-        tweet_1_history_msg = create_tweet_logging_msg(tweet_1_content)
-        tweet_2_history_msg = create_tweet_logging_msg(tweet_2_content)
-        assert is_string_in_filelines(tweet_1_history_msg, filepath=test_filepath)
-        assert is_string_in_filelines(tweet_2_history_msg, filepath=test_filepath)
+        tweet1_history_msg = create_tweet_logging_msg(tweet1_content)
+        tweet2_history_msg = create_tweet_logging_msg(tweet2_content)
+        assert is_string_in_filelines(tweet1_history_msg, filepath=test_filepath)
+        assert is_string_in_filelines(tweet2_history_msg, filepath=test_filepath)
 
     def test_number_of_executions_corresponds_to_filelines(
         self,
-        monkeypatch,
         test_file,
     ):
         """
@@ -120,14 +118,12 @@ class TestAddTweetToHistory(object):
         message is written into a single line.
         """
         test_filepath = test_file.as_posix()
-        import logtweet
-        monkeypatch.setattr(logtweet, "LOG_FILE", test_filepath)
-        tweet_1_content = "This is a\n\nmultiline\n\ntweet."
-        tweet_2_content = "This is another tweet."
+        tweet1_content = "This is a\n\nmultiline\n\ntweet."
+        tweet2_content = "This is another tweet."
 
         from logtweet import add_tweet_to_history
-        add_tweet_to_history(tweet_1_content, history_filepath=test_filepath)
-        add_tweet_to_history(tweet_2_content, history_filepath=test_filepath)
+        add_tweet_to_history(tweet1_content, history_filepath=test_filepath)
+        add_tweet_to_history(tweet2_content, history_filepath=test_filepath)
 
         with open(test_filepath, "r") as test_fileobj:
             lines = test_fileobj.readlines()
