@@ -4,8 +4,6 @@
 #       detail. This should be hidden. Also "tweet_logging" is a little
 #       confusing because the tweet is generated from a "log".
 
-import pytest  # type: ignore
-
 
 class TestCreateTweetLoggingMsg(object):
     """Tests for ``create_tweet_logging_msg`` function."""
