@@ -2,17 +2,18 @@
 
 """Module to post tweet based on today's #100DaysOfCode log."""
 
+# TODO: Refactor this into multiple modules. This is way to long right now.
+
 import argparse
 from datetime import date, datetime, timedelta
-import logging
 import os
 import re
 from typing import Optional
 
-from bs4 import BeautifulSoup
-from bs4.element import Tag
+from bs4 import BeautifulSoup  # type: ignore
+from bs4.element import Tag  # type: ignore
 import requests
-import tweepy
+import tweepy  # type: ignore
 
 from logtweet.conf import get_config
 
@@ -20,48 +21,54 @@ from logtweet.conf import get_config
 config = get_config()
 
 URL = config["LogTweet"]["url"]
-TODAY = date.today()
-DATE_FORMAT = "%B %d, %Y"
+DATE_FORMAT = "%B %d, %Y"  # noqa: WPS323
 MAX_TWEET_LEN = 240
-LOG_FORMAT = "%(asctime)s %(name)-10.10s %(levelname)-4.4s %(message)s"
 LOG_FILE = os.path.expanduser("~/.config/logtweet/tweet.log")
-
-logging.basicConfig(
-    level=logging.INFO,
-    format=LOG_FORMAT,
-    filename=LOG_FILE,
-    filemode="a",  # append
-)
 
 
 def main():
     """Create a tweet based on today's log message."""
+    # TODO: Create tests for main function.
     parser = create_arg_parser()
     args = parser.parse_args()
     offset = args.offset
 
+    # TODO: Move every thing that is related to generating the tweet content to
+    #       a separate function. All that the app is doing on the highest
+    #       level, which is what the main is concerned with, is generating a
+    #       tweet message from some source for a given date and then send it
+    #       (or print if in test mode). It also wants to prevent duplicate
+    #       tweets -- which is a high level decision in the app design.
+    #       All other details should be abstracted into lower functions.
     response = requests.get(URL)
     soup = BeautifulSoup(response.text, "html.parser")
 
     # Get today's heading
-    today_heading = get_today_heading(soup, offset)
+    today_date = date.today() + timedelta(days=offset)
+    today_heading = get_day_heading(soup, heading_date=today_date)
 
     # Generate tweet preamble (E.g. 77/#100DaysOfCode)
-    preamble = build_preamble(today_heading)
+    preamble = build_preamble(today_heading.text)
 
     # Extract first link from list of links for the day.
-    link = get_first_link(today_heading)
-    # Create shortened link to first link of the day.
-    if link:
+    try:
+        link = get_first_link(today_heading)
+    except LookupError:
+        pass
+    else:
+        # Create shortened link to first link of the day.
+        # TODO: Move the link API handling into the link function/module.
         bitly_api_key = config.get(
             section="Bitly",
             option="api_key",
-            fallback=None
+            fallback=None,
         )
         link = get_short_link(link, bitly_api_key)
 
     # Calculate max message length. This needs to be the maximum tweet
     # length, reduced by the preamble and the link.
+    # TODO: Create separate function to build tweet. The tweet template only
+    #       needs to be available in that function.
     tweet_content_template = "{preamble} {tweet_message}\n\n{link}"
     tweet_length_wo_message = len(tweet_content_template.format(
         preamble=preamble,
@@ -79,7 +86,19 @@ def main():
         link=link,
     )
 
-    send_tweet(tweet_content, test_mode=args.testmode)
+    if args.testmode:
+        print(tweet_content)
+    else:
+        # Check log before sending tweet to prevent duplication.
+        tweeted_before = is_tweet_in_history(tweet_content)
+        if tweeted_before:
+            err_msg = "Tweet with this content already exists!"
+            raise RuntimeError(err_msg)
+        # Send the tweet
+        send_tweet(tweet_content, config["Twitter"])
+        # Create history record of sent tweet for future lookup.
+        add_tweet_to_history(tweet_content)
+        # TODO: Add success message to user.
 
 
 def create_arg_parser() -> argparse.ArgumentParser:
@@ -113,19 +132,24 @@ def create_arg_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def is_today(day_heading_text: str, offset: int = None) -> bool:
+def heading_matches_date(day_heading_text: str, given_date: date) -> bool:
     """
-    Check if given day heading represents today.
+    Check if given day heading represents the given date.
 
     Arguments:
-        day_heading_text (str): Text content of the day's heading.
-        offset (int): Number of days by which to offset the value of today.
+        day_heading_text (str) : String to extract the date from. Expected
+            format like this: "Day 1: October 16, 2019, Wednesday".
+        given_date (date): datetime.date object to check the heading
+            text against.
 
     Returns:
-        bool: Expresses if the given day heading text represents today.
+        bool: Expresses if the given day heading text represents the given
+            date.
 
     """
     # Extract the date string
+    # TODO: Create separate function for the date_string extraction.
+    # A separate function makes this easier to test.
     date_string = re.sub(
         r"(.*: )(.*)(, .*day.*)",  # pattern to create groups
         r"\2",  # Return only second group
@@ -133,22 +157,19 @@ def is_today(day_heading_text: str, offset: int = None) -> bool:
     )
     # Convert to date object
     date_obj = datetime.strptime(date_string, DATE_FORMAT).date()
-    # Check if today
-    today = TODAY
-    if offset is not None:
-        today = TODAY + timedelta(days=offset)
-    return date_obj == today
+
+    return date_obj == given_date
 
 
-def get_today_heading(soup: BeautifulSoup, offset: int) -> Tag:
+def get_day_heading(soup: BeautifulSoup, heading_date: date) -> Tag:
     """
     Return today's heading element or None.
 
     Arguments:
         soup (BeautifulSoup): Soup object of log page parsed with
             BeautifulSoup.
-        offset (int): Number of days by which to offset the value of today.
-            E.g. yesterday is `offset = -1`.
+        heading_date (date): ``datetime.date`` object for which the heading
+            shall be extracted.
 
     Returns:
         Tag: Heading element representing today.
@@ -160,46 +181,89 @@ def get_today_heading(soup: BeautifulSoup, offset: int) -> Tag:
     """
     day_headings = soup.find_all("h2")
     for day in day_headings[::]:
-        if is_today(day.text, offset):
+        if heading_matches_date(day.text, heading_date):
             return day
-    raise LookupError("No heading for found for today!")
+    raise LookupError("No heading found for today!")
 
 
-def build_preamble(today_heading: Tag) -> str:
+def extract_day_number_from_heading_string(heading_string: str) -> int:
+    """
+    Extract day number from heading string.
+
+    >>> extract_day_number_from_heading_string(
+    ...    "Day 1: October 16, 2019, Wednesday",
+    ... )
+    1
+
+    Arguments:
+        heading_string (str): Day's log header string from which the day can be
+            extracted. Expected format is something like
+            `Day 1: October 16, 2019, Wednesday`.
+
+    Returns:
+        int: Day number string that was extracted from the heading string.
+
+    Raises:
+        ValueError: is raised if no day number could be extracted due to
+            formatting issues.
+
+    """
+    day_str = re.sub(
+        r"(Day\s)(\d+)(:.*)",
+        r"\2",
+        heading_string,
+    )
+    try:
+        day = int(day_str)
+    except ValueError:
+        raise ValueError(
+            "Could not extract day number."
+            + " Check the formatting of the given `heading_string`.",
+        )
+    return day
+
+
+def build_preamble(heading_string: str) -> str:
     """
     Build preamble for tweet.
 
     The preamble for e.g. day 77 would look like: "77/#100DaysOfCode".
 
     Arguments:
-        today_heading (Tag): Today's log header from which the day can be
-            extracted.
+        heading_string (str): Day's log header string from which the day can be
+            extracted. Expected format is something like
+            `Day 1: October 16, 2019, Wednesday`.
 
     Returns:
         str: Preamble for the tweet message.
 
+    Raises:
+        ValueError: if the preamble could not be build.
+
     """
-    day_with_leading_whitespace = re.sub(
-        r"(.*)(\s\d+)(:.*)",
-        r"\2",
-        today_heading.text,
-    )
-    day = day_with_leading_whitespace.strip()
+    # TODO: Allow days being marked as `Off-Day` in the heading.
+    try:
+        day = extract_day_number_from_heading_string(heading_string)
+    except ValueError:
+        raise ValueError(
+            "Could not build preamble."
+            + " Check the formatting of the given heading_string.",
+        )
     return f"{day}/#100DaysOfCode"
 
 
-def get_todays_subheading(
-    today_heading: Tag,
+def get_day_subheading_by_text(
+    day_heading: Tag,
     subheading_text: str,
-) -> Optional[Tag]:
+) -> Tag:
     """
     Retrieve the next subheader (h3) element with the given text.
 
-    This function only iterates over the following sibling's of the
-    ``today_heading`` until the next day heading level (h2) is found.
+    This function only iterates over the following sibling's of the given
+    ``day_heading`` until the next day heading (h2) is found.
 
     Arguments:
-        today_heading (Tag): Tag element of today's header. This is the
+        day_heading (Tag): Tag element of a day's header. This is the
             starting point to look for following sibling subheaders.
         subheading_text (str): Content string for the searched subheader, which
             can be retrieved from the subheader element with
@@ -207,11 +271,15 @@ def get_todays_subheading(
 
     Returns:
         Tag: Found subheader element with given ``.text`` attribute.
-        None: If no subheader was found, None is returned.
+
+    Raises:
+        LookupError: if no subheader with the given ``.text`` attribute could
+            be found after the given ``day_heading`` element and before the
+            next.
 
     """
     # Go over the next siblings until the next day heading is found
-    current_element = today_heading
+    current_element = day_heading
     while True:
         next_sibling = current_element.next_sibling
         if not next_sibling or next_sibling.name == "h2":
@@ -219,25 +287,61 @@ def get_todays_subheading(
         if next_sibling.name == "h3" and next_sibling.text == subheading_text:
             return next_sibling
         current_element = next_sibling
-    return None
+    raise LookupError(
+        "No subheading with text '{0}' could be found".format(subheading_text)
+        + " after the day heading '{0}'!".format(day_heading),
+    )
 
 
-def get_first_link(today_heading: Tag) -> str:
+def get_first_link(day_heading: Tag) -> Optional[str]:
     """
     Extract the first link  URL from the list of the day's links.
 
+    Expects the following structure after the day header:
+
+    ::
+
+        <h2>Day 1: October 16, 2019, Wednesday</h2>
+        ...
+        <h3>Link(s)</h3>
+        <ol>
+          <li><a href="http://example.com/1">Example Link 1</a></li>
+          <li><a href="http://example.com/2">Example Link 2</a></li>
+        </ol>
+
+    For the given example, it would return "http://example.com/1".
+
     Arguments:
-        today_heading (Tag): Today's log header from which the day can be
-            extracted.
+        day_heading (Tag): Day's log header element which is followed by the
+            subheadings. The ``Link(s)`` subheading in turn needs to be
+            followed by an ordered list. The link address (``href``) found in
+            the anchor element of the first list item is returned.
 
     Returns:
-        str: First link found in the list of links or empty if no links found.
+        str: First link address found in the first list item.
+
+    Raises:
+        LookupError: is raised if no link could be found under the day's
+            heading. This also includes anchor element for empty ``href``
+            attribute.
 
     """
-    link_heading = get_todays_subheading(today_heading, "Link(s)")
-    if not link_heading:
-        return ""
-    return link_heading.find_next_sibling("ol").li.a["href"]
+    link_address = None
+    link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
+    try:
+        link_address = (
+            link_heading.find_next_sibling(  # type: ignore
+                "ol",
+            ).li.a.get("href")
+        )
+    except AttributeError:
+        pass
+    if not link_address:  # Catches empty link addresses and None
+        raise LookupError(
+            "No link extracted."
+            + " Please check that a link list exists under the day's heading.",
+        )
+    return link_address
 
 
 def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
@@ -250,9 +354,9 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
 
     Arguments:
         long_link (str): Long link to shorten.
-        bitly_api_key (Optional[str]): API key for the Bit.ly service. See the
-            `Bitly API documentation`_ on how to retrieve an API key. Default
-            is `None`.
+        bitly_api_key (Optional[str]): API key for the Bit.ly service.
+            See the `Bitly API documentation`_ on how to retrieve an API key.
+            Default is `None`.
 
     Returns:
         str: Shortened link pointing to the same resource as the long link.
@@ -261,6 +365,7 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
         https://dev.bitly.com/v4/#section/Application-using-a-single-account
 
     """
+    # TODO: Split into separate functions for default and Bit.ly shortener.
     shortener_url = "https://s.lpld.io/create"
     headers = {}
     shortlink_key = "short"
@@ -274,26 +379,27 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
     return response.json()[shortlink_key]
 
 
-def get_tweet_message(today_heading: Tag, max_len: int) -> str:
+def get_tweet_message(day_heading: Tag, max_len: int) -> str:
     """
     Extract the tweet content from the paragraphs after content heading.
 
     Arguments:
-        today_heading (Tag): Heading tag element for today.
+        day_heading (Tag): Heading tag element for today.
         max_len (int): Maximum length of tweet message.
 
     Returns:
-        str: Tweet message with a maximum length of MAX_TWEET_LEN
+        str: Tweet message with a maximum length of max_len
 
     Raises:
-        LookupError: This error is raised if no content heading is found or the
+        LookupError: is raised if no content heading is found or the extracted
             message is empty.
 
     """
     # Grab today's content heading
-    content_heading = get_todays_subheading(today_heading, "Today's Progress")
-    if content_heading is None:
-        raise LookupError("No content heading found for today!")
+    content_heading = get_day_subheading_by_text(
+        day_heading,
+        "Today's Progress",
+    )
     # Loop over the next siblings until you find something
     # that is not a paragraph. Extract content from the paragraphs until
     # maximum tweet length is reached.
@@ -307,12 +413,23 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
             break
         current_element = next_sibling
 
+        # TODO: Separate function to concatenate message content
         possible_content = "{existing_content}\n\n{new_content}".format(
             existing_content=possible_content,
             new_content=current_element.text,
         ).strip()
 
         if len(possible_content) > max_len:
+            # When possible content is longer than maximum before any thing is
+            # extracted, a special error is raised to allow explicit handling
+            # of this issue. This can go unhandled so that the user becomes
+            # aware of this issue and can adjust the content in the log.
+            if not tweet_message:
+                raise ValueError(
+                    "The first paragraph is too long!"
+                    + " Maximum length: {}".format(max_len)
+                    + " Extracted content: '{}'".format(possible_content)
+                )
             break
         tweet_message = possible_content
 
@@ -321,7 +438,7 @@ def get_tweet_message(today_heading: Tag, max_len: int) -> str:
     return tweet_message
 
 
-def twitter_authenticate(
+def get_tweepy_api(
     api_key: str,
     api_secret: str,
     access_token: str,
@@ -344,41 +461,112 @@ def twitter_authenticate(
     """
     auth = tweepy.OAuthHandler(api_key, api_secret)
     auth.set_access_token(access_token, access_secret)
-    return tweepy.API(auth)
+    api = tweepy.API(auth)
+    api.verify_credentials()  # Raises exception if not valid
+    return api
 
 
-def send_tweet(tweet_content: str, test_mode=False) -> None:
+def create_tweet_logging_msg(tweet_content: str) -> str:
+    """
+    Create logging message based on tweet content.
+
+    Arguments:
+        tweet_content (str): Content string of the tweet.
+
+    Returns:
+        str: Single line log message for the tweet. Log messages should be
+            single line for readability and extraction. Therefore, newline
+            characters are replaced with spaces.
+
+    """
+    return tweet_content.replace("\n", " ")
+
+
+def is_string_in_filelines(search_string: str, filepath: str) -> bool:
+    """
+    Check if string can be found in file.
+
+    File is checked line by line. Thus, strings spanning multiple lines are not
+    supported.
+
+    Arguments:
+        search_string (str): String to lookup in the lines of the file.
+        filepath (str): String path of the file to check.
+
+    Returns:
+        bool: Expresses if the ``search_string`` was found in the file.
+
+    """
+    with open(filepath, "r") as file_obj:
+        return any(
+            search_string in line for line in file_obj.readlines()
+        )
+
+
+def is_tweet_in_history(
+    tweet_content: str,
+    history_filepath: str = LOG_FILE,
+) -> bool:
+    """
+    Check if the history contains a message representing the tweet_content.
+
+    Arguments:
+        tweet_content (str): Tweet content string.
+        history_filepath (str): Path string to the history file that is to be
+            checked for the tweet content representation.
+
+    Returns:
+        bool: Expresses if the tweet was sent before (and therefore is in the
+            history).
+
+    """
+    tweet_logging_msg = create_tweet_logging_msg(tweet_content)
+    return is_string_in_filelines(tweet_logging_msg, filepath=history_filepath)
+
+
+def add_tweet_to_history(
+    tweet_content: str,
+    history_filepath: str = LOG_FILE,
+) -> None:
+    """
+    Add tweet to history file.
+
+    Arguments:
+        tweet_content (str): Tweet content string for which an entry shall be
+            created in the history file. The tweet is converted into a single
+            line by calling the ``create_tweet_logging_msg()`` on it.
+        history_filepath (str): Optional path string to the history file to
+            append the tweet to. Default is ``logtweet.LOG_FILE``.
+
+    """
+    tweet_history_msg = create_tweet_logging_msg(tweet_content)
+    full_line = "{0} - Sent : {1}\n".format(datetime.now(), tweet_history_msg)
+    with open(history_filepath, "a") as history_file:
+        history_file.writelines(full_line)
+
+
+def send_tweet(tweet_content: str, twitter_config: dict) -> None:
     """
     Send tweet with given content.
 
-    For this to work, the config needs to contain valid Twitter API key and
-    access token.
+    The sending requires valid Twitter access. Pass the twitter config as a
+    dict-like object with the following keys:
+
+    * "api_key",
+    * "api_secret",
+    * "access_token",
+    * "access_secret".
 
     Arguments:
         tweet_content (str): Content of the tweet.
-
-    Raises:
-        RuntimeError: Raised if the defined tweet content was posted before.
+        twitter_config (dict): Dict-like object with above keys.
 
     """
-    # Check log before sending tweet to prevent duplication.
-    log_tweet = tweet_content.replace("\n", " ")
-    with open(LOG_FILE, "r") as f:
-        tweeted = any(log_tweet in line for line in f.readlines())
-    if tweeted:
-        warn_msg = "Tweet with this content already exists!"
-        logging.warning(warn_msg)
-        raise RuntimeError(warn_msg)
-    tweepy_api = twitter_authenticate(
-        config["Twitter"]["api_key"],
-        config["Twitter"]["api_secret"],
-        config["Twitter"]["access_token"],
-        config["Twitter"]["access_secret"],
+    tweepy_api = get_tweepy_api(
+        twitter_config["api_key"],
+        twitter_config["api_secret"],
+        twitter_config["access_token"],
+        twitter_config["access_secret"],
     )
-    if test_mode is False:
-        # Send tweet
-        tweepy_api.update_status(tweet_content)
-        # Log tweet
-        logging.info(log_tweet)
-    else:
-        print(tweet_content)
+    # Send tweet
+    tweepy_api.update_status(tweet_content)

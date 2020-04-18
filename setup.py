@@ -18,11 +18,14 @@ develop_requires = [
     # "twine" to upload to pypi in secure way.
     # See: https://packaging.python.org/tutorials/packaging-projects/
     "twine",
+    "pytest",
+    "wemake-python-styleguide",
+    "mypy",
 ]
 
 setup(
     name="logtweet",
-    version="0.1.4",
+    version="0.1.5dev",
     author="Tibor Leupold",
     author_email="tibor@lpld.io",
     description="Create a tweet based on a #100DaysOfCode log message",

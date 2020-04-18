@@ -3,7 +3,6 @@
 """Define methods for configuration of the app."""
 
 from configparser import ConfigParser
-
 import os
 
 
