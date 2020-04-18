@@ -71,6 +71,43 @@ def heading_matches_date(
     return date_obj == given_date
 
 
+def extract_day_number_from_heading_string(heading_string: str) -> int:
+    """
+    Extract day number from heading string.
+
+    >>> extract_day_number_from_heading_string(
+    ...    "Day 1: October 16, 2019, Wednesday",
+    ... )
+    1
+
+    Arguments:
+        heading_string (str): Day's log header string from which the day can be
+            extracted. Expected format is something like
+            `Day 1: October 16, 2019, Wednesday`.
+
+    Returns:
+        int: Day number string that was extracted from the heading string.
+
+    Raises:
+        ValueError: is raised if no day number could be extracted due to
+            formatting issues.
+
+    """
+    day_str = re.sub(
+        r"(Day\s)(\d+)(:.*)",
+        r"\2",
+        heading_string,
+    )
+    try:
+        day = int(day_str)
+    except ValueError:
+        raise ValueError(
+            "Could not extract day number."
+            + " Check the formatting of the given `heading_string`.",
+        )
+    return day
+
+
 def get_first_link(day_heading: bs4.element.Tag) -> str:
     """
     Extract the first link  URL from the list of the day's links.

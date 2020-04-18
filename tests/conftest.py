@@ -54,13 +54,6 @@ def example_soup():
 </html>"""
     return BeautifulSoup(page_content, "html.parser")
 
-
-@pytest.fixture
-def day_1_heading(example_soup):
-    from logtweet import get_day_heading
-    return get_day_heading(example_soup, date(2019, 10, 16))
-
-
 @pytest.fixture
 def test_file(tmp_path):
     return tmp_path / "test.txt"

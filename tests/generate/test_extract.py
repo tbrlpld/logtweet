@@ -7,6 +7,12 @@ from datetime import date
 import pytest
 
 
+@pytest.fixture
+def day_1_heading(example_soup):
+    from logtweet.generate.extract import get_day_heading
+    return get_day_heading(example_soup, date(2019, 10, 16))
+
+
 class TestHeadingMatchesDate(object):
     """Tests for the `is_today` function."""
 
@@ -60,7 +66,7 @@ class TestHeadingMatchesDate(object):
         expected_return,
     ):
 
-        from logtweet import heading_matches_date
+        from logtweet.generate.extract import heading_matches_date
         actual_return = heading_matches_date(heading_text, given_date)
 
         assert actual_return == expected_return
@@ -71,7 +77,7 @@ class TestGetDayHeading(object):
 
     def test_extraction_of_first_heading(self, example_soup):
         """Return Tag object with the expected string content."""
-        from logtweet import get_day_heading
+        from logtweet.generate.extract import get_day_heading
         heading = get_day_heading(
             example_soup,
             heading_date=date(2019, 10, 16),
@@ -84,7 +90,7 @@ class TestGetDayHeading(object):
 
     def test_extraction_of_second_heading(self, example_soup):
         """Return Tag object with the expected string content."""
-        from logtweet import get_day_heading
+        from logtweet.generate.extract import get_day_heading
         heading = get_day_heading(
             example_soup,
             heading_date=date(2019, 10, 17),
@@ -98,7 +104,7 @@ class TestGetDayHeading(object):
     def test_exception_if_no_heading_for_today(self, example_soup):
         """Raises exception if heading for today not in soup."""
         with pytest.raises(LookupError, match=r"^No heading found.*$"):
-            from logtweet import get_day_heading
+            from logtweet.generate.extract import get_day_heading
             get_day_heading(
                 example_soup,
                 heading_date=date(2019, 10, 18),
@@ -121,7 +127,7 @@ class TestExtractDayNumberFromHeadingString(object):
     )
     def test_valid_heading(self, heading_string, expected_return):
         """Return the correct preamble for a given heading string."""
-        from logtweet import extract_day_number_from_heading_string
+        from logtweet.generate.extract import extract_day_number_from_heading_string
         actual_return = extract_day_number_from_heading_string(heading_string)
 
         assert actual_return == expected_return
@@ -140,7 +146,7 @@ class TestExtractDayNumberFromHeadingString(object):
         # heading_string = "Off-Day: November 2, 2019, Saturday"  # No day number
         # heading_string = "Day 1, October 16, 2019, Wednesday"  # Comma instead of colon.
 
-        from logtweet import extract_day_number_from_heading_string
+        from logtweet.generate.extract import extract_day_number_from_heading_string
         with pytest.raises(
             ValueError,
             match=r"^Could not extract day number.*$",
@@ -161,7 +167,7 @@ class TestGetDaySubheadingByText(object):
     )
     def test_existing_subheaders(self, day_1_heading, subheading_text):
         """Extract existing sub-headers."""
-        from logtweet import get_day_subheading_by_text
+        from logtweet.generate.extract import get_day_subheading_by_text
         progress_subheading = get_day_subheading_by_text(
             day_1_heading,
             subheading_text,
@@ -183,7 +189,7 @@ class TestGetDaySubheadingByText(object):
     def test_not_existing_subheaders(self, day_1_heading, subheading_text):
         """Extract not-existing sub-headers."""
 
-        from logtweet import get_day_subheading_by_text
+        from logtweet.generate.extract import get_day_subheading_by_text
         with pytest.raises(
             LookupError,
             match=r"^No subheading with text '{0}'.*".format(subheading_text),
@@ -235,13 +241,13 @@ class TestGetFirstLink(object):
         """Test extraction of a valid link."""
         heading_date = date(2019, 10, 16)
         expected_link = "http://example.com/1"  # Valid link
-        from logtweet import get_day_heading
+        from logtweet.generate.extract import get_day_heading
         day_heading = get_day_heading(
             link_variation_soup,
             heading_date,
         )
+        from logtweet.generate.extract import get_first_link
 
-        from logtweet import get_first_link
         extracted_link = get_first_link(day_heading)
 
         assert extracted_link == expected_link
@@ -267,13 +273,13 @@ class TestGetFirstLink(object):
 
         Different cases are provided by parametrization.
         """
-        from logtweet import get_day_heading
+        from logtweet.generate.extract import get_day_heading
         day_heading = get_day_heading(
             link_variation_soup,
             heading_date,
         )
+        from logtweet.generate.extract import get_first_link
 
-        from logtweet import get_first_link
         with pytest.raises(LookupError):
             get_first_link(day_heading)
 
@@ -286,7 +292,7 @@ class TestGetTweetMessage(object):
         expected_tweet_msg = (
             "It's the first paragraph. It's 50 characters long."
         )
-        from logtweet import get_tweet_message
+        from logtweet.generate.extract import get_tweet_message
 
         actual_tweet_msg = get_tweet_message(day_1_heading, max_len=50)
 
@@ -306,7 +312,7 @@ class TestGetTweetMessage(object):
             + "\n\nThe second paragraph."
             + " This is one that's 60 characters long."
         )
-        from logtweet import get_tweet_message
+        from logtweet.generate.extract import get_tweet_message
 
         actual_tweet_msg = get_tweet_message(day_1_heading, max_len=112)
 
@@ -316,7 +322,7 @@ class TestGetTweetMessage(object):
         """
         Raise exception when first paragraph is too long to extract a message.
         """
-        from logtweet import get_tweet_message
+        from logtweet.generate.extract import get_tweet_message
 
         with pytest.raises(
             ValueError,
@@ -326,9 +332,9 @@ class TestGetTweetMessage(object):
 
     def test_exception_when_no_content(self, example_soup):
         """Raise exception when no paragraph content found."""
-        from logtweet import get_day_heading
+        from logtweet.generate.extract import get_day_heading
         day_heading = get_day_heading(example_soup, date(2019, 10, 17))
-        from logtweet import get_tweet_message
+        from logtweet.generate.extract import get_tweet_message
 
         with pytest.raises(
             LookupError,
