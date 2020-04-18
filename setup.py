@@ -40,7 +40,7 @@ setup(
     packages=["logtweet"],
     entry_points={
         "console_scripts": [
-            "logtweet = logtweet:main",
+            "logtweet = logtweet.app:main",
         ],
     },
     include_package_data=True,  # To copy the files listen in MANIFEST.in
