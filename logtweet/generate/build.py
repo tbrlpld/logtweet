@@ -2,7 +2,9 @@
 
 """Functions related to building the tweet content."""
 
-import re
+# TODO: Rename all builder functions ``make_...``
+
+from logtweet.generate.extract import extract_day_number_from_heading_string
 
 
 def build_preamble(heading_string: str) -> str:
@@ -23,7 +25,8 @@ def build_preamble(heading_string: str) -> str:
         ValueError: if the preamble could not be build.
 
     """
-    # TODO: Allow days being marked as `Off-Day` in the heading.
+    # TODO: Remove extraction dependency. Take needed values as input.
+    #       Let caller gather needed input.
     try:
         day = extract_day_number_from_heading_string(heading_string)
     except ValueError:

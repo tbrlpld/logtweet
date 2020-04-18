@@ -2,7 +2,7 @@
 
 """Test functions regarding creation of the tweet."""
 
-import pytest
+import pytest  # type: ignore
 
 
 class TestBuildPreamble(object):
@@ -21,7 +21,7 @@ class TestBuildPreamble(object):
     )
     def test_valid_heading(self, heading_string, expected_return):
         """Return the correct preamble for a given heading string."""
-        from logtweet import build_preamble
+        from logtweet.generate.build import build_preamble
         actual_return = build_preamble(heading_string)
 
         assert actual_return == expected_return
@@ -37,6 +37,6 @@ class TestBuildPreamble(object):
     )
     def test_exception_invalid_heading_string_format(self, heading_string):
         """Raise exception for invalid formatted heading strings."""
-        from logtweet import build_preamble
+        from logtweet.generate.build import build_preamble
         with pytest.raises(ValueError, match=r"^Could not build preamble.*$"):
             build_preamble(heading_string)
