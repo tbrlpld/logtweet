@@ -3,6 +3,7 @@
 """Module to generate tweet content from a log."""
 
 import datetime
+from typing import Optional
 
 import bs4  # type: ignore
 
@@ -12,7 +13,11 @@ from logtweet._content import extract, build, shortlink  # noqa: WPS436
 MAX_TWEET_LEN = 240
 
 
-def get_tweet_content(log_string: str, day_date: datetime.date) -> str:
+def get_tweet_content(
+    log_string: str,
+    day_date: datetime.date,
+    bitly_api_key: Optional[str] = None,
+) -> str:
     """
     Get tweet content from a log string for a given date.
 
@@ -25,10 +30,17 @@ def get_tweet_content(log_string: str, day_date: datetime.date) -> str:
             #       types. The generation of the custom type validates the
             #       structure
         day_date (datetime.date): Day for which the tweet is to be generated.
+        bitly_api_key (Opeional[str]): While generating the tweet content, the
+            first link from the "Link(s)" section is extracted and shortened.
+            The user if an API key for the Bit.ly service is provided, that
+            service is used. This argument defaults to ``None``, in which case
+            `Shorten That URL_ is used.
 
     Returns:
         str: Tweet content for the given ``day_date`` extracted from the
         ``log_string``.
+
+    .. _`Shorten That URL`: https://s.lpld.io
 
     """
     soup = bs4.BeautifulSoup(log_string, "html.parser")
@@ -45,12 +57,6 @@ def get_tweet_content(log_string: str, day_date: datetime.date) -> str:
         pass
     else:
         # Create shortened link to first link of the day.
-        # TODO: Move the link API handling into the link function/module.
-        bitly_api_key = config.get(
-            section="Bitly",
-            option="api_key",
-            fallback=None,
-        )
         link = shortlink.get_short_link(link, bitly_api_key)
 
     # Calculate max message length. This needs to be the maximum tweet

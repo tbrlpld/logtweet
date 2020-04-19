@@ -22,6 +22,12 @@ def main():
     day_date = date.today() + timedelta(days=args.offset)
 
     config = conf.get_config()
+    url = config["LogTweet"]["url"]
+    bitly_api_key = config.get(
+        section="Bitly",
+        option="api_key",
+        fallback=None,
+    )
 
     # TODO: Add validation that this is actually a URL. This would go hand in
     #       hand with creating other options for sources. Validation should be
@@ -29,10 +35,13 @@ def main():
     #       the source does not match the expected type. Chaining try-except
     #       blocks allows testing for multiple possible source types. When all
     #       possible sources fail, inform the user.
-    url = config["LogTweet"]["url"]
     response = requests.get(url)
 
-    tweet_content = content.get_tweet_content(response.text, day_date)
+    tweet_content = content.get_tweet_content(
+        response.text,
+        day_date,
+        bitly_api_key,
+    )
 
     if args.testmode:
         print(tweet_content)
