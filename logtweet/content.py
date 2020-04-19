@@ -40,7 +40,7 @@ def get_tweet_content(
         str: Tweet content for the given ``day_date`` extracted from the
         ``log_string``.
 
-    .. _`Shorten That URL`: https://s.lpld.io
+    .. _`Shorten That URL: https://s.lpld.io
 
     """
     soup = bs4.BeautifulSoup(log_string, "html.parser")
