@@ -4,7 +4,7 @@
 
 # TODO: Rename all builder functions ``make_...``
 
-from logtweet.generate.extract import extract_day_number_from_heading_string
+from logtweet._content.extract import extract_day_number_from_heading_string
 
 
 def build_preamble(heading_string: str) -> str:
