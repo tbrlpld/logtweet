@@ -18,7 +18,7 @@ def main():
     day_date = date.today() + timedelta(days=args.offset)
 
     config = conf.get_config()
-    url = config["LogTweet"]["url"]
+    source_string = config["LogTweet"]["source"]
     bitly_api_key = config.get(
         section="Bitly",
         option="api_key",
@@ -31,7 +31,8 @@ def main():
     #       the source does not match the expected type. Chaining try-except
     #       blocks allows testing for multiple possible source types. When all
     #       possible sources fail, inform the user.
-    response = requests.get(url)
+    response = requests.get(source_string)
+    # log_content = get_log_content_from_source(source_string)
 
     tweet_content = content.get_tweet_content(
         response.text,
