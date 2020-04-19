@@ -2,10 +2,6 @@
 
 """Module for main app functionality of logtweet."""
 
-# TODO: Refactor this into multiple modules. This is way to long right now.
-# TODO: Move business logic from init to separate file. Only use init file
-#       to expose public functions.
-
 import argparse
 from datetime import date, timedelta
 

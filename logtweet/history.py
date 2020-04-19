@@ -18,12 +18,12 @@ def add_tweet_to_history(
     Arguments:
         tweet_content (str): Tweet content string for which an entry shall be
             created in the history file. The tweet is converted into a single
-            line by calling the ``create_tweet_logging_msg()`` on it.
+            line by calling the ``create_tweet_history_msg()`` on it.
         history_filepath (str): Optional path string to the history file to
             append the tweet to. Default is ``logtweet.LOG_FILE``.
 
     """
-    tweet_history_msg = create_tweet_logging_msg(tweet_content)
+    tweet_history_msg = create_tweet_history_msg(tweet_content)
     full_line = "{0} - Sent : {1}\n".format(
         datetime.datetime.now(),
         tweet_history_msg,
@@ -49,11 +49,11 @@ def is_tweet_in_history(
             history).
 
     """
-    tweet_logging_msg = create_tweet_logging_msg(tweet_content)
+    tweet_logging_msg = create_tweet_history_msg(tweet_content)
     return is_string_in_filelines(tweet_logging_msg, filepath=history_filepath)
 
 
-def create_tweet_logging_msg(tweet_content: str) -> str:
+def create_tweet_history_msg(tweet_content: str) -> str:
     """
     Create logging message based on tweet content.
 
