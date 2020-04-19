@@ -3,9 +3,9 @@
 """Defines class representing a valid online source for the log."""
 
 
-import validators
+import validators  # type: ignore
 
-from logtweet._source.exceptions import NotAURLError
+from logtweet._source.exceptions import NotAUrlError
 
 
 class OnlineLogSource(object):
@@ -19,11 +19,11 @@ class OnlineLogSource(object):
         is in fact a valid URL representation.
 
         Raises:
-            NotAURLError: if the given ``source_string`` does not represent a
+            NotAUrlError: if the given ``source_string`` does not represent a
                 valid URL.
 
         """
         is_url = validators.url(source_string)
         if is_url is not True:
-            raise NotAURLError
+            raise NotAUrlError(source_string)
         self.source_string = source_string

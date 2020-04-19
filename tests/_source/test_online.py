@@ -19,9 +19,21 @@ def test_valid_url_creates_instance():
 
 def test_invalid_url_raises_exception():
     from logtweet._source.online import OnlineLogSource
-    from logtweet._source.exceptions import NotAURLError
+    from logtweet._source.exceptions import NotAUrlError
 
-    with pytest.raises(NotAURLError):
+    with pytest.raises(NotAUrlError):
         OnlineLogSource("not a url, just a string")
 
-# TODO: show URL in error message.
+
+def test_invalid_url_shown_in_raised_exception():
+    from logtweet._source.online import OnlineLogSource
+    from logtweet._source.exceptions import NotAUrlError
+    source_string = "not a url, just a string"
+
+    with pytest.raises(
+        NotAUrlError,
+        match=r"^The given source string '{0}' is not a URL!".format(
+            source_string,
+        ),
+    ):
+        OnlineLogSource(source_string)
