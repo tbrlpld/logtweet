@@ -9,78 +9,30 @@
 import argparse
 from datetime import date, timedelta
 
-from bs4 import BeautifulSoup  # type: ignore
 import requests
 
-from logtweet import conf, history, send
-from logtweet.generate import extract, build
-
-
-config = conf.get_config()
-
-URL = config["LogTweet"]["url"]
-MAX_TWEET_LEN = 240
+from logtweet import conf, history, send, content
 
 
 def main():
     """Create a tweet based on today's log message."""
-    # TODO: Create tests for main function.
     parser = create_arg_parser()
     args = parser.parse_args()
-    offset = args.offset
 
-    # TODO: Move every thing that is related to generating the tweet content to
-    #       a separate function. All that the app is doing on the highest
-    #       level, which is what the main is concerned with, is generating a
-    #       tweet message from some source for a given date and then send it
-    #       (or print if in test mode). It also wants to prevent duplicate
-    #       tweets -- which is a high level decision in the app design.
-    #       All other details should be abstracted into lower functions.
-    response = requests.get(URL)
-    soup = BeautifulSoup(response.text, "html.parser")
+    day_date = date.today() + timedelta(days=args.offset)
 
-    # Get today's heading
-    today_date = date.today() + timedelta(days=offset)
-    today_heading = extract.get_day_heading(soup, heading_date=today_date)
+    config = conf.get_config()
 
-    # Generate tweet preamble (E.g. 77/#100DaysOfCode)
-    preamble = build.build_preamble(today_heading.text)
+    # TODO: Add validation that this is actually a URL. This would go hand in
+    #       hand with creating other options for sources. Validation should be
+    #       placed in custom classes. The instantiation of the class fails if
+    #       the source does not match the expected type. Chaining try-except
+    #       blocks allows testing for multiple possible source types. When all
+    #       possible sources fail, inform the user.
+    url = config["LogTweet"]["url"]
+    response = requests.get(url)
 
-    # Extract first link from list of links for the day.
-    try:
-        link = extract.get_first_link(today_heading)
-    except LookupError:
-        pass
-    else:
-        # Create shortened link to first link of the day.
-        # TODO: Move the link API handling into the link function/module.
-        bitly_api_key = config.get(
-            section="Bitly",
-            option="api_key",
-            fallback=None,
-        )
-        link = get_short_link(link, bitly_api_key)
-
-    # Calculate max message length. This needs to be the maximum tweet
-    # length, reduced by the preamble and the link.
-    # TODO: Create separate function to build tweet. The tweet template only
-    #       needs to be available in that function.
-    tweet_content_template = "{preamble} {tweet_message}\n\n{link}"
-    tweet_length_wo_message = len(tweet_content_template.format(
-        preamble=preamble,
-        tweet_message="",
-        link=link,
-    ))
-    max_length = MAX_TWEET_LEN - tweet_length_wo_message
-    # Get content
-    tweet_message = extract.get_tweet_message(today_heading, max_len=max_length)
-
-    # Build content from preamble, message and link
-    tweet_content = tweet_content_template.format(
-        preamble=preamble,
-        tweet_message=tweet_message,
-        link=link,
-    )
+    tweet_content = content.get_tweet_content(response.text, day_date)
 
     if args.testmode:
         print(tweet_content)
