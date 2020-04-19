@@ -11,6 +11,7 @@ requires = [
     "bs4",
     "requests",
     "tweepy",
+    "validators",
 ]
 
 develop_requires = [
