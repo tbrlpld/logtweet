@@ -30,7 +30,7 @@ class OnlineLogSource(object):
 
         """
         self.raise_for_invalid_url(source_string)
-        self.source_string = source_string
+        self.url = source_string
         # self.get_content_from_online_source(self.source_string)
 
     @staticmethod
@@ -53,9 +53,9 @@ class OnlineLogSource(object):
         if is_url is not True:
             raise NotAUrlError(source_string)
 
-    def get_content_from_online_source(self, source_string: str = None) -> str:
+    def get_content_from_url(self, url: str = None) -> str:
         """Get content from online source."""
-        if source_string is None:
-            source_string = self.source_string
-        response = requests.get(source_string)
+        if url is None:
+            url = self.url
+        response = requests.get(url)
         return response.text

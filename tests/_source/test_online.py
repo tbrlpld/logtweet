@@ -93,8 +93,8 @@ class TestGetContentFromOnlineSource(object):
         from logtweet._source.online import OnlineLogSource
         online_obj = OnlineLogSource(valid_url)
 
-        returned_page_content = online_obj.get_content_from_online_source(
-            source_string=valid_url,
+        returned_page_content = online_obj.get_content_from_url(
+            url=valid_url,
         )
 
         assert returned_page_content == mock_page_content
@@ -114,6 +114,6 @@ class TestGetContentFromOnlineSource(object):
         from logtweet._source.online import OnlineLogSource
         online_obj = OnlineLogSource(valid_url)
 
-        returned_page_content = online_obj.get_content_from_online_source()
+        returned_page_content = online_obj.get_content_from_url()
 
         assert returned_page_content == mock_page_content
