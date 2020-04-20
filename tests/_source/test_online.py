@@ -73,7 +73,7 @@ class TestGetContentFromOnlineSource(object):
         import requests
         def mock_get(*args, **kwargs):
             mock_resp = requests.Response()
-            mock_resp.status = status_code
+            mock_resp.status_code = status_code
             mock_resp._content = bytes(page_content, encoding="utf-8")
             return mock_resp
         return mock_get
@@ -117,3 +117,77 @@ class TestGetContentFromOnlineSource(object):
         returned_page_content = online_obj.get_content_from_url()
 
         assert returned_page_content == mock_page_content
+
+    def test_raises_error_for_404(
+        self,
+        monkeypatch,
+        valid_url,
+    ):
+        mock_page_content = "<html><body>The content</body></html>"
+        from logtweet._source.online import requests
+        monkeypatch.setattr(
+            requests,
+            "get",
+            self.mock_get_factory(404, mock_page_content),
+        )
+        from logtweet._source.exceptions import HTTPStatusError
+        from logtweet._source.online import OnlineLogSource
+        online_obj = OnlineLogSource(valid_url)
+
+        with pytest.raises(HTTPStatusError):
+            online_obj.get_content_from_url()
+
+    def test_error_for_404_shows_status_code(
+        self,
+        monkeypatch,
+        valid_url,
+    ):
+        mock_page_content = "<html><body>The content</body></html>"
+        from logtweet._source.online import requests
+        monkeypatch.setattr(
+            requests,
+            "get",
+            self.mock_get_factory(404, mock_page_content),
+        )
+        from logtweet._source.exceptions import HTTPStatusError
+        from logtweet._source.online import OnlineLogSource
+        online_obj = OnlineLogSource(valid_url)
+
+        with pytest.raises(HTTPStatusError, match=r".*404.*"):
+            online_obj.get_content_from_url()
+
+    def test_raises_error_for_connection_error(self, monkeypatch, valid_url):
+        from logtweet._source.online import requests
+        def mock_get_raises_connection_error(*args, **kwargs):
+            raise requests.ConnectionError
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get_raises_connection_error,
+        )
+        from logtweet._source.exceptions import RequestError
+        from logtweet._source.online import OnlineLogSource
+        online_obj = OnlineLogSource(valid_url)
+
+        with pytest.raises(RequestError):
+            online_obj.get_content_from_url()
+
+    def test_raised_error_for_connection_error_shows_url(
+        self,
+        monkeypatch,
+        valid_url,
+    ):
+        from logtweet._source.online import requests
+        def mock_get_raises_connection_error(*args, **kwargs):
+            raise requests.ConnectionError
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get_raises_connection_error,
+        )
+        from logtweet._source.exceptions import RequestError
+        from logtweet._source.online import OnlineLogSource
+        online_obj = OnlineLogSource(valid_url)
+
+        with pytest.raises(RequestError, match=r".*{0}.*".format(valid_url)):
+            online_obj.get_content_from_url()

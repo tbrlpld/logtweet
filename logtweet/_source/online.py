@@ -7,7 +7,11 @@ from typing import Literal
 import requests
 import validators  # type: ignore
 
-from logtweet._source.exceptions import NotAUrlError
+from logtweet._source.exceptions import (  # noqa: WPS436
+    NotAUrlError,
+    HTTPStatusError,
+    RequestError,
+)
 
 
 class OnlineLogSource(object):
@@ -54,8 +58,21 @@ class OnlineLogSource(object):
             raise NotAUrlError(source_string)
 
     def get_content_from_url(self, url: str = None) -> str:
-        """Get content from online source."""
+        """
+        Get content from online source.
+
+        # TODO: How to document side effects?
+        """
         if url is None:
             url = self.url
-        response = requests.get(url)
+
+        try:
+            response = requests.get(url)
+        except requests.exceptions.RequestException:
+            raise RequestError(url)
+
+        try:
+            response.raise_for_status()
+        except requests.HTTPError as error:
+            raise HTTPStatusError(error)
         return response.text
