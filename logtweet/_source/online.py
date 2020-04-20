@@ -8,7 +8,7 @@ from logtweet._source.exceptions import (  # noqa: WPS436
     HTTPStatusError,
     RequestError,
 )
-from logtweet._source.valid_url import ValidUrl
+from logtweet._source.valid_url import ValidUrl  # noqa: WPS436
 
 
 class OnlineLogSource(object):
@@ -34,19 +34,26 @@ class OnlineLogSource(object):
 
         Raises:
             NotAUrlError: when the passed source string is not a valid URL.
-            RequestError: when the network connection to the URL target
-                fails.
+            RequestError: when the network connection to the URL target fails.
             HTTPStatusError: when the URL host responds with an error status
                 code.
+
         """
+        # Raises NotAUrlError
+        self.url = ValidUrl(source_string)
 
-        self.url = ValidUrl(source_string)  # Raises NotAUrlError
-
-        self._content = get_content_from_url(self.url)
+        # Raises RequestError and HTTPStatusError
+        self._content = get_content_from_url(self.url)  # noqa: WPS110
 
     @property
-    def content(self):
-        return self._content
+    def content(self):  # noqa: WPS110
+        """
+        Return online log content.
+
+        Returns:
+            str: content of online log source
+        """
+        return self._content  # noqa: WPS110
 
 
 def get_content_from_url(valid_url: ValidUrl) -> str:
@@ -57,11 +64,13 @@ def get_content_from_url(valid_url: ValidUrl) -> str:
         valid_url (ValidUrl): Validated url object from which the content
             should be retrieved.
 
+    Returns:
+        str: Content retrieved from the URL.
+
     Raises:
-        RequestError: when the network connection to the URL target
-            fails.
-        HTTPStatusError: when the URL host responds with an error status
-            code.
+        TypeError: when the passed URL is not of type ``ValidUrl``.
+        RequestError: when the network connection to the URL target fails.
+        HTTPStatusError: when the URL host responds with an error status code.
 
     """
     if not isinstance(valid_url, ValidUrl):
