@@ -49,13 +49,13 @@ def is_tweet_in_history(
             history).
 
     """
-    tweet_logging_msg = create_tweet_history_msg(tweet_content)
-    return is_string_in_filelines(tweet_logging_msg, filepath=history_filepath)
+    tweet_history_msg = create_tweet_history_msg(tweet_content)
+    return is_string_in_filelines(tweet_history_msg, filepath=history_filepath)
 
 
 def create_tweet_history_msg(tweet_content: str) -> str:
     """
-    Create logging message based on tweet content.
+    Create history message based on tweet content.
 
     Arguments:
         tweet_content (str): Content string of the tweet.

@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-# TODO: Rename this and the actual module from "tweet_logging" to "history".
-#       The fact that I am using the logging module is an implementation
-#       detail. This should be hidden. Also "tweet_logging" is a little
-#       confusing because the tweet is generated from a "log".
 
 
 class TestCreateTweetHistoryMsg(object):
     """Tests for ``create_tweet_history_msg`` function."""
 
-    def test_turn_multiline_tweet_into_single_line_logging_msg(self):
+    def test_turn_multiline_tweet_into_single_line_history_msg(self):
         tweet_content = "This is a\n\nmultiline\n\ntweet."
         expected_msg = "This is a  multiline  tweet."
         from logtweet.history import create_tweet_history_msg
@@ -137,9 +133,9 @@ class TestIsTweetInHistory(object):
     ):
         tweet_content = "This is a\n\nmultiline\n\ntweet."
         from logtweet.history import create_tweet_history_msg
-        tweet_logging_msg = create_tweet_history_msg(tweet_content)
+        tweet_history_msg = create_tweet_history_msg(tweet_content)
         test_file_content = f"""This is something.
-{tweet_logging_msg}
+{tweet_history_msg}
 This is some more."""
         test_file.write_text(test_file_content)
         from logtweet.history import is_tweet_in_history
@@ -158,9 +154,9 @@ This is some more."""
         """Test history message with prefix in file."""
         tweet_content = "This is a\n\nmultiline\n\ntweet."
         from logtweet.history import create_tweet_history_msg
-        tweet_logging_msg = create_tweet_history_msg(tweet_content)
+        tweet_history_msg = create_tweet_history_msg(tweet_content)
         test_file_content = f"""This is something.
-Here is something. But '{tweet_logging_msg}' is here too.
+Here is something. But '{tweet_history_msg}' is here too.
 This is some more."""
         test_file.write_text(test_file_content)
         from logtweet.history import is_tweet_in_history
