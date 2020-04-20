@@ -4,6 +4,7 @@
 
 from typing import Literal
 
+import requests
 import validators  # type: ignore
 
 from logtweet._source.exceptions import NotAUrlError
@@ -30,6 +31,7 @@ class OnlineLogSource(object):
         """
         self.raise_for_invalid_url(source_string)
         self.source_string = source_string
+        # self.get_content_from_online_source(self.source_string)
 
     @staticmethod
     def raise_for_invalid_url(source_string: str) -> None:
@@ -50,3 +52,8 @@ class OnlineLogSource(object):
         is_url = validators.url(source_string)
         if is_url is not True:
             raise NotAUrlError(source_string)
+
+    def get_content_from_online_source(self, source_string: str) -> str:
+        """Get content from online source."""
+        response = requests.get(source_string)
+        return response.text
