@@ -55,9 +55,9 @@ class TestGetContentFromOnlineSource(object):
             "get",
             self.mock_get_factory(200, mock_page_content),
         )
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
 
-        returned_page_content = OnlineLogSource.get_content_from_url(
+        returned_page_content = get_content_from_url(
             valid_url_obj,
         )
 
@@ -76,10 +76,10 @@ class TestGetContentFromOnlineSource(object):
             self.mock_get_factory(404, mock_page_content),
         )
         from logtweet._source.exceptions import HTTPStatusError
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
 
         with pytest.raises(HTTPStatusError):
-            OnlineLogSource.get_content_from_url(valid_url_obj)
+            get_content_from_url(valid_url_obj)
 
     def test_error_for_404_shows_status_code(
         self,
@@ -94,10 +94,10 @@ class TestGetContentFromOnlineSource(object):
             self.mock_get_factory(404, mock_page_content),
         )
         from logtweet._source.exceptions import HTTPStatusError
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
 
         with pytest.raises(HTTPStatusError, match=r".*404.*"):
-            OnlineLogSource.get_content_from_url(valid_url_obj)
+            get_content_from_url(valid_url_obj)
 
     def test_raises_error_for_connection_error(self, monkeypatch, valid_url_obj):
         from logtweet._source.online import requests
@@ -109,10 +109,10 @@ class TestGetContentFromOnlineSource(object):
             mock_get_raises_connection_error,
         )
         from logtweet._source.exceptions import RequestError
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
 
         with pytest.raises(RequestError):
-            OnlineLogSource.get_content_from_url(valid_url_obj)
+            get_content_from_url(valid_url_obj)
 
     def test_raised_error_for_connection_error_shows_url(
         self,
@@ -129,13 +129,13 @@ class TestGetContentFromOnlineSource(object):
             mock_get_raises_connection_error,
         )
         from logtweet._source.exceptions import RequestError
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
 
         with pytest.raises(
             RequestError,
             match=r".*{0}.*".format(valid_url),
         ):
-            OnlineLogSource.get_content_from_url(valid_url_obj)
+            get_content_from_url(valid_url_obj)
 
     def test_raises_type_error_if_input_not_valid_url_instance(
         self,
@@ -149,11 +149,11 @@ class TestGetContentFromOnlineSource(object):
         URL by creating a corresponding object.
 
         """
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.online import get_content_from_url
         assert isinstance(valid_url, str)
 
         with pytest.raises(TypeError):
-            OnlineLogSource.get_content_from_url(valid_url)
+            get_content_from_url(valid_url)
 
 
 class TestInitialization(object):
@@ -165,18 +165,18 @@ class TestInitialization(object):
         monkeypatch,
         valid_url,
     ):
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source import online
         def returns_page_content(*args, **kwargs):
             return page_content
         monkeypatch.setattr(
-            OnlineLogSource,
+            online,
             "get_content_from_url",
             returns_page_content,
         )
 
-        instance = OnlineLogSource(valid_url)
+        instance = online.OnlineLogSource(valid_url)
 
-        assert isinstance(instance, OnlineLogSource)
+        assert isinstance(instance, online.OnlineLogSource)
 
     def test_valid_url_makes_content_available(
         self,
@@ -184,16 +184,16 @@ class TestInitialization(object):
         monkeypatch,
         valid_url,
     ):
-        from logtweet._source.online import OnlineLogSource
+        from logtweet._source import online
         def returns_page_content(*args, **kwargs):
             return page_content
         monkeypatch.setattr(
-            OnlineLogSource,
+            online,
             "get_content_from_url",
             returns_page_content,
         )
 
-        online_obj = OnlineLogSource(valid_url)
+        online_obj = online.OnlineLogSource(valid_url)
 
         assert online_obj.content == page_content
 
@@ -203,4 +203,3 @@ class TestInitialization(object):
 
         with pytest.raises(NotAUrlError):
             OnlineLogSource(invalid_url)
-

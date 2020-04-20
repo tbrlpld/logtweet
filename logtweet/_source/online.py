@@ -42,40 +42,40 @@ class OnlineLogSource(object):
 
         self.url = ValidUrl(source_string)  # Raises NotAUrlError
 
-        self._content = self.get_content_from_url(self.url)
-
-    @staticmethod
-    def get_content_from_url(valid_url: ValidUrl) -> str:
-        """
-        Get content from online source.
-
-        Arguments:
-            valid_url (ValidUrl): Validated url object from which the content
-                should be retrieved.
-
-        Raises:
-            RequestError: when the network connection to the URL target
-                fails.
-            HTTPStatusError: when the URL host responds with an error status
-                code.
-
-        """
-        if not isinstance(valid_url, ValidUrl):
-            raise TypeError(
-                "Expected `ValidUrl` got {0}".format(type(valid_url)),
-            )
-
-        try:
-            response = requests.get(valid_url.url)
-        except requests.exceptions.RequestException:
-            raise RequestError(valid_url.url)
-
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as error:
-            raise HTTPStatusError(error)
-        return response.text
+        self._content = get_content_from_url(self.url)
 
     @property
     def content(self):
         return self._content
+
+
+def get_content_from_url(valid_url: ValidUrl) -> str:
+    """
+    Get content from online source.
+
+    Arguments:
+        valid_url (ValidUrl): Validated url object from which the content
+            should be retrieved.
+
+    Raises:
+        RequestError: when the network connection to the URL target
+            fails.
+        HTTPStatusError: when the URL host responds with an error status
+            code.
+
+    """
+    if not isinstance(valid_url, ValidUrl):
+        raise TypeError(
+            "Expected `ValidUrl` got {0}".format(type(valid_url)),
+        )
+
+    try:
+        response = requests.get(valid_url.url)
+    except requests.exceptions.RequestException:
+        raise RequestError(valid_url.url)
+
+    try:
+        response.raise_for_status()
+    except requests.HTTPError as error:
+        raise HTTPStatusError(error)
+    return response.text

@@ -15,19 +15,19 @@ def invalid_url():
 
 
 class TestIsValidUrlStaticMethod(object):
-    """Test the static ``raise_for_invalid_url`` method."""
+    """Test the ``is_valid_url`` function."""
 
     def test_valid_url_returns_none(self, valid_url):
-        from logtweet._source.valid_url import ValidUrl
+        from logtweet._source.valid_url import is_valid_url
 
-        is_valid = ValidUrl.is_valid_url(valid_url)
+        is_valid = is_valid_url(valid_url)
 
         assert is_valid is True
 
     def test_valid_url_returns_none(self, invalid_url):
-        from logtweet._source.valid_url import ValidUrl
+        from logtweet._source.valid_url import is_valid_url
 
-        is_valid = ValidUrl.is_valid_url(invalid_url)
+        is_valid = is_valid_url(invalid_url)
 
         assert is_valid is False
 

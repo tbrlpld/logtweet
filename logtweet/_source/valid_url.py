@@ -23,24 +23,23 @@ class ValidUrl(object):
             NotAUrlError: if the passed url is not a valid URL.
 
         """
-
-        if not self.is_valid_url(url):
+        if not is_valid_url(url):
             raise NotAUrlError(url)
         self.url = url
 
-    @staticmethod
-    def is_valid_url(url: str) -> bool:
-        """
-        Check if the given URL is valid.
 
-        Arguments:
-            url (str): URL that is to be validated.
+def is_valid_url(url: str) -> bool:
+    """
+    Check if the given URL is valid.
 
-        Returns:
-            bool: Expresses if the given URL is valid.
+    Arguments:
+        url (str): URL that is to be validated.
 
-        """
-        is_url = validators.url(url)
-        if is_url is not True:
-            return False
-        return True
+    Returns:
+        bool: Expresses if the given URL is valid.
+
+    """
+    is_url = validators.url(url)
+    if is_url is not True:
+        return False
+    return True
