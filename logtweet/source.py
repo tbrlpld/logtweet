@@ -15,6 +15,8 @@ def get_log_content_from_source(source_string: str) -> str:
             log content from.
 
     """
+    # TODO: Implement functionality for `get_log_content_from_source`
+
     # Instantiate online source object.
     # Instantiation only works if the given source string is in fact a URL and
     # can be reached.
