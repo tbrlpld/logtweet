@@ -53,7 +53,9 @@ class OnlineLogSource(object):
         if is_url is not True:
             raise NotAUrlError(source_string)
 
-    def get_content_from_online_source(self, source_string: str) -> str:
+    def get_content_from_online_source(self, source_string: str = None) -> str:
         """Get content from online source."""
+        if source_string is None:
+            source_string = self.source_string
         response = requests.get(source_string)
         return response.text

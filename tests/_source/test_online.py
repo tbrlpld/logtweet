@@ -68,24 +68,52 @@ class TestRaiseForInvalidUrlStaticMethod(object):
 class TestGetContentFromOnlineSource(object):
     """Test `get_content_from_online_source` method."""
 
-    def test_returns_page_content_from_source_string(
+    @staticmethod
+    def mock_get_factory(status_code: int, page_content: str = ""):
+        import requests
+        def mock_get(*args, **kwargs):
+            mock_resp = requests.Response()
+            mock_resp.status = status_code
+            mock_resp._content = bytes(page_content, encoding="utf-8")
+            return mock_resp
+        return mock_get
+
+    def test_returns_page_content_from_passed_source_string(
         self,
         monkeypatch,
         valid_url,
     ):
         mock_page_content = "<html><body>The content</body></html>"
         from logtweet._source.online import requests
-        def mock_get(*args, **kwargs):
-            mock_resp = requests.Response()
-            mock_resp.status = 200
-            mock_resp._content = bytes(mock_page_content, encoding="utf-8")
-            return mock_resp
-        monkeypatch.setattr(requests, "get", mock_get)
+        monkeypatch.setattr(
+            requests,
+            "get",
+            self.mock_get_factory(200, mock_page_content),
+        )
         from logtweet._source.online import OnlineLogSource
         online_obj = OnlineLogSource(valid_url)
 
         returned_page_content = online_obj.get_content_from_online_source(
             source_string=valid_url,
         )
+
+        assert returned_page_content == mock_page_content
+
+    def test_returns_page_content_instance_source_string_if_none_passed(
+        self,
+        monkeypatch,
+        valid_url,
+    ):
+        mock_page_content = "<html><body>The content</body></html>"
+        from logtweet._source.online import requests
+        monkeypatch.setattr(
+            requests,
+            "get",
+            self.mock_get_factory(200, mock_page_content),
+        )
+        from logtweet._source.online import OnlineLogSource
+        online_obj = OnlineLogSource(valid_url)
+
+        returned_page_content = online_obj.get_content_from_online_source()
 
         assert returned_page_content == mock_page_content
