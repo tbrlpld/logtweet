@@ -32,17 +32,9 @@ class OnlineLogSource(object):
             source_string (str): String that identifies the online resource
                 which should be validated.
 
-        Raises:
-            NotAUrlError: when the passed source string is not a valid URL.
-            RequestError: when the network connection to the URL target fails.
-            HTTPStatusError: when the URL host responds with an error status
-                code.
-
         """
-        # Raises NotAUrlError
         self.url = ValidUrl(source_string)
 
-        # Raises RequestError and HTTPStatusError
         self._content = get_content_from_url(self.url)  # noqa: WPS110
 
     @property
