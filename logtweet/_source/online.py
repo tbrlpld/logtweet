@@ -24,6 +24,11 @@ class OnlineLogSource(object):
         During initialization, it is validated that the given ``source_string``
         is in fact a valid URL representation.
 
+        Also, the online source is only valid if the content can successfully
+        be retrieved. Thus, a successful instantiation makes the log content
+        available. If anything fails while retrieving the content, the
+        instantiation fails and no element is created.
+
         Arguments:
             source_string (str): String that identifies the online resource
                 which should be validated.
@@ -33,9 +38,11 @@ class OnlineLogSource(object):
                 valid URL.
 
         """
+        # TODO: Extract the valid URL into a separate type and only accept that
+        #       type for further processing.
         self.raise_for_invalid_url(source_string)
         self.url = source_string
-        # self.get_content_from_online_source(self.source_string)
+        self._content = self.get_content_from_url(self.url)
 
     @staticmethod
     def raise_for_invalid_url(source_string: str) -> None:
@@ -57,14 +64,15 @@ class OnlineLogSource(object):
         if is_url is not True:
             raise NotAUrlError(source_string)
 
-    def get_content_from_url(self, url: str = None) -> str:
+    @staticmethod
+    def get_content_from_url(url: str) -> str:
         """
         Get content from online source.
 
-        # TODO: How to document side effects?
+        This function requires the passed string to be a valid URL. This
+        expectation should be enforced. So another type that only works for
+        valid URLs might make sense.
         """
-        if url is None:
-            url = self.url
 
         try:
             response = requests.get(url)
@@ -76,3 +84,7 @@ class OnlineLogSource(object):
         except requests.HTTPError as error:
             raise HTTPStatusError(error)
         return response.text
+
+    @property
+    def content(self):
+        return self._content

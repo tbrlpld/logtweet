@@ -17,22 +17,52 @@ def valid_url():
 def invalid_url():
     return "not a url, just a string"
 
+@pytest.fixture
+def page_content():
+    return "<html><body>The content</body></html>"
+
 
 class TestInitialization(object):
     """Test the initialization of ``OnlineLogSource``."""
-    def test_valid_url_creates_instance(self, valid_url):
+    # def test_valid_url_creates_instance(self, valid_url):
+    #     from logtweet._source.online import OnlineLogSource
+
+    #     instance = OnlineLogSource(valid_url)
+
+    #     assert isinstance(instance, OnlineLogSource)
+
+    # def test_invalid_url_raises_exception(self, invalid_url):
+    #     from logtweet._source.online import OnlineLogSource
+    #     from logtweet._source.exceptions import NotAUrlError
+
+    #     with pytest.raises(NotAUrlError):
+    #         OnlineLogSource(invalid_url)
+    def test_initializing_with_valid_url_makes_content_available(
+        self,
+        page_content,
+        monkeypatch,
+        valid_url,
+    ):
+        # Mock the methods that are tested below.
         from logtweet._source.online import OnlineLogSource
+        def returns_none(*args, **kwargs):
+            return None
+        monkeypatch.setattr(
+            OnlineLogSource,
+            "raise_for_invalid_url",
+            returns_none,
+        )
+        def returns_page_content(*args, **kwargs):
+            return page_content
+        monkeypatch.setattr(
+            OnlineLogSource,
+            "get_content_from_url",
+            returns_page_content,
+        )
 
-        instance = OnlineLogSource(valid_url)
+        online_obj = OnlineLogSource(valid_url)
 
-        assert isinstance(instance, OnlineLogSource)
-
-    def test_invalid_url_raises_exception(self, invalid_url):
-        from logtweet._source.online import OnlineLogSource
-        from logtweet._source.exceptions import NotAUrlError
-
-        with pytest.raises(NotAUrlError):
-            OnlineLogSource(invalid_url)
+        assert online_obj.content == page_content
 
 
 class TestRaiseForInvalidUrlStaticMethod(object):
@@ -91,32 +121,32 @@ class TestGetContentFromOnlineSource(object):
             self.mock_get_factory(200, mock_page_content),
         )
         from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+        # online_obj = OnlineLogSource(valid_url)
 
-        returned_page_content = online_obj.get_content_from_url(
+        returned_page_content = OnlineLogSource.get_content_from_url(
             url=valid_url,
         )
 
         assert returned_page_content == mock_page_content
 
-    def test_returns_page_content_instance_source_string_if_none_passed(
-        self,
-        monkeypatch,
-        valid_url,
-    ):
-        mock_page_content = "<html><body>The content</body></html>"
-        from logtweet._source.online import requests
-        monkeypatch.setattr(
-            requests,
-            "get",
-            self.mock_get_factory(200, mock_page_content),
-        )
-        from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+    # def test_returns_page_content_instance_source_string_if_none_passed(
+    #     self,
+    #     monkeypatch,
+    #     valid_url,
+    # ):
+    #     mock_page_content = "<html><body>The content</body></html>"
+    #     from logtweet._source.online import requests
+    #     monkeypatch.setattr(
+    #         requests,
+    #         "get",
+    #         self.mock_get_factory(200, mock_page_content),
+    #     )
+    #     from logtweet._source.online import OnlineLogSource
+    #     online_obj = OnlineLogSource(valid_url)
 
-        returned_page_content = online_obj.get_content_from_url()
+    #     returned_page_content = online_obj.get_content_from_url()
 
-        assert returned_page_content == mock_page_content
+    #     assert returned_page_content == mock_page_content
 
     def test_raises_error_for_404(
         self,
@@ -132,10 +162,10 @@ class TestGetContentFromOnlineSource(object):
         )
         from logtweet._source.exceptions import HTTPStatusError
         from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+        # online_obj = OnlineLogSource(valid_url)
 
         with pytest.raises(HTTPStatusError):
-            online_obj.get_content_from_url()
+            OnlineLogSource.get_content_from_url(valid_url)
 
     def test_error_for_404_shows_status_code(
         self,
@@ -151,10 +181,10 @@ class TestGetContentFromOnlineSource(object):
         )
         from logtweet._source.exceptions import HTTPStatusError
         from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+        # online_obj = OnlineLogSource(valid_url)
 
         with pytest.raises(HTTPStatusError, match=r".*404.*"):
-            online_obj.get_content_from_url()
+            OnlineLogSource.get_content_from_url(valid_url)
 
     def test_raises_error_for_connection_error(self, monkeypatch, valid_url):
         from logtweet._source.online import requests
@@ -167,10 +197,10 @@ class TestGetContentFromOnlineSource(object):
         )
         from logtweet._source.exceptions import RequestError
         from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+        # online_obj = OnlineLogSource(valid_url)
 
         with pytest.raises(RequestError):
-            online_obj.get_content_from_url()
+            OnlineLogSource.get_content_from_url(valid_url)
 
     def test_raised_error_for_connection_error_shows_url(
         self,
@@ -187,7 +217,7 @@ class TestGetContentFromOnlineSource(object):
         )
         from logtweet._source.exceptions import RequestError
         from logtweet._source.online import OnlineLogSource
-        online_obj = OnlineLogSource(valid_url)
+        # online_obj = OnlineLogSource(valid_url)
 
         with pytest.raises(RequestError, match=r".*{0}.*".format(valid_url)):
-            online_obj.get_content_from_url()
+            OnlineLogSource.get_content_from_url(valid_url)
