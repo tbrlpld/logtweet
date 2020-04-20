@@ -60,6 +60,11 @@ class OnlineLogSource(object):
                 code.
 
         """
+        if not isinstance(valid_url, ValidUrl):
+            raise TypeError(
+                "Expected `ValidUrl` got {0}".format(type(valid_url)),
+            )
+
         try:
             response = requests.get(valid_url.url)
         except requests.exceptions.RequestException:

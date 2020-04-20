@@ -137,6 +137,24 @@ class TestGetContentFromOnlineSource(object):
         ):
             OnlineLogSource.get_content_from_url(valid_url_obj)
 
+    def test_raises_type_error_if_input_not_valid_url_instance(
+        self,
+        valid_url,
+    ):
+        """
+        Test raises type error if input is not instance of  ``ValidUrl``.
+
+        E.g. if the input is of type string (even if this represents a valid
+        URL) the type error is raised. The caller is expected to validate the
+        URL by creating a corresponding object.
+
+        """
+        from logtweet._source.online import OnlineLogSource
+        assert isinstance(valid_url, str)
+
+        with pytest.raises(TypeError):
+            OnlineLogSource.get_content_from_url(valid_url)
+
 
 class TestInitialization(object):
     """Test the initialization of ``OnlineLogSource``."""
