@@ -30,5 +30,14 @@ def make_tweet_content(preamble: str, message: str, link: str) -> str:
     """
     Make formatted tweet message from preamble, message and link.
 
+    Arguments:
+        preamble (str): Preamble to be used in the beginning of the tweet.
+        message (str): Main message of the tweet.
+        link (str): Link to be added in the end of the tweet.
+
+    Returns:
+        str: Full tweet content. If only empty strings are passed, this string
+            still contains the white space used to format the message.
+
     """
     return f"{preamble} {message}\n\n{link}"

@@ -49,22 +49,30 @@ class TestMakePreamble(object):
 class TestMakeTweetContent(object):
     """Tests for `make_tweet_content` function."""
 
-    def test_tweet_message_format(self):
+    @pytest.mark.parametrize(
+        "preamble, message, link, expected_tweet_content",
+        [
+            ("", "", "", " \n\n"),  # Testing the white space
+            ("preamble", "message", "link", "preamble message\n\nlink"),
+            (
+                "preamble",
+                "messages first line\nmessages second line.",
+                "link",
+                "preamble messages first line\nmessages second line.\n\nlink"
+            ),
+        ],
+    )
+    def test_tweet_message_format(
+        self,
+        preamble,
+        message,
+        link,
+        expected_tweet_content,
+    ):
         preamble = "preamble"
         message = "message"
         link = "link"
         expected_tweet_content = "preamble message\n\nlink"
-        from logtweet._content.build import make_tweet_content
-
-        actual_tweet_content = make_tweet_content(preamble, message, link)
-
-        assert actual_tweet_content == expected_tweet_content
-
-    def test_multiline_message(self):
-        preamble = "preamble"
-        message = "messages first line\nmessages second line."
-        link = "link"
-        expected_tweet_content = "preamble messages first line\nmessages second line.\n\nlink"
         from logtweet._content.build import make_tweet_content
 
         actual_tweet_content = make_tweet_content(preamble, message, link)

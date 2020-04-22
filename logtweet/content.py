@@ -10,9 +10,6 @@ import bs4  # type: ignore
 from logtweet._content import extract, build, shortlink  # noqa: WPS436
 
 
-MAX_TWEET_LEN = 240
-
-
 def get_tweet_content(
     log_string: str,
     day_date: datetime.date,
@@ -78,13 +75,24 @@ def get_tweet_content(
 def calc_max_tweet_msg_len(
     preamble: str,
     link: str,
-    max_tweet_len: int = MAX_TWEET_LEN,
-):
+    max_tweet_len: int = 240,
+) -> int:
     """
     Calculate maximum tweet message length.
 
-    The maximum available message length in the tweet is depended on the
-    length of preamble and the length of the link.
+    The available length for the message is simply the subtraction of the
+    preamble, the link and the white spaces in an empty tweet from the maximum
+    tweet length.
+
+    Arguments:
+        preamble (str): Preamble to be used in the beginning of the tweet.
+        link (str): Link to be added in the end of the tweet.
+        max_tweet_len (int): (Optional) Default is 240.
+
+    Returns:
+        int: Length available for the tweet message, when combined with
+             the given preamble and link.
+
     """
     tweet_length_wo_message = len(build.make_tweet_content(
         preamble=preamble,
@@ -92,4 +100,3 @@ def calc_max_tweet_msg_len(
         link=link,
     ))
     return max_tweet_len - tweet_length_wo_message
-
