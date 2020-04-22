@@ -48,7 +48,7 @@ def get_tweet_content(
     day_heading = extract.get_day_heading(soup, heading_date=day_date)
 
     # Generate tweet preamble (E.g. 77/#100DaysOfCode)
-    preamble = build.build_preamble(day_heading.text)
+    preamble = build.make_preamble(day_heading.text)
 
     # Extract first link from list of links for the day.
     try:
