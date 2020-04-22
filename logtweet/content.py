@@ -46,10 +46,7 @@ def get_tweet_content(
     soup = bs4.BeautifulSoup(log_string, "html.parser")
 
     day_heading = extract.get_day_heading(soup, heading_date=day_date)
-
-    # Generate tweet preamble (E.g. 77/#100DaysOfCode)
-    preamble = build.make_preamble(day_heading.text)
-
+    day_number = extract.get_day_number_from_heading_string(day_heading.text)
     # Extract first link from list of links for the day.
     try:
         link = extract.get_first_link(day_heading)
@@ -59,6 +56,8 @@ def get_tweet_content(
         # Create shortened link to first link of the day.
         link = shortlink.get_short_link(link, bitly_api_key)
 
+    # Generate tweet preamble (E.g. 77/#100DaysOfCode)
+    preamble = build.make_preamble(day_number)
     # Calculate max message length. This needs to be the maximum tweet
     # length, reduced by the preamble and the link.
     # TODO: Create separate function to build tweet. The tweet template only

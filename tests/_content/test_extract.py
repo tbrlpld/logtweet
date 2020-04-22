@@ -112,7 +112,7 @@ class TestGetDayHeading(object):
 
 
 class TestExtractDayNumberFromHeadingString(object):
-    """Tests for `extract_day_number_from_heading_string` function."""
+    """Tests for `get_day_number_from_heading_string` function."""
 
     @pytest.mark.parametrize(
         "heading_string, expected_return",
@@ -127,8 +127,8 @@ class TestExtractDayNumberFromHeadingString(object):
     )
     def test_valid_heading(self, heading_string, expected_return):
         """Return the correct preamble for a given heading string."""
-        from logtweet._content.extract import extract_day_number_from_heading_string
-        actual_return = extract_day_number_from_heading_string(heading_string)
+        from logtweet._content.extract import get_day_number_from_heading_string
+        actual_return = get_day_number_from_heading_string(heading_string)
 
         assert actual_return == expected_return
 
@@ -146,12 +146,12 @@ class TestExtractDayNumberFromHeadingString(object):
         # heading_string = "Off-Day: November 2, 2019, Saturday"  # No day number
         # heading_string = "Day 1, October 16, 2019, Wednesday"  # Comma instead of colon.
 
-        from logtweet._content.extract import extract_day_number_from_heading_string
+        from logtweet._content.extract import get_day_number_from_heading_string
         with pytest.raises(
             ValueError,
             match=r"^Could not extract day number.*$",
         ):
-            extract_day_number_from_heading_string(heading_string)
+            get_day_number_from_heading_string(heading_string)
 
 
 class TestGetDaySubheadingByText(object):

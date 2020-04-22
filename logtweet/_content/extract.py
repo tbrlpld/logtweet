@@ -71,11 +71,11 @@ def heading_matches_date(
     return date_obj == given_date
 
 
-def extract_day_number_from_heading_string(heading_string: str) -> int:
+def get_day_number_from_heading_string(heading_string: str) -> int:
     """
     Extract day number from heading string.
 
-    >>> extract_day_number_from_heading_string(
+    >>> get_day_number_from_heading_string(
     ...    "Day 1: October 16, 2019, Wednesday",
     ... )
     1
