@@ -2,7 +2,7 @@
 
 """Setup script."""
 
-from setuptools import setup
+from setuptools import setup  # type: ignore
 
 with open("README.md", "r") as f:
     long_description = f.read()
