@@ -137,7 +137,7 @@ def get_first_link(day_heading: bs4.element.Tag) -> str:
 
     Raises:
         LookupError: is raised if no link could be found under the day's
-            heading. This also includes anchor element for empty ``href``
+            heading. This also includes anchor element with empty ``href``
             attribute.
 
     """

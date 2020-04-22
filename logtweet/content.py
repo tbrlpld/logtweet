@@ -47,36 +47,49 @@ def get_tweet_content(
 
     day_heading = extract.get_day_heading(soup, heading_date=day_date)
     day_number = extract.get_day_number_from_heading_string(day_heading.text)
-    # Extract first link from list of links for the day.
     try:
         link = extract.get_first_link(day_heading)
     except LookupError:
-        pass
+        link = ""
     else:
-        # Create shortened link to first link of the day.
         link = shortlink.get_short_link(link, bitly_api_key)
 
     # Generate tweet preamble (E.g. 77/#100DaysOfCode)
     preamble = build.make_preamble(day_number)
     # Calculate max message length. This needs to be the maximum tweet
     # length, reduced by the preamble and the link.
-    # TODO: Create separate function to build tweet. The tweet template only
-    #       needs to be available in that function.
-    tweet_content_template = "{preamble} {tweet_message}\n\n{link}"
-    tweet_length_wo_message = len(tweet_content_template.format(
-        preamble=preamble,
-        tweet_message="",
-        link=link,
-    ))
-    max_length = MAX_TWEET_LEN - tweet_length_wo_message
+    max_tweet_msg_len = calc_max_tweet_msg_len(preamble, link)
     # Get content
     # TODO: Refactor to function that retrieves all progress paragraphs.
     # TODO: Refactor to function that makes limited length string from strings.
-    tweet_message = extract.get_tweet_message(day_heading, max_len=max_length)
+    tweet_message = extract.get_tweet_message(
+        day_heading,
+        max_len=max_tweet_msg_len,
+    )
 
     # Build content from preamble, message and link
-    return tweet_content_template.format(
+    return build.make_tweet_content(
         preamble=preamble,
-        tweet_message=tweet_message,
+        message=tweet_message,
         link=link,
     )
+
+
+def calc_max_tweet_msg_len(
+    preamble: str,
+    link: str,
+    max_tweet_len: int = MAX_TWEET_LEN,
+):
+    """
+    Calculate maximum tweet message length.
+
+    The maximum available message length in the tweet is depended on the
+    length of preamble and the length of the link.
+    """
+    tweet_length_wo_message = len(build.make_tweet_content(
+        preamble=preamble,
+        message="",
+        link=link,
+    ))
+    return max_tweet_len - tweet_length_wo_message
+

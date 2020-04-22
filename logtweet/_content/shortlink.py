@@ -29,6 +29,9 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
 
     """
     # TODO: Split into separate functions for default and Bit.ly shortener.
+    # TODO: Only return shortened link, if it actually shorter. At least when
+    #       using the default link shortener. When using Bit.ly the user might
+    #       want to have the analytical data, even if the link is not shorter.
     shortener_url = "https://s.lpld.io/create"
     headers = {}
     shortlink_key = "short"
