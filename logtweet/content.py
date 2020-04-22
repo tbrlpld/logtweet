@@ -70,6 +70,8 @@ def get_tweet_content(
     ))
     max_length = MAX_TWEET_LEN - tweet_length_wo_message
     # Get content
+    # TODO: Refactor to function that retrieves all progress paragraphs.
+    # TODO: Refactor to function that makes limited length string from strings.
     tweet_message = extract.get_tweet_message(day_heading, max_len=max_length)
 
     # Build content from preamble, message and link

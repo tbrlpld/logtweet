@@ -24,3 +24,11 @@ def make_preamble(day_number: int) -> str:
             "Expected 'int', got '{0}'".format(type(day_number).__name__),
         )
     return f"{day_number}/#100DaysOfCode"
+
+
+def make_tweet_content(preamble: str, message: str, link: str) -> str:
+    """
+    Make formatted tweet message from preamble, message and link.
+
+    """
+    return f"{preamble} {message}\n\n{link}"

@@ -44,3 +44,29 @@ class TestMakePreamble(object):
             match=r"^Expected 'int', got '{0}'.*$".format(received_type),
         ):
             make_preamble(day_number)
+
+
+class TestMakeTweetContent(object):
+    """Tests for `make_tweet_content` function."""
+
+    def test_tweet_message_format(self):
+        preamble = "preamble"
+        message = "message"
+        link = "link"
+        expected_tweet_content = "preamble message\n\nlink"
+        from logtweet._content.build import make_tweet_content
+
+        actual_tweet_content = make_tweet_content(preamble, message, link)
+
+        assert actual_tweet_content == expected_tweet_content
+
+    def test_multiline_message(self):
+        preamble = "preamble"
+        message = "messages first line\nmessages second line."
+        link = "link"
+        expected_tweet_content = "preamble messages first line\nmessages second line.\n\nlink"
+        from logtweet._content.build import make_tweet_content
+
+        actual_tweet_content = make_tweet_content(preamble, message, link)
+
+        assert actual_tweet_content == expected_tweet_content
