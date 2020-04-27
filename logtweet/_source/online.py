@@ -18,7 +18,7 @@ class OnlineLogSource(object):
         """
         Initialize OnlineLogSource object.
 
-        During initialization, it is validated that the given `source_string`
+        During initialization, it is validated that the given `url`
         is in fact a valid URL representation.
 
         Also, the online source is only valid if the content can successfully
