@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 import requests
 
-from logtweet import conf, history, send, content
+from logtweet import conf, history, send, content, source
 
 
 def main():
@@ -25,17 +25,10 @@ def main():
         fallback=None,
     )
 
-    # TODO: Add validation that this is actually a URL. This would go hand in
-    #       hand with creating other options for sources. Validation should be
-    #       placed in custom classes. The instantiation of the class fails if
-    #       the source does not match the expected type. Chaining try-except
-    #       blocks allows testing for multiple possible source types. When all
-    #       possible sources fail, inform the user.
-    response = requests.get(source_string)
-    # log_content = get_log_content_from_source(source_string)
+    log_content = source.get_log_content_from_source(source_string)
 
     tweet_content = content.get_tweet_content(
-        response.text,
+        log_content,
         day_date,
         bitly_api_key,
     )
@@ -43,7 +36,7 @@ def main():
     if args.testmode:
         print(tweet_content)
     else:
-        # Check log before sending tweet to prevent duplication.
+        # Check history before sending tweet to prevent duplication.
         tweeted_before = history.is_tweet_in_history(tweet_content)
         if tweeted_before:
             err_msg = "Tweet with this content already exists!"
