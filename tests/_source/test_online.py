@@ -30,6 +30,55 @@ def page_content():
     return "<html><body>The content</body></html>"
 
 
+class TestInitialization(object):
+    """Test the initialization of ``OnlineLogSource``."""
+
+    def test_valid_url_creates_instance(
+        self,
+        page_content,
+        monkeypatch,
+        valid_url,
+    ):
+        from logtweet._source import online
+        def returns_page_content(*args, **kwargs):
+            return page_content
+        monkeypatch.setattr(
+            online,
+            "get_content_from_url",
+            returns_page_content,
+        )
+
+        instance = online.OnlineLogSource(valid_url)
+
+        assert isinstance(instance, online.OnlineLogSource)
+
+    def test_valid_url_makes_content_available(
+        self,
+        page_content,
+        monkeypatch,
+        valid_url,
+    ):
+        from logtweet._source import online
+        def returns_page_content(*args, **kwargs):
+            return page_content
+        monkeypatch.setattr(
+            online,
+            "get_content_from_url",
+            returns_page_content,
+        )
+
+        online_obj = online.OnlineLogSource(valid_url)
+
+        assert online_obj.content == page_content
+
+    def test_invalid_url_raises_exception(self, invalid_url):
+        from logtweet._source.online import OnlineLogSource
+        from logtweet._source.exceptions import NotAUrlError
+
+        with pytest.raises(NotAUrlError):
+            OnlineLogSource(invalid_url)
+
+
 class TestGetContentFromOnlineSource(object):
     """Test `get_content_from_online_source` static method."""
 
@@ -155,51 +204,3 @@ class TestGetContentFromOnlineSource(object):
         with pytest.raises(TypeError):
             get_content_from_url(valid_url)
 
-
-class TestInitialization(object):
-    """Test the initialization of ``OnlineLogSource``."""
-
-    def test_valid_url_creates_instance(
-        self,
-        page_content,
-        monkeypatch,
-        valid_url,
-    ):
-        from logtweet._source import online
-        def returns_page_content(*args, **kwargs):
-            return page_content
-        monkeypatch.setattr(
-            online,
-            "get_content_from_url",
-            returns_page_content,
-        )
-
-        instance = online.OnlineLogSource(valid_url)
-
-        assert isinstance(instance, online.OnlineLogSource)
-
-    def test_valid_url_makes_content_available(
-        self,
-        page_content,
-        monkeypatch,
-        valid_url,
-    ):
-        from logtweet._source import online
-        def returns_page_content(*args, **kwargs):
-            return page_content
-        monkeypatch.setattr(
-            online,
-            "get_content_from_url",
-            returns_page_content,
-        )
-
-        online_obj = online.OnlineLogSource(valid_url)
-
-        assert online_obj.content == page_content
-
-    def test_invalid_url_raises_exception(self, invalid_url):
-        from logtweet._source.online import OnlineLogSource
-        from logtweet._source.exceptions import NotAUrlError
-
-        with pytest.raises(NotAUrlError):
-            OnlineLogSource(invalid_url)
