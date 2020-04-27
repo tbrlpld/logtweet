@@ -5,8 +5,6 @@
 import argparse
 from datetime import date, timedelta
 
-import requests
-
 from logtweet import conf, history, send, content, source
 
 
