@@ -1,5 +1,5 @@
-# TODO: Add tests for `get_tweet_content` function.
-# TODO: Test no link in list.
+# TEST: Add tests for `get_tweet_content` function.
+# TEST: No link in list.
 
 import pytest  # type: ignore
 
