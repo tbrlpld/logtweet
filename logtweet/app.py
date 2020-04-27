@@ -11,7 +11,16 @@ from logtweet import conf, history, send, content, source
 
 
 def main():
-    """Create a tweet based on today's log message."""
+    """
+    Create a tweet based on today's log message.
+
+    Raises
+    ------
+    RuntimeError
+        When function is run in a way that leads to attempting to send a tweet
+        that has been sent before.
+
+    """
     parser = create_arg_parser()
     args = parser.parse_args()
 
@@ -39,8 +48,7 @@ def main():
         # Check history before sending tweet to prevent duplication.
         tweeted_before = history.is_tweet_in_history(tweet_content)
         if tweeted_before:
-            err_msg = "Tweet with this content already exists!"
-            raise RuntimeError(err_msg)
+            raise RuntimeError("Tweet with this content already exists!")
         # Send the tweet
         send.send_tweet(tweet_content, config["Twitter"])
         # Create history record of sent tweet for future lookup.
