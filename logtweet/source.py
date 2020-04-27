@@ -3,6 +3,9 @@
 """Retrieve log content from different sources."""
 
 
+from logtweet._source.online import OnlineLogSource
+
+
 def get_log_content_from_source(source_string: str) -> str:
     """
     Get log content from the given source.
@@ -15,13 +18,5 @@ def get_log_content_from_source(source_string: str) -> str:
             log content from.
 
     """
-    # TODO: Implement functionality for `get_log_content_from_source`
-
-    # Instantiate online source object.
-    # Instantiation only works if the given source string is in fact a URL and
-    # can be reached.
-
-    # Get content from online source object...
-
-    # ... and return the content (string).
-    pass
+    online_obj = OnlineLogSource(source_string)
+    return online_obj.content
