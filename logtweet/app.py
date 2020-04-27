@@ -61,6 +61,7 @@ def create_arg_parser() -> argparse.ArgumentParser:
         "-o",
         "--offset",
         type=int,
+        default=0,
         help=(
             "Days to offset the today value with."
             + " Can be positive or negative."
