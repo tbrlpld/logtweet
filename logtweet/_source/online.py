@@ -36,12 +36,14 @@ class OnlineLogSource(object):
 
         Raises
         ------
-        NotAUrlError:
+        NotAUrlError
             If the passed URL is not a valid URL.
-        RequestError:
+        RequestError
             When the network connection to the URL target fails.
-        HTTPStatusError:
+        HTTPStatusError
             When the URL host responds with an error status code.
+
+        # noqa: DAR402
 
         """
         self.url = ValidUrl(url)
