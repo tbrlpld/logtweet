@@ -20,6 +20,7 @@ develop_requires = [
     # See: https://packaging.python.org/tutorials/packaging-projects/
     "twine",
     "pytest",
+    "pytest-cov",
     "wemake-python-styleguide",
     "mypy",
 ]
