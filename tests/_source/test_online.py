@@ -9,26 +9,6 @@ import pytest  # type: ignore
 # Or I need to mock the function that represents the availability of an online
 # source.
 
-@pytest.fixture
-def valid_url():
-    return "https://example.com"
-
-
-@pytest.fixture
-def valid_url_obj(valid_url):
-    from logtweet._source.valid_url import ValidUrl
-    return ValidUrl(valid_url)
-
-
-@pytest.fixture
-def invalid_url():
-    return "not a url, just a string"
-
-
-@pytest.fixture
-def page_content():
-    return "<html><body>The content</body></html>"
-
 
 class TestInitialization(object):
     """Test the initialization of ``OnlineLogSource``."""
