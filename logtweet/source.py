@@ -40,3 +40,9 @@ def get_log_content_from_source(source_string: str) -> str:
     """
     online_obj = OnlineLogSource(source_string)
     return online_obj.content
+
+# TODO: Define an abstract Source base class. This will define the needed
+#       functionality from the perspective of this module. The implementations
+#       can then inherit from that abstract class and only need to implement
+#       the desired functionality. I need to think about how to **restructure
+#       the modules** to do that though. I need to avoid circular dependencies.

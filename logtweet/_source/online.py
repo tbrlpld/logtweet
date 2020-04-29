@@ -47,6 +47,9 @@ class OnlineLogSource(object):
 
         """
         self.url = ValidUrl(url)
+        # TODO: Accept the concrete URL validator as a parameter.
+        # TODO: Define an abstract URL validator that defines what the
+        #       validator needs to provide from this class' perspective.
 
         self._content = get_content_from_url(self.url)  # noqa: WPS110
 
