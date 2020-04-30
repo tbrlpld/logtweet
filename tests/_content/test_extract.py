@@ -4,7 +4,8 @@
 
 from datetime import date
 
-import pytest
+from bs4 import BeautifulSoup
+import pytest  # type: ignore
 
 
 @pytest.fixture
@@ -282,6 +283,53 @@ class TestGetFirstLink(object):
 
         with pytest.raises(LookupError):
             get_first_link(day_heading)
+
+
+class TestGetProgressParagraphs(object):
+    """Tests for `get_progress_paragraphs` method."""
+
+
+    def test_no_progress_section(self):
+        html_log_content = """<html><body>
+<h2>Day 1: October 16, 2019, Wednesday</h2>
+</body></html>"""
+        soup = BeautifulSoup(html_log_content, "html.parser")
+        from logtweet._content.extract import get_day_heading
+        day_heading = get_day_heading(soup, date(2019, 10, 16))
+        from logtweet._content.extract import get_progress_paragraphs
+
+        with pytest.raises(LookupError):
+            get_progress_paragraphs(day_heading)
+
+
+    def test_no_paragraphs_after_progress_section(self):
+        pass
+
+    def test_no_content_in_paragraphs(self):
+        pass
+
+    def test_returns_all_pargraphs(self):
+        pass
+
+
+    # def test_returns_all_progress_pargraphs(self, day_1_heading):
+    #     expected = (
+    #         "It's the first paragraph. It's 50 characters long.",
+    #         "The second paragraph. This is one that's 60 characters long.",
+    #     )
+    #     from logtweet._content.extract import get_progress_paragraphs
+
+    #     actual = get_progress_paragraphs(day_1_heading)
+
+    #     assert actual == expected
+
+
+
+
+
+
+
+
 
 
 class TestGetTweetMessage(object):

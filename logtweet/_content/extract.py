@@ -200,6 +200,20 @@ def get_day_subheading_by_text(
     )
 
 
+def get_progress_paragraphs(day_heading: bs4.element.Tag):
+    """
+    Return all progress paragraphs that follow the given `day_heading`.
+
+    """
+    progress_heading = get_day_subheading_by_text(
+        day_heading,
+        "Today's Progress",
+    )
+
+    # next_sibling = progress_heading.find_next_sibling()
+
+
+
 def get_tweet_message(day_heading: bs4.element.Tag, max_len: int) -> str:
     """
     Extract the tweet content from the paragraphs after content heading.
