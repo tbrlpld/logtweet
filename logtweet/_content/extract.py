@@ -7,6 +7,8 @@ import re
 
 import bs4  # type: ignore
 
+from logtweet._content import exceptions
+
 
 DATE_FORMAT = "%B %d, %Y"  # noqa: WPS323
 
@@ -210,7 +212,9 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
         "Today's Progress",
     )
 
-    # next_sibling = progress_heading.find_next_sibling()
+    next_sibling = progress_heading.find_next_sibling()
+    if next_sibling is None or next_sibling.name != "p":
+        raise exceptions.NoProgressPargraphs
 
 
 

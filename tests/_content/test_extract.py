@@ -288,22 +288,45 @@ class TestGetFirstLink(object):
 class TestGetProgressParagraphs(object):
     """Tests for `get_progress_paragraphs` method."""
 
-
-    def test_no_progress_section(self):
+    @staticmethod
+    def get_day_heading_with_added_html(html_insert=""):
         html_log_content = """<html><body>
-<h2>Day 1: October 16, 2019, Wednesday</h2>
-</body></html>"""
+<h2>Day 1: October 16, 2019, Wednesday</h2>{0}
+</body></html>""".format(html_insert)
         soup = BeautifulSoup(html_log_content, "html.parser")
         from logtweet._content.extract import get_day_heading
-        day_heading = get_day_heading(soup, date(2019, 10, 16))
+        return get_day_heading(soup, date(2019, 10, 16))
+
+    def test_no_progress_section(self):
+        day_heading = self.get_day_heading_with_added_html()
         from logtweet._content.extract import get_progress_paragraphs
 
         with pytest.raises(LookupError):
             get_progress_paragraphs(day_heading)
 
+    def test_nothing_after_progress_section_heading(self):
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>""",
+        )
+        from logtweet._content.exceptions import NoProgressPargraphs
+        from logtweet._content.extract import get_progress_paragraphs
 
-    def test_no_paragraphs_after_progress_section(self):
-        pass
+        with pytest.raises(NoProgressPargraphs):
+            get_progress_paragraphs(day_heading)
+
+    def test_links_directly_after_progress_section_heading(self):
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<h3>Link(s)</h3>""",
+        )
+
+        from logtweet._content.exceptions import NoProgressPargraphs
+        from logtweet._content.extract import get_progress_paragraphs
+
+        with pytest.raises(NoProgressPargraphs):
+            get_progress_paragraphs(day_heading)
 
     def test_no_content_in_paragraphs(self):
         pass
