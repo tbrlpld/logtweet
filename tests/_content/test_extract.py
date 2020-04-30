@@ -386,7 +386,25 @@ class TestGetProgressParagraphs(object):
 
         assert actual == expected
 
-    # TEST: Returns content for two paragraphs with empty in between.
+    def test_filters_empty_paragraph_between_two_filled_paragraphs(self):
+        """Returns content for two paragraphs with empty in between."""
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p>First paragraph with content.</p>
+<p></p>
+<p>A second paragraph with content.</p>""",
+        )
+        expected = (
+            "First paragraph with content.",
+            "A second paragraph with content.",
+        )
+        from logtweet._content.extract import get_progress_paragraphs
+
+        actual = get_progress_paragraphs(day_heading)
+
+        assert actual == expected
+
 
     # TEST: Does not return content of next day section
 
