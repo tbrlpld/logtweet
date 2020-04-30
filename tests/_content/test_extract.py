@@ -352,22 +352,31 @@ class TestGetProgressParagraphs(object):
 
         assert actual == expected
 
+    def test_returns_content_for_two_paragraphs(self):
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p>Finally a paragraph with content.</p>
+<p>Even a second paragraph with content.</p>""",
+        )
+        expected = (
+            "Finally a paragraph with content.",
+            "Even a second paragraph with content.",
+        )
+        from logtweet._content.extract import get_progress_paragraphs
+
+        actual = get_progress_paragraphs(day_heading)
+
+        assert actual == expected
 
 
-    def test_returns_all_pargraphs(self):
-        pass
+    # TEST: Returns content for two paragraphs with empty in between.
+
+    # TEST: Does not return content of next day section
+
+    # TEST: Does not return content of next day heading
 
 
-    # def test_returns_all_progress_pargraphs(self, day_1_heading):
-    #     expected = (
-    #         "It's the first paragraph. It's 50 characters long.",
-    #         "The second paragraph. This is one that's 60 characters long.",
-    #     )
-    #     from logtweet._content.extract import get_progress_paragraphs
-
-    #     actual = get_progress_paragraphs(day_1_heading)
-
-    #     assert actual == expected
 
 
 

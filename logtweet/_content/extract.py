@@ -206,6 +206,8 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
     """
     Return all progress paragraphs that follow the given `day_heading`.
 
+    # TODO: Document function
+
     """
     progress_heading = get_day_subheading_by_text(
         day_heading,
@@ -219,7 +221,18 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
     if next_sibling.text == "":
         raise exceptions.EmptyProgressParagraphsError
 
-    return (next_sibling.text,)
+    current_paragraph = next_sibling
+    paragraph_contents = []
+    paragraph_contents.append(current_paragraph.text)
+
+    next_sibling = current_paragraph.find_next_sibling()
+    while (next_sibling is not None and next_sibling.name == "p"):
+        current_paragraph = next_sibling
+
+        paragraph_contents.append(current_paragraph.text)
+        next_sibling = current_paragraph.find_next_sibling()
+
+    return tuple(paragraph_contents)
 
 
 def get_tweet_message(day_heading: bs4.element.Tag, max_len: int) -> str:
