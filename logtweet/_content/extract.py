@@ -214,8 +214,10 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
 
     next_sibling = progress_heading.find_next_sibling()
     if next_sibling is None or next_sibling.name != "p":
-        raise exceptions.NoProgressPargraphs
+        raise exceptions.NoProgressPargraphsError
 
+    if next_sibling.text == "":
+        raise exceptions.EmptyProgressParagraphsError
 
 
 def get_tweet_message(day_heading: bs4.element.Tag, max_len: int) -> str:

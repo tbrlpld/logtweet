@@ -309,10 +309,10 @@ class TestGetProgressParagraphs(object):
             html_insert="""
 <h3>Today&#39;s Progress</h3>""",
         )
-        from logtweet._content.exceptions import NoProgressPargraphs
+        from logtweet._content.exceptions import NoProgressPargraphsError
         from logtweet._content.extract import get_progress_paragraphs
 
-        with pytest.raises(NoProgressPargraphs):
+        with pytest.raises(NoProgressPargraphsError):
             get_progress_paragraphs(day_heading)
 
     def test_links_directly_after_progress_section_heading(self):
@@ -321,15 +321,27 @@ class TestGetProgressParagraphs(object):
 <h3>Today&#39;s Progress</h3>
 <h3>Link(s)</h3>""",
         )
-
-        from logtweet._content.exceptions import NoProgressPargraphs
+        from logtweet._content.exceptions import NoProgressPargraphsError
         from logtweet._content.extract import get_progress_paragraphs
 
-        with pytest.raises(NoProgressPargraphs):
+        with pytest.raises(NoProgressPargraphsError):
             get_progress_paragraphs(day_heading)
 
     def test_no_content_in_paragraphs(self):
-        pass
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p></p>""",
+        )
+        from logtweet._content.exceptions import EmptyProgressParagraphsError
+        from logtweet._content.extract import get_progress_paragraphs
+
+        with pytest.raises(EmptyProgressParagraphsError):
+            get_progress_paragraphs(day_heading)
+
+
+
+
 
     def test_returns_all_pargraphs(self):
         pass

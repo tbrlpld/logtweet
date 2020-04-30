@@ -9,18 +9,19 @@ class LogtweetContentError(Exception):
     pass  # noqa: WPS420, WPS604
 
 
-class NoProgressPargraphs(LogtweetContentError):
-    """Raised when response status code indicates error, e.g. 404."""
+class NoProgressPargraphsError(LogtweetContentError):
+    """Raise when no progress paragraphs exist."""
 
     def __init__(self):
-        """
-        Initialize ``NoProgressPargraphs``.
+        """Initialize ``NoProgressPargraphs``."""
+        self.message = "No progress paragraphs found!"
+        super().__init__(self.message)
 
-        Arguments:
-            source_string (str): Provide the source string that is not a URL.
-                Optional argument. Defaults to empty string. If not provided,
-                the source string is not shown to the user.
 
-        """
-        self.message = "Could no retrieve any progress paragraphs!"
+class EmptyProgressParagraphsError(LogtweetContentError):
+    """Raise when progress paragraphs are empty exist."""
+
+    def __init__(self):
+        """Initialize ``NoProgressPargraphs``."""
+        self.message = "No content in progress paragraphs found!"
         super().__init__(self.message)
