@@ -218,9 +218,6 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
     if next_sibling is None or next_sibling.name != "p":
         raise exceptions.NoProgressPargraphsError
 
-    if next_sibling.text == "":
-        raise exceptions.EmptyProgressParagraphsError
-
     paragraph_contents = []
     while (next_sibling is not None and next_sibling.name == "p"):
         current_paragraph = next_sibling
@@ -228,6 +225,13 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
         paragraph_contents.append(current_paragraph.text)
 
         next_sibling = current_paragraph.find_next_sibling()
+
+    # Remove empty items
+    paragraph_contents = list(
+        filter(lambda item: item != "", paragraph_contents),  # noqa: WPS110
+    )
+    if not paragraph_contents:
+        raise exceptions.EmptyProgressParagraphsError
 
     return tuple(paragraph_contents)
 

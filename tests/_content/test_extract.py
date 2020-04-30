@@ -369,6 +369,22 @@ class TestGetProgressParagraphs(object):
 
         assert actual == expected
 
+    def test_returns_content_second_if_first_paragraph_empty(self):
+        """Only first paragraph empty."""
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p></p>
+<p>A second paragraph with content.</p>""",
+        )
+        expected = (
+            "A second paragraph with content.",
+        )
+        from logtweet._content.extract import get_progress_paragraphs
+
+        actual = get_progress_paragraphs(day_heading)
+
+        assert actual == expected
 
     # TEST: Returns content for two paragraphs with empty in between.
 
