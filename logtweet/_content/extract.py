@@ -4,6 +4,7 @@
 
 import datetime
 import re
+from typing import Tuple
 
 import bs4  # type: ignore
 
@@ -202,11 +203,35 @@ def get_day_subheading_by_text(
     )
 
 
-def get_progress_paragraphs(day_heading: bs4.element.Tag):
+def get_progress_paragraphs(day_heading: bs4.element.Tag) -> Tuple[str, ...]:
     """
     Return all progress paragraphs that follow the given `day_heading`.
 
-    # TODO: Document function
+    Parameters
+    ----------
+    day_heading : bs4.element.Tag
+        Day heading element after which the progress paragraphs should be
+        returned.
+
+    Returns
+    -------
+    Tuple[str, ...]
+        Tuple containing all the strings of the progress paragraphs. Empty
+        paragraphs are filtered. Tuple will never be empty. If no paragraphs
+        with content are found, EmptyProgressParagraphsError is raised.
+
+    # noqa: DAR402
+
+    Raises
+    ------
+    LookupError
+        When no day section header with the text `"Today's Progress"` can be
+        found.
+    NoProgressPargraphsError
+        When no paragraph elements after the progress section header are found.
+    EmptyProgressParagraphsError
+        When no content could be extracted out of the existing paragraph
+        elements following the progress section header.
 
     """
     progress_heading = get_day_subheading_by_text(
