@@ -405,10 +405,43 @@ class TestGetProgressParagraphs(object):
 
         assert actual == expected
 
+    def test_dont_return_paragraphs_after_next_section_heading(self):
+        """Does not return paragraphs after next day section heading."""
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p>Progress paragraph with content.</p>
+<h3>Thoughts</h3>
+<p>Not a progress paragraph.</p>""",
+        )
+        expected = (
+            "Progress paragraph with content.",
+        )
+        from logtweet._content.extract import get_progress_paragraphs
 
-    # TEST: Does not return content of next day section
+        actual = get_progress_paragraphs(day_heading)
 
-    # TEST: Does not return content of next day heading
+        assert actual == expected
+
+    def test_dont_return_paragraphs_after_next_day_heading(self):
+        """Does not return progress content after next day heading."""
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p>Progress paragraph with content.</p>
+<h2>Day 2: October 17, 2019, Thursday</h2>
+<h3>Today&#39;s Progress</h3>
+<p>Progress paragraph of a different day.</p>
+""",
+        )
+        expected = (
+            "Progress paragraph with content.",
+        )
+        from logtweet._content.extract import get_progress_paragraphs
+
+        actual = get_progress_paragraphs(day_heading)
+
+        assert actual == expected
 
 
 
