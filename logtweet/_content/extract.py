@@ -214,17 +214,19 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
         "Today's Progress",
     )
 
-    next_sibling = progress_heading.find_next_sibling()
-    if next_sibling is None or next_sibling.name != "p":
+    # This could be integrated into the while loop, but I like the readability
+    # better right now.
+    possible_paragraph = progress_heading.find_next_sibling()
+    if possible_paragraph is None or possible_paragraph.name != "p":
         raise exceptions.NoProgressPargraphsError
 
     paragraph_contents = []
-    while (next_sibling is not None and next_sibling.name == "p"):
-        current_paragraph = next_sibling
+    while (possible_paragraph is not None and possible_paragraph.name == "p"):
+        current_paragraph = possible_paragraph
 
         paragraph_contents.append(current_paragraph.text)
 
-        next_sibling = current_paragraph.find_next_sibling()
+        possible_paragraph = current_paragraph.find_next_sibling()
 
     # Remove empty items
     paragraph_contents = list(
