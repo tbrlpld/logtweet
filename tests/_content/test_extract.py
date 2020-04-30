@@ -339,7 +339,18 @@ class TestGetProgressParagraphs(object):
         with pytest.raises(EmptyProgressParagraphsError):
             get_progress_paragraphs(day_heading)
 
+    def test_returns_content_from_one_paragraph(self):
+        day_heading = self.get_day_heading_with_added_html(
+            html_insert="""
+<h3>Today&#39;s Progress</h3>
+<p>Finally a paragraph with content.</p>""",
+        )
+        expected = ("Finally a paragraph with content.",)
+        from logtweet._content.extract import get_progress_paragraphs
 
+        actual = get_progress_paragraphs(day_heading)
+
+        assert actual == expected
 
 
 

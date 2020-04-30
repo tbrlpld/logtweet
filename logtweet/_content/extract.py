@@ -219,6 +219,8 @@ def get_progress_paragraphs(day_heading: bs4.element.Tag):
     if next_sibling.text == "":
         raise exceptions.EmptyProgressParagraphsError
 
+    return (next_sibling.text,)
+
 
 def get_tweet_message(day_heading: bs4.element.Tag, max_len: int) -> str:
     """
