@@ -94,6 +94,15 @@ class TestJoinStringsToMaxLen(object):
         ):
             join_strings_to_max_len(strings, max_len=1)
 
+    def test_empty_strings_in_sequence(self):
+        """Only empty strings in sequence."""
+        strings = ["", ""]
+        expected = ""
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len=0)
+
+        assert actual == expected
 
     def test_first_string_longer_than_max(self):
         """First string longer than max."""
