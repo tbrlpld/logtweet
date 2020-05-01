@@ -50,6 +50,9 @@ def make_tweet_content(preamble: str, message: str, link: str) -> str:
 def join_strings_to_max_len(strings: Sequence[str], max_len: int) -> str:
     """Join string to a maximum given amount."""
 
+    if not strings:
+        raise ValueError("Passed sequence is empty. Can not join strings.")
+
     if len(strings[0]) > max_len:
         raise exceptions.StringJoiningError(
             "First string longer than maximum length!"
