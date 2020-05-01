@@ -2,6 +2,10 @@
 
 """Functions related to building the tweet content."""
 
+from typing import Sequence
+
+from logtweet._content import exceptions
+
 
 def make_preamble(day_number: int) -> str:
     """
@@ -41,3 +45,14 @@ def make_tweet_content(preamble: str, message: str, link: str) -> str:
 
     """
     return f"{preamble} {message}\n\n{link}"
+
+
+def join_strings_to_max_len(strings: Sequence[str], max_len: int) -> str:
+    """Join string to a maximum given amount."""
+
+    if len(strings[0]) > max_len:
+        raise exceptions.StringJoiningError(
+            "First string longer than maximum length!"
+            + " Maximum length: {0}".format(max_len)
+            + ", First string: {0}".format(strings[0]),
+        )

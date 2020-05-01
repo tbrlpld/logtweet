@@ -78,3 +78,44 @@ class TestMakeTweetContent(object):
         actual_tweet_content = make_tweet_content(preamble, message, link)
 
         assert actual_tweet_content == expected_tweet_content
+
+
+class TestJoinStringsToMaxLen(object):
+    """Test `join_strings_to_max_len` function."""
+
+    def test_first_string_longer_than_max(self):
+        """First string longer than max."""
+        strings = ["This is the string"]
+        from logtweet._content.exceptions import StringJoiningError
+        from logtweet._content.build import join_strings_to_max_len
+
+        with pytest.raises(
+            StringJoiningError,
+            match=r"^First string longer than maximum length",
+        ):
+            join_strings_to_max_len(strings, max_len=1)
+
+
+    # def test_single_string_list_to_string(self):
+    #     """Takes list with single string."""
+    #     strings = ["This is the string"]
+    #     expected = "This is the string"
+    #     from logtweet._content.build import join_strings_to_max_len
+
+    #     actual = join_strings_to_max_len(strings, max_len=len(expected))
+
+    #     assert actual == expected
+
+    # def test_single_string_tuple_to_string(self):
+    #     """Takes tuple with single string."""
+    #     strings = ("This is the string")
+    #     expected = "This is the string"
+    #     from logtweet._content.build import join_strings_to_max_len
+
+    #     actual = join_strings_to_max_len(strings, max_len=len(expected))
+
+    #     assert actual == expected
+
+
+    # TEST: Second string longer than max
+    # TEST: Define separator between strings
