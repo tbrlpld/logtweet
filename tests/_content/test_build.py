@@ -95,6 +95,42 @@ class TestJoinStringsToMaxLen(object):
         ):
             join_strings_to_max_len(strings, max_len=1)
 
+    def test_single_string_in_list_shorter_than_max(self):
+        """First string shorter than max."""
+        strings = ["This is the string."]
+        expected = "This is the string."
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len=len(expected))
+
+        assert actual == expected
+
+    def test_single_string_in_tuple_shorter_than_max(self):
+        """Takes tuple with single string."""
+        strings = ("This is the string")
+        expected = "This is the string"
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len=len(expected))
+
+        assert actual == expected
+
+
+    # def test_second_string_longer_than_max(self):
+    #     """Second string longer than max."""
+    #     strings = [
+    #         "This is the first string.",
+    #         "This is the second string.",
+    #     ]
+    #     max_len = 25
+    #     expected = "This is the first string."
+    #     from logtweet._content.build import join_strings_to_max_len
+
+    #     actual = join_strings_to_max_len(strings, max_len)
+
+    #     assert actual == expected
+
+
 
     # def test_single_string_list_to_string(self):
     #     """Takes list with single string."""
@@ -116,6 +152,4 @@ class TestJoinStringsToMaxLen(object):
 
     #     assert actual == expected
 
-
-    # TEST: Second string longer than max
     # TEST: Define separator between strings

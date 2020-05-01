@@ -56,3 +56,5 @@ def join_strings_to_max_len(strings: Sequence[str], max_len: int) -> str:
             + " Maximum length: {0}".format(max_len)
             + ", First string: {0}".format(strings[0]),
         )
+
+    return "".join(strings)
