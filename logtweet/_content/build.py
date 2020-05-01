@@ -53,6 +53,12 @@ def join_strings_to_max_len(strings: Sequence[str], max_len: int) -> str:
     if not strings:
         raise ValueError("Passed sequence is empty. Can not join strings.")
 
+    if max_len < 0:
+        raise ValueError(
+            "Maximum length is negative."
+            + " Only positive values are acceptable.",
+        )
+
     if len(strings[0]) > max_len:
         raise exceptions.StringJoiningError(
             "First string longer than maximum length!"

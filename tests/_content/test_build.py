@@ -104,6 +104,18 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
+    def test_negative_maximum(self):
+        """Negative maximum length."""
+        strings = ["", ""]
+        max_len = -1
+        from logtweet._content.build import join_strings_to_max_len
+
+        with pytest.raises(
+            ValueError,
+            match=r"^Maximum length is negative.",
+        ):
+            join_strings_to_max_len(strings, max_len)
+
     def test_first_string_longer_than_max(self):
         """First string longer than max."""
         strings = ["This is the string"]
