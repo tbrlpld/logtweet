@@ -119,12 +119,12 @@ class TestJoinStringsToMaxLen(object):
     def test_first_string_longer_than_max(self):
         """First string longer than max."""
         strings = ["This is the string"]
-        from logtweet._content.exceptions import StringJoiningError
+        from logtweet._content.exceptions import FirstStringLongerThanMaxError
         from logtweet._content.build import join_strings_to_max_len
 
         with pytest.raises(
-            StringJoiningError,
-            match=r"^First string longer than maximum length",
+            FirstStringLongerThanMaxError,
+            match=r"^First string in sequence longer than maximum length",
         ):
             join_strings_to_max_len(strings, max_len=1)
 

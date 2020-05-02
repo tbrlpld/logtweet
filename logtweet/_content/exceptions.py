@@ -13,7 +13,7 @@ class NoProgressPargraphsError(LogtweetContentError):
     """Raise when no progress paragraphs exist."""
 
     def __init__(self):
-        """Initialize ``NoProgressPargraphs``."""
+        """Initialize `NoProgressPargraphs`."""
         self.message = "No progress paragraphs found!"
         super().__init__(self.message)
 
@@ -22,12 +22,21 @@ class EmptyProgressParagraphsError(LogtweetContentError):
     """Raise when progress paragraphs are empty exist."""
 
     def __init__(self):
-        """Initialize ``NoProgressPargraphs``."""
+        """Initialize `EmptyProgressPargraphs`."""
         self.message = "No content in progress paragraphs found!"
         super().__init__(self.message)
 
 
-class StringJoiningError(LogtweetContentError):
+class FirstStringLongerThanMaxError(LogtweetContentError):
     """Raise when issue with joining strings."""
 
-    pass  # noqa: WPS420, WPS604
+    def __init__(self, strings, max_len):
+        """Initialize `FirstStringLongerThanMaxError`."""
+        self.message = (
+            "First string in sequence longer than maximum length."
+            + " Can not join any strings."
+            + " Maximum length: {0}".format(max_len)
+            + ", Strings: {0}".format(max_len)
+        )
+        super().__init__(self.message)
+
