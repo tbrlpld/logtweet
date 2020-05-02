@@ -53,9 +53,14 @@ def join_strings_to_max_len(
     sep: str = "",
 ) -> str:
     """
-    Join string to a maximum given amount.
+    Join strings to a maximum given amount.
 
-    # TODO: Document function.
+    Parameters
+    ----------
+    strings: Union[List[str], Tuple[str]]
+        List or tuple of strings that shall be joined.
+    max_len: int
+        Maximum length of the returned string.
 
     """
 
@@ -73,7 +78,9 @@ def join_strings_to_max_len(
 
     joined = ""
     for string in strings:
-        if (len(joined) + len(string)) <= max_len:
+        if not joined:
+            joined = string
+        elif (len(joined) + len(string)) <= max_len:
             joined += sep + string
 
     return joined.strip()

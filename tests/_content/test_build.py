@@ -134,21 +134,26 @@ class TestJoinStringsToMaxLen(object):
         """First string shorter than max."""
         strings = ["This is the string."]
         expected = "This is the string."
+        max_len = len(expected)
         from logtweet._content.build import join_strings_to_max_len
 
-        actual = join_strings_to_max_len(strings, max_len=len(expected))
+        actual = join_strings_to_max_len(strings, max_len)
 
         assert actual == expected
+        assert len(actual) <= max_len
 
     def test_single_string_in_tuple_shorter_than_max(self) -> None:
         """Takes tuple with single string."""
         strings = ("This is the string",)
         expected = "This is the string"
+        max_len = len(expected)
         from logtweet._content.build import join_strings_to_max_len
 
-        actual = join_strings_to_max_len(strings, max_len=len(expected))
+        actual = join_strings_to_max_len(strings, max_len)
 
         assert actual == expected
+        assert len(actual) <= max_len
+
 
     def test_second_string_not_added_if_total_max_would_be_exceeded(
         self,
@@ -165,6 +170,8 @@ class TestJoinStringsToMaxLen(object):
         actual = join_strings_to_max_len(strings, max_len)
 
         assert actual == expected
+        assert len(actual) <= max_len
+
 
     def test_second_string_added(self) -> None:
         """Does not add second string if that would exceed total max length."""
@@ -179,6 +186,7 @@ class TestJoinStringsToMaxLen(object):
         actual = join_strings_to_max_len(strings, max_len)
 
         assert actual == expected
+        assert len(actual) <= max_len
 
     def test_separator_can_be_defined(self) -> None:
         """Define separator between strings."""
@@ -194,3 +202,35 @@ class TestJoinStringsToMaxLen(object):
         actual = join_strings_to_max_len(strings, max_len, sep=separator)
 
         assert actual == expected
+        assert len(actual) <= max_len
+
+    def test_non_whitespace_separator_only_between_strings(self) -> None:
+        """Separator should only be between strings."""
+        strings = [
+            "This is the first string.",
+            "This is the second string.",
+        ]
+        separator = "-"
+        max_len = len(strings[0]) + len(strings[1]) + len(separator)
+        expected = "This is the first string.-This is the second string."
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len, sep=separator)
+
+        assert actual == expected
+        assert len(actual) <= max_len
+
+    # def test_max_len_too_short_for_separator(self) -> None:
+    #     """Define separator between strings."""
+    #     strings = [
+    #         "This is the first string.",
+    #         "This is the second string.",
+    #     ]
+    #     separator = " "
+    #     max_len = len(strings[0]) + len(strings[1])
+    #     # expected = "This is the first string."
+    #     from logtweet._content.build import join_strings_to_max_len
+
+    #     actual = join_strings_to_max_len(strings, max_len, sep=separator)
+
+    #     assert len(actual) <= max_len
