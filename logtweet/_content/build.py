@@ -48,7 +48,7 @@ def make_tweet_content(preamble: str, message: str, link: str) -> str:
 
 
 def join_strings_to_max_len(
-    strings: Union[List[str], Tuple[str]],
+    strings: Union[List[str], Tuple[str, ...]],
     max_len: int,
     sep: str = "",
 ) -> str:

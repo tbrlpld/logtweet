@@ -58,11 +58,12 @@ def get_tweet_content(
     max_tweet_msg_len = calc_max_tweet_msg_len(preamble, link)
     # Get content
     progress_paragraphs = extract.get_progress_paragraphs(day_heading)
-    # TODO: (1) Refactor to function that makes limited length string from strings.
-    tweet_message = extract.get_tweet_message(
-        day_heading,
+    tweet_message = build.join_strings_to_max_len(
+        strings=progress_paragraphs,
         max_len=max_tweet_msg_len,
+        sep="\n\n",
     )
+
 
     # Build content from preamble, message and link
     return build.make_tweet_content(
