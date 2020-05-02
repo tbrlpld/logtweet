@@ -2,6 +2,8 @@
 
 """Test functions regarding creation of the tweet."""
 
+from typing import Tuple
+
 import pytest  # type: ignore
 
 
@@ -19,7 +21,7 @@ class TestMakePreamble(object):
             (999, "999/#100DaysOfCode"),
         ],
     )
-    def test_valid_int_inputs(self, day_number, expected_return):
+    def test_valid_int_inputs(self, day_number, expected_return) -> None:
         """Return the correct preamble for a given heading string."""
         from logtweet._content.build import make_preamble
         actual_return = make_preamble(day_number)
@@ -68,7 +70,7 @@ class TestMakeTweetContent(object):
         message,
         link,
         expected_tweet_content,
-    ):
+    ) -> None:
         preamble = "preamble"
         message = "message"
         link = "link"
@@ -83,7 +85,7 @@ class TestMakeTweetContent(object):
 class TestJoinStringsToMaxLen(object):
     """Test `join_strings_to_max_len` function."""
 
-    def test_empty_sequence(self):
+    def test_empty_sequence(self) -> None:
         """Pass empty sequence."""
         strings = []
         from logtweet._content.build import join_strings_to_max_len
@@ -94,7 +96,7 @@ class TestJoinStringsToMaxLen(object):
         ):
             join_strings_to_max_len(strings, max_len=1)
 
-    def test_empty_strings_in_sequence(self):
+    def test_empty_strings_in_sequence(self) -> None:
         """Only empty strings in sequence."""
         strings = ["", ""]
         expected = ""
@@ -104,7 +106,7 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
-    def test_negative_maximum(self):
+    def test_negative_maximum(self) -> None:
         """Negative maximum length."""
         strings = ["", ""]
         max_len = -1
@@ -116,7 +118,7 @@ class TestJoinStringsToMaxLen(object):
         ):
             join_strings_to_max_len(strings, max_len)
 
-    def test_first_string_longer_than_max(self):
+    def test_first_string_longer_than_max(self) -> None:
         """First string longer than max."""
         strings = ["This is the string"]
         from logtweet._content.exceptions import FirstStringLongerThanMaxError
@@ -128,7 +130,7 @@ class TestJoinStringsToMaxLen(object):
         ):
             join_strings_to_max_len(strings, max_len=1)
 
-    def test_single_string_in_list_shorter_than_max(self):
+    def test_single_string_in_list_shorter_than_max(self) -> None:
         """First string shorter than max."""
         strings = ["This is the string."]
         expected = "This is the string."
@@ -138,9 +140,9 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
-    def test_single_string_in_tuple_shorter_than_max(self):
+    def test_single_string_in_tuple_shorter_than_max(self) -> None:
         """Takes tuple with single string."""
-        strings = ("This is the string")
+        strings = ("This is the string",)
         expected = "This is the string"
         from logtweet._content.build import join_strings_to_max_len
 
@@ -148,13 +150,15 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
-    def test_second_string_longer_than_max(self):
-        """Second string longer than max."""
+    def test_does_not_add_second_string_if_total_max_would_be_exceeded(
+        self,
+    ) -> None:
+        """Does not add second string if that would exceed total max length."""
         strings = [
             "This is the first string.",
             "This is the second string.",
         ]
-        max_len = 25
+        max_len = len(strings[0])
         expected = "This is the first string."
         from logtweet._content.build import join_strings_to_max_len
 
