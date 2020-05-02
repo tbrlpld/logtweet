@@ -67,4 +67,9 @@ def join_strings_to_max_len(strings: Sequence[str], max_len: int) -> str:
     if len(strings[0]) > max_len:
         raise exceptions.FirstStringLongerThanMaxError(strings, max_len)
 
-    return "".join(strings)
+    joined = ""
+    for string in strings:
+        if (len(joined) + len(string)) <= max_len:
+            joined += string
+
+    return joined

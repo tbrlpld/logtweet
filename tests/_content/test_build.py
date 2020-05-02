@@ -148,19 +148,19 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
-    # def test_second_string_longer_than_max(self):
-    #     """Second string longer than max."""
-    #     strings = [
-    #         "This is the first string.",
-    #         "This is the second string.",
-    #     ]
-    #     max_len = 25
-    #     expected = "This is the first string."
-    #     from logtweet._content.build import join_strings_to_max_len
+    def test_second_string_longer_than_max(self):
+        """Second string longer than max."""
+        strings = [
+            "This is the first string.",
+            "This is the second string.",
+        ]
+        max_len = 25
+        expected = "This is the first string."
+        from logtweet._content.build import join_strings_to_max_len
 
-    #     actual = join_strings_to_max_len(strings, max_len)
+        actual = join_strings_to_max_len(strings, max_len)
 
-    #     assert actual == expected
+        assert actual == expected
 
 
     # TEST: Define separator between strings
