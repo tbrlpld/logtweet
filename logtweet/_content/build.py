@@ -78,9 +78,10 @@ def join_strings_to_max_len(
 
     joined = ""
     for string in strings:
+        new_length = len(joined) + len(string) + len(sep)
         if not joined:
             joined = string
-        elif (len(joined) + len(string)) <= max_len:
+        elif new_length <= max_len:
             joined += sep + string
 
     return joined.strip()

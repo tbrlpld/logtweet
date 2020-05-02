@@ -220,17 +220,27 @@ class TestJoinStringsToMaxLen(object):
         assert actual == expected
         assert len(actual) <= max_len
 
-    # def test_max_len_too_short_for_separator(self) -> None:
-    #     """Define separator between strings."""
-    #     strings = [
-    #         "This is the first string.",
-    #         "This is the second string.",
-    #     ]
-    #     separator = " "
-    #     max_len = len(strings[0]) + len(strings[1])
-    #     # expected = "This is the first string."
-    #     from logtweet._content.build import join_strings_to_max_len
+    def test_max_len_too_short_for_separator(self) -> None:
+        """
+        Test that separator length is accounted for in joining.
 
-    #     actual = join_strings_to_max_len(strings, max_len, sep=separator)
+        It had occurred to me that my implementation could lead to the return
+        exceeding the maximum length, because I had not accounted for the
+        length of the separator.
 
-    #     assert len(actual) <= max_len
+        This test defines a max length that is just long enough for the strings
+        but not the separator. Thus, only the first string should be returned.
+        """
+        strings = [
+            "This is the first string.",
+            "This is the second string.",
+        ]
+        separator = "-"
+        max_len = len(strings[0]) + len(strings[1])
+        expected = "This is the first string."
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len, sep=separator)
+
+        assert len(actual) <= max_len
+        assert actual == expected
