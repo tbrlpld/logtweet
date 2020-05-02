@@ -4,8 +4,8 @@
 
 from datetime import date
 
-from bs4 import BeautifulSoup
-import pytest
+from bs4 import BeautifulSoup  # type: ignore
+import pytest  # type: ignore
 
 
 @pytest.fixture

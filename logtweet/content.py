@@ -18,24 +18,29 @@ def get_tweet_content(
     """
     Get tweet content from a log string for a given date.
 
-    Arguments:
-        log_string (str): String representation of the log. The log string is
-            expected to contain an HTML log. The HMTL log is expected to
-            contain contain ``<h2>`` elements for the day headings and ``<h3>``
-            elements for the day's subsections.
-            # TODO: Force these expectation on the content through custom
-            #       types. The generation of the custom type validates the
-            #       structure
-        day_date (datetime.date): Day for which the tweet is to be generated.
-        bitly_api_key (Opeional[str]): While generating the tweet content, the
-            first link from the "Link(s)" section is extracted and shortened.
-            The user if an API key for the Bit.ly service is provided, that
-            service is used. This argument defaults to ``None``, in which case
-            `Shorten That URL_ is used.
+    Parameters
+    ----------
+    log_string : str
+        String representation of the log. The log string is expected to contain
+        an HTML log. The HMTL log is expected to contain contain ``<h2>``
+        elements for the day headings and ``<h3>`` elements for the day's
+        subsections.
+        # TODO: Force these expectation on the content through custom
+        #       types. The generation of the custom type validates the
+        #       structure
+    day_date : datetime.date
+        Day for which the tweet is to be generated.
+    bitly_api_key : Optional[str]
+        While generating the tweet content, the first link from the "Link(s)"
+        section is extracted and shortened.
+        The user if an API key for the Bit.ly service is provided, that
+        service is used. This argument defaults to ``None``, in which case
+        `Shorten That URL_ is used.
 
-    Returns:
-        str: Tweet content for the given ``day_date`` extracted from the
-        ``log_string``.
+    Returns
+    -------
+    str
+        Tweet content for the given `day_date` extracted from the `log_string`.
 
     .. _`Shorten That URL: https://s.lpld.io
 
@@ -58,10 +63,10 @@ def get_tweet_content(
     max_tweet_msg_len = calc_max_tweet_msg_len(preamble, link)
     # Get content
     progress_paragraphs = extract.get_progress_paragraphs(day_heading)
-    # TODO: (1) Refactor to function that makes limited length string from strings.
-    tweet_message = extract.get_tweet_message(
-        day_heading,
+    tweet_message = build.join_strings_to_max_len(
+        strings=progress_paragraphs,
         max_len=max_tweet_msg_len,
+        sep="\n\n",
     )
 
     # Build content from preamble, message and link
@@ -84,14 +89,20 @@ def calc_max_tweet_msg_len(
     preamble, the link and the white spaces in an empty tweet from the maximum
     tweet length.
 
-    Arguments:
-        preamble (str): Preamble to be used in the beginning of the tweet.
-        link (str): Link to be added in the end of the tweet.
-        max_tweet_len (int): (Optional) Default is 240.
+    Parameters
+    ----------
+    preamble :str
+        Preamble to be used in the beginning of the tweet.
+    link : str
+        Link to be added in the end of the tweet.
+    max_tweet_len : int
+        Optional. Maximum tweet length. Default is 240.
 
-    Returns:
-        int: Length available for the tweet message, when combined with
-             the given preamble and link.
+    Returns
+    -------
+    int
+        Length available for the tweet message, when combined with the given
+        preamble and link.
 
     """
     tweet_length_wo_message = len(build.make_tweet_content(
