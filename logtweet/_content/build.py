@@ -50,6 +50,7 @@ def make_tweet_content(preamble: str, message: str, link: str) -> str:
 def join_strings_to_max_len(
     strings: Union[List[str], Tuple[str]],
     max_len: int,
+    sep: str = "",
 ) -> str:
     """
     Join string to a maximum given amount.
@@ -70,9 +71,9 @@ def join_strings_to_max_len(
     if len(strings[0]) > max_len:
         raise exceptions.FirstStringLongerThanMaxError(strings, max_len)
 
-    # joined = ""
-    # for string in strings:
-    #     if (len(joined) + len(string)) <= max_len:
-    #         joined += string
+    joined = ""
+    for string in strings:
+        if (len(joined) + len(string)) <= max_len:
+            joined += sep + string
 
-    return strings[0]
+    return joined.strip()

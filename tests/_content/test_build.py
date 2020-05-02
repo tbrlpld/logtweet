@@ -150,7 +150,7 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
-    def test_does_not_add_second_string_if_total_max_would_be_exceeded(
+    def test_second_string_not_added_if_total_max_would_be_exceeded(
         self,
     ) -> None:
         """Does not add second string if that would exceed total max length."""
@@ -166,5 +166,31 @@ class TestJoinStringsToMaxLen(object):
 
         assert actual == expected
 
+    def test_second_string_added(self) -> None:
+        """Does not add second string if that would exceed total max length."""
+        strings = [
+            "This is the first string.",
+            "This is the second string.",
+        ]
+        max_len = len(strings[0]) + len(strings[1])
+        expected = "This is the first string.This is the second string."
+        from logtweet._content.build import join_strings_to_max_len
 
-    # TEST: Define separator between strings
+        actual = join_strings_to_max_len(strings, max_len)
+
+        assert actual == expected
+
+    def test_separator_can_be_defined(self) -> None:
+        """Define separator between strings."""
+        strings = [
+            "This is the first string.",
+            "This is the second string.",
+        ]
+        separator = " "
+        max_len = len(strings[0]) + len(strings[1]) + len(separator)
+        expected = "This is the first string. This is the second string."
+        from logtweet._content.build import join_strings_to_max_len
+
+        actual = join_strings_to_max_len(strings, max_len, sep=separator)
+
+        assert actual == expected
