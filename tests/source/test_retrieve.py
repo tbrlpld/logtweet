@@ -33,6 +33,28 @@ class TestGetLogContentFromSource(object):
 
         assert returned_content == log_content
 
+    # TEST: Retrievers that inherited from the abstract class are not accepted.
+
+    def test_exception_during_content_retrieval_not_caught(
+        self,
+    ) -> None:
+        """An exception raised during content retrieval is not caught."""
+        class TestExceptionError(Exception):
+            pass
+
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+            def get_content(self) -> str:
+                raise TestExceptionError
+        mock_source_content_retriever = MockSourceContentRetriever()
+        from logtweet.source.retrieve import get_log_content_from_source
+
+        with pytest.raises(TestExceptionError):
+            get_log_content_from_source(
+                mock_source_content_retriever,
+            )
+
+
     # def test_invalid_url_raises_exception(
     #     self,
     #     invalid_url,
