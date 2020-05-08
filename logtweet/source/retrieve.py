@@ -26,8 +26,9 @@ class AbstractValidSource(abc.ABC):
             )
         if not self.is_valid(source_string):
             raise SourceValidationError
+        self.source_string = source_string
 
-    @staticmethod
+    @staticmethod  # noqa: WPS602
     @abc.abstractmethod
     def is_valid(source_string: str) -> bool:
         """

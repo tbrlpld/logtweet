@@ -9,8 +9,34 @@ import pytest  # type: ignore
 class TestAbstractValidSource(object):
     """Test `AbstractValidSource` class."""
 
-    # TEST: Child init succeeds
-    # TEST: Source string available on initialized child
+    def test_child_init_succeeds_if_is_valid(self) -> None:
+        """
+        Child init succeeds if `is_valid` is `True`.
+
+        If the implementation of `is_valid` succeeds, then the initialization
+        of the valid source will succeed.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+        class Child(AbstractValidSource):
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+
+        Child("some_string")
+
+    def test_source_string_property_on_instance(self) -> None:
+        """Source string available on initialized child."""
+        source_string = "some source string"
+        from logtweet.source.retrieve import AbstractValidSource
+        class Child(AbstractValidSource):
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+
+        child_instance = Child(source_string)
+
+        assert child_instance.source_string == source_string
 
     def test_raise_validation_error_if_not_is_valid(self) -> None:
         """Raise SourceValidationError if `is_valid` returns False."""
@@ -25,7 +51,6 @@ class TestAbstractValidSource(object):
 
         with pytest.raises(SourceValidationError):
             Child("some_string")
-
 
     def test_child_init_argument_is_string(self) -> None:
         """
@@ -151,6 +176,8 @@ class TestAbstactSourceContentRetriever(object):
         )
 
         assert source_content_retriever.valid_source == valid_test_source
+
+    # TEST: SourceContentRetrivalError is available to be raised in `get_content` implementation
 
     def test_instantiaing_child_fails_if_not_passed_valid_source_type(
         self,
