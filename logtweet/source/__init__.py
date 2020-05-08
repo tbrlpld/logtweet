@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Private package with helpers modules for use by the ``source`` module."""
+"""Package with components regarding source content retrieval."""
 
 # TODO: (1) Refactor to clean architecture where use case is not dependent on
 #       implementation

@@ -9,7 +9,7 @@ import pytest  # type: ignore
 class TestGetLogContentFromSource(object):
     """Test the `get_log_content_from_source` function."""
 
-    def test_return_content_from_mock_source(
+    def test_return_content_from_mock_source_content_retriever(
         self,
     ) -> None:
         """
@@ -19,18 +19,17 @@ class TestGetLogContentFromSource(object):
 
         """
         log_content = "Just some sting that represents the content of the log."
-        from logtweet.source.content_retrival import AbstractSource
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
 
-        class MockSource(AbstractSource):
-            @property
-            def content(self) -> str:
+        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+            def get_content(self) -> str:
                 return log_content
-        mock_source = MockSource()
-        from logtweet.source.content_retrival import (
-            get_log_content_from_source,
-        )
+        mock_source_content_retriever = MockSourceContentRetriever()
+        from logtweet.source.retrieve import get_log_content_from_source
 
-        returned_content = get_log_content_from_source(mock_source)
+        returned_content = get_log_content_from_source(
+            mock_source_content_retriever,
+        )
 
         assert returned_content == log_content
 
