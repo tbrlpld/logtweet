@@ -8,30 +8,27 @@ import pytest  # type: ignore
 
 class TestAbstactSourceContentRetriever(object):
 
-    def test_direct_instantiation_fails(self) -> None:
-        """Direct instantiation fails."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
-
-        with pytest.raises(
-            TypeError,
-            match=r"Can't instantiate",
-        ):
-            AbstractSourceContentRetriever()  # type: ignore
-
-    def test_instantiating_child_fails_if_not_implements_get_content_method(
+    def test_instantiaing_child_fails_if_not_passed_valid_source_type(
         self,
     ) -> None:
-        """Instantiation of child fails if not implements `get_content`."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        """
+        Instantiating child fails if source argument not correct type.
 
-        class Child(AbstractSourceContentRetriever):
+        Only instances of subclasses of `AbstractValidSource` are accepted.
+
+        """
+        class NotValidSourceType(object):
             pass
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        class Child(AbstractSourceContentRetriever):
+            def get_content(self) -> str:
+                return ""
 
         with pytest.raises(
             TypeError,
-            match=r"Can't instantiate",
+            match=r"Expected.* got.*",
         ):
-            Child()  # type: ignore
+            Child(NotValidSourceType())
 
     def test_instantiating_child_fails_if_not_passed_valid_source_instance(
         self,
@@ -49,7 +46,30 @@ class TestAbstactSourceContentRetriever(object):
         ):
             Child()
 
-    # TEST: Instantiation of child fail is validated source argument not correct type.
+    def test_instantiating_child_fails_if_not_implements_get_content_method(
+        self,
+    ) -> None:
+        """Instantiation of child fails if not implements `get_content`."""
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+
+        class Child(AbstractSourceContentRetriever):
+            pass
+
+        with pytest.raises(
+            TypeError,
+            match=r"Can't instantiate",
+        ):
+            Child()  # type: ignore
+
+    def test_direct_instantiation_fails(self) -> None:
+        """Direct instantiation fails."""
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+
+        with pytest.raises(
+            TypeError,
+            match=r"Can't instantiate",
+        ):
+            AbstractSourceContentRetriever()  # type: ignore
 
 
 class TestGetLogContentFromSource(object):

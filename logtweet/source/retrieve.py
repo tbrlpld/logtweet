@@ -17,6 +17,10 @@ import abc
 #       the desired functionality. I need to think about how to **restructure
 #       the modules** to do that though. I need to avoid circular dependencies.
 
+class AbstractValidSource(abc.ABC):
+    pass
+
+
 class AbstractSourceContentRetriever(abc.ABC):
     """
     Abstract source class.
@@ -25,8 +29,28 @@ class AbstractSourceContentRetriever(abc.ABC):
     define.
     """
 
-    def __init__(self, valid_source):
-        pass
+    def __init__(self, valid_source: AbstractValidSource) -> None:
+        """
+        Initialize AbstractSourceContentRetriever.
+
+        Parameters
+        ----------
+        valid_source: AbstractValidSource
+            `ValidSource` instance. If this is missing, the
+            `SourceContentRetriever` can not be initialized.
+
+        Raises
+        ------
+        TypeError
+            If the `valid_source` is not an instance of a subclass of
+            `AbstractValidSource`.
+
+        """
+        if not isinstance(valid_source, AbstractValidSource):
+            raise TypeError(
+                "Expected {0}".format(AbstractValidSource)
+                + " got {0}".format(type(valid_source)),
+            )
 
     @abc.abstractmethod
     def get_content(self) -> str:
