@@ -18,7 +18,20 @@ import abc
 #       the modules** to do that though. I need to avoid circular dependencies.
 
 class AbstractValidSource(abc.ABC):
-    pass
+    """Abstract valid source class."""
+
+    @abc.abstractmethod
+    def __init__(self) -> None:
+        """Initialize AbstractValidSource."""
+
+
+class SourceContentRetrievalError(Exception):
+    """
+    Raise if error during content retrieval.
+
+    This class is meant to be extended to more meaningful error types.
+
+    """
 
 
 class AbstractSourceContentRetriever(abc.ABC):
@@ -41,7 +54,7 @@ class AbstractSourceContentRetriever(abc.ABC):
         Parameters
         ----------
         valid_source: AbstractValidSource
-            `ValidSource` instance. If this is missing, the
+            `AbstractValidSource` instance. If this is missing, the
             `SourceContentRetriever` can not be initialized.
 
         Raises

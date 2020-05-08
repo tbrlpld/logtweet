@@ -5,6 +5,22 @@
 
 import pytest  # type: ignore
 
+class TestAbstractValidSource(object):
+    # TEST: AbstractValidSource
+    # TEST: Child init succeeds
+    # TEST: Child init fails if is_valid fails
+    # TEST: Child init fails if is_valid not implemented
+
+    def test_direct_init_fails(object) -> None:
+        """Direct init fails."""
+        from logtweet.source.retrieve import AbstractValidSource
+
+        with pytest.raises(
+            TypeError,
+            match=r"Can't instantiate",
+        ):
+            AbstractValidSource()
+
 
 class TestAbstactSourceContentRetriever(object):
 
