@@ -145,14 +145,16 @@ class TestAbstactSourceContentRetriever(object):
         """Successful instantiation."""
         from logtweet.source.retrieve import AbstractValidSource
         class ValidTestSource(AbstractValidSource):
-            pass
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+        valid_test_source = ValidTestSource("some string")
         from logtweet.source.retrieve import AbstractSourceContentRetriever
         class SourceContentRetrieverImplementation(
             AbstractSourceContentRetriever,
         ):
             def get_content(self) -> str:
                 return ""
-        valid_test_source = ValidTestSource()
 
         SourceContentRetrieverImplementation(
             valid_test_source,
@@ -162,14 +164,16 @@ class TestAbstactSourceContentRetriever(object):
         """Source property available on instance."""
         from logtweet.source.retrieve import AbstractValidSource
         class ValidTestSource(AbstractValidSource):
-            pass
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+        valid_test_source = ValidTestSource("some string")
         from logtweet.source.retrieve import AbstractSourceContentRetriever
         class SourceContentRetrieverImplementation(
             AbstractSourceContentRetriever,
         ):
             def get_content(self) -> str:
                 return ""
-        valid_test_source = ValidTestSource()
 
         source_content_retriever = SourceContentRetrieverImplementation(
             valid_test_source,
