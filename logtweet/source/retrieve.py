@@ -25,6 +25,9 @@ class AbstractSourceContentRetriever(abc.ABC):
     define.
     """
 
+    def __init__(self, valid_source):
+        pass
+
     @abc.abstractmethod
     def get_content(self) -> str:
         """Return content string from the source."""
@@ -49,13 +52,16 @@ def get_log_content_from_source(
         Log content returned by the `SourceContentRetriever.get_content()`
         method.
 
+    # noqa: DAR402
+
     Raises
     ------
+    TypeError
+        If passed `source_content_retriever` is not of correct type
+        `AbstractSourceContentRetriever`.
     SourceContentRetrievalError
         This exception or any of its child exceptions may be raised if
         something went wrong during the content retrieval.
-
-    # noqa: DAR402
 
     """
     is_expected_type = isinstance(
