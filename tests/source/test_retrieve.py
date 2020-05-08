@@ -8,6 +8,23 @@ import pytest  # type: ignore
 
 class TestAbstactSourceContentRetriever(object):
 
+    def test_instantiation_succeeds(self) -> None:
+        """Successful instantiation."""
+        from logtweet.source.retrieve import AbstractValidSource
+        class ValidTestSource(AbstractValidSource):
+            pass
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        class SourceContentRetrieverImplementation(
+            AbstractSourceContentRetriever,
+        ):
+            def get_content(self) -> str:
+                return ""
+        valid_test_source = ValidTestSource()
+
+        SourceContentRetrieverImplementation(
+            valid_test_source,
+        )
+
     def test_instantiaing_child_fails_if_not_passed_valid_source_type(
         self,
     ) -> None:
@@ -152,22 +169,3 @@ class TestGetLogContentFromSource(object):
             get_log_content_from_source(
                 mock_source_content_retriever,
             )
-
-
-    # def test_invalid_url_raises_exception(
-    #     self,
-    #     invalid_url,
-    # ):
-    #     """
-    #     Test invalid URL raises exception.
-
-    #     I am not testing for any specific exceptions, because that is up to the
-    #     implementation, i.e. depends on the lower level functions.
-
-    #     """
-    #     from logtweet.source import get_log_content_from_source
-
-    #     with pytest.raises(Exception):
-    #         get_log_content_from_source(invalid_url)
-
-
