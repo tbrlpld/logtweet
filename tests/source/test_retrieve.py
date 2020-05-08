@@ -203,7 +203,7 @@ class TestAbstactSourceContentRetriever(object):
             TypeError,
             match=r"Expected.* got.*",
         ):
-            Child(NotValidSourceType())
+            Child(NotValidSourceType())  # type: ignore
 
     def test_instantiating_child_fails_if_not_passed_valid_source_instance(
         self,
@@ -219,7 +219,7 @@ class TestAbstactSourceContentRetriever(object):
             TypeError,
             match=r".*missing.*argument.*",
         ):
-            Child()
+            Child()  # type: ignore
 
     def test_instantiating_child_fails_if_not_implements_get_content_method(
         self,
