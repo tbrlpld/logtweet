@@ -12,8 +12,42 @@ class TestAbstractValidSource(object):
     # TEST: Child init succeeds
     # TEST: Source string available on initialized child
     # TEST: Child init fails if is_valid fails
-    # TEST: is_valid requires source string argument
-    # TEST: Child init requires source string
+
+    def test_child_init_requires_source_sting_argument(self) -> None:
+        """
+        Child init requires source string.
+
+        If the argument is not passed, an exception is raised.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+        class Child(AbstractValidSource):
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+
+        with pytest.raises(
+            TypeError,
+            match=r".*missing.*argument",
+        ):
+            Child()  # type: ignore
+
+    # TEST: exception if is valid source string argument wrong type.
+
+    def test_is_valid_requires_source_string_argument(self) -> None:
+        """
+        `is_valid` requires source string argument.
+
+        If the argument is not passed, an exception is raised.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+
+        with pytest.raises(
+            TypeError,
+            match=r".*missing.*argument",
+        ):
+            AbstractValidSource.is_valid()  # type: ignore
 
     def test_child_init_fails_if_is_valid_not_implemented(self) -> None:
         """

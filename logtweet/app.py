@@ -32,6 +32,7 @@ def main():
         fallback=None,
     )
 
+    # TODO: Allow source to be local file. Handle the two possible types.
     log_content = source.get_log_content_from_source(source_string)
 
     tweet_content = content.get_tweet_content(

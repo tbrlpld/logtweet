@@ -1,32 +1,53 @@
 # -*- coding: utf-8 -*-
 
-"""Retrieve log content from different sources."""
-
-# TODO: Allow source to be local file. Handle the two possible types.
-
+"""Retrieve log content from a source."""
 
 import abc
 
-# from logtweet._source.online import OnlineLogSource  # noqa: WPS436
 
+class SourceValidationError(Exception):
+    """
+    Raise if source could not be validated.
 
+    This is only a base exception, intended to be extended by more specific
+    validation errors.
 
-# TODO: Define an abstract Source base class. This will define the needed
-#       functionality from the perspective of this module. The implementations
-#       can then inherit from that abstract class and only need to implement
-#       the desired functionality. I need to think about how to **restructure
-#       the modules** to do that though. I need to avoid circular dependencies.
+    """
+
 
 class AbstractValidSource(abc.ABC):
     """Abstract valid source class."""
 
-    def __init__(self) -> None:
+    def __init__(self, source_string: str) -> None:
         """Initialize AbstractValidSource."""
 
     @staticmethod
     @abc.abstractmethod
-    def is_valid() -> bool:
-        """Source string is a valid source."""
+    def is_valid(source_string: str) -> bool:
+        """
+        Source string is a valid source.
+
+        # noqa: DAR202
+
+        Parameters
+        ----------
+        source_string : str
+            String that identifies the source to validate.
+
+        Returns
+        -------
+        bool
+            `True` is the source is valid, `False` if not.
+
+        # noqa: DAR402
+
+        Raises
+        ------
+        SourceValidationError
+            This is a subclass of this exception shall be raised if the
+            validation fails.
+
+        """
 
 
 class SourceContentRetrievalError(Exception):
