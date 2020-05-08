@@ -250,8 +250,30 @@ class TestAbstactSourceContentRetriever(object):
 class TestGetLogContentFromSource(object):
     """Test the `get_log_content_from_source` function."""
 
+    # Import for type annotations
+    from logtweet.source.retrieve import AbstractValidSource
+
+    @pytest.fixture  # type: ignore
+    def mock_valid_source(
+        self,
+    ) -> AbstractValidSource:
+        """
+        Return a mock instance of an AbstractValidSource subclass.
+
+        This is helpful when you want to invoke SourceContentRetrievers without
+        actually validating the source.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+        class MockValidSource(AbstractValidSource):
+            @staticmethod
+            def is_valid(source_string: str) -> bool:
+                return True
+        return MockValidSource("this has no meaning")
+
     def test_return_content_from_mock_source_content_retriever(
         self,
+        mock_valid_source: AbstractValidSource,
     ) -> None:
         """
         Use case returns content from source instance.
@@ -261,11 +283,13 @@ class TestGetLogContentFromSource(object):
         """
         log_content = "Just some sting that represents the content of the log."
         from logtweet.source.retrieve import AbstractSourceContentRetriever
-
         class MockSourceContentRetriever(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return log_content
-        mock_source_content_retriever = MockSourceContentRetriever()
+        mock_source_content_retriever = MockSourceContentRetriever(
+            mock_valid_source,
+        )
+
         from logtweet.source.retrieve import get_log_content_from_source
 
         returned_content = get_log_content_from_source(
@@ -311,6 +335,7 @@ class TestGetLogContentFromSource(object):
 
     def test_exception_during_content_retrieval_not_caught(
         self,
+        mock_valid_source: AbstractValidSource,
     ) -> None:
         """An exception raised during content retrieval is not caught."""
         class TestExceptionError(Exception):
@@ -320,7 +345,9 @@ class TestGetLogContentFromSource(object):
         class MockSourceContentRetriever(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 raise TestExceptionError
-        mock_source_content_retriever = MockSourceContentRetriever()
+        mock_source_content_retriever = MockSourceContentRetriever(
+            mock_valid_source,
+        )
         from logtweet.source.retrieve import get_log_content_from_source
 
         with pytest.raises(TestExceptionError):
