@@ -20,6 +20,12 @@ class AbstractValidSource(abc.ABC):
 
     def __init__(self, source_string: str) -> None:
         """Initialize AbstractValidSource."""
+        if not isinstance(source_string, str):
+            raise TypeError(
+                "Expected str, got {0}".format(type(source_string)),
+            )
+        if not self.is_valid(source_string):
+            raise SourceValidationError
 
     @staticmethod
     @abc.abstractmethod
