@@ -25,6 +25,25 @@ class TestAbstactSourceContentRetriever(object):
             valid_test_source,
         )
 
+    def test_source_property_available_on_instance(self) -> None:
+        """Source property available on instance."""
+        from logtweet.source.retrieve import AbstractValidSource
+        class ValidTestSource(AbstractValidSource):
+            pass
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        class SourceContentRetrieverImplementation(
+            AbstractSourceContentRetriever,
+        ):
+            def get_content(self) -> str:
+                return ""
+        valid_test_source = ValidTestSource()
+
+        source_content_retriever = SourceContentRetrieverImplementation(
+            valid_test_source,
+        )
+
+        assert source_content_retriever.valid_source == valid_test_source
+
     def test_instantiaing_child_fails_if_not_passed_valid_source_type(
         self,
     ) -> None:

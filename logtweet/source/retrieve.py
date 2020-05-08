@@ -23,10 +23,15 @@ class AbstractValidSource(abc.ABC):
 
 class AbstractSourceContentRetriever(abc.ABC):
     """
-    Abstract source class.
+    Abstract source content retriever class.
 
     This abstract class defines the required methods that subclasses should
     define.
+
+    The initialization of this class requires an instance of a
+    `AbstractValidSource` to be passed. This means the caller needs to create
+    a valid source instance before the retriever can be initialized.
+
     """
 
     def __init__(self, valid_source: AbstractValidSource) -> None:
@@ -51,10 +56,22 @@ class AbstractSourceContentRetriever(abc.ABC):
                 "Expected {0}".format(AbstractValidSource)
                 + " got {0}".format(type(valid_source)),
             )
+        self.valid_source = valid_source
 
     @abc.abstractmethod
     def get_content(self) -> str:
-        """Return content string from the source."""
+        """
+        Return content string from the source.
+
+        # noqa: DAR402
+
+        Raises
+        ------
+        SourceContentRetrievalError
+            This exception or any of its child exceptions may be raised if
+            something went wrong during the content retrieval.
+
+        """
 
 
 def get_log_content_from_source(
