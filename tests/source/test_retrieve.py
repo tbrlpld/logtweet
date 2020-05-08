@@ -5,24 +5,47 @@
 
 import pytest  # type: ignore
 
-class TestAbstractValidSource(object):
-    # TEST: AbstractValidSource
-    # TEST: Child init succeeds
-    # TEST: Child init fails if is_valid fails
-    # TEST: Child init fails if is_valid not implemented
 
-    def test_direct_init_fails(object) -> None:
+class TestAbstractValidSource(object):
+    """Test `AbstractValidSource` class."""
+
+    # TEST: Child init succeeds
+    # TEST: Source string available on initialized child
+    # TEST: Child init fails if is_valid fails
+    # TEST: is_valid requires source string argument
+    # TEST: Child init requires source string
+
+    def test_child_init_fails_if_is_valid_not_implemented(self) -> None:
+        """
+        Child init fails if is_valid not implemented.
+
+        `is_valid` is the one abstract method that is required.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+        class Child(AbstractValidSource):
+            def __init__(self) -> None:
+                pass
+
+        with pytest.raises(
+            TypeError,
+            match=r"Can't instantiate.*abstract",
+        ):
+            Child()  # type: ignore
+
+    def test_direct_init_fails(self) -> None:
         """Direct init fails."""
         from logtweet.source.retrieve import AbstractValidSource
 
         with pytest.raises(
             TypeError,
-            match=r"Can't instantiate",
+            match=r"Can't instantiate.*abstract",
         ):
-            AbstractValidSource()
+            AbstractValidSource()  # type: ignore
 
 
 class TestAbstactSourceContentRetriever(object):
+    """Test `AbstractSourceContentRetriever` class."""
 
     def test_instantiation_succeeds(self) -> None:
         """Successful instantiation."""

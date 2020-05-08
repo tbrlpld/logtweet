@@ -20,9 +20,13 @@ import abc
 class AbstractValidSource(abc.ABC):
     """Abstract valid source class."""
 
-    @abc.abstractmethod
     def __init__(self) -> None:
         """Initialize AbstractValidSource."""
+
+    @staticmethod
+    @abc.abstractmethod
+    def is_valid() -> bool:
+        """Source string is a valid source."""
 
 
 class SourceContentRetrievalError(Exception):
