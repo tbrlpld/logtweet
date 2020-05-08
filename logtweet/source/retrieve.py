@@ -25,10 +25,9 @@ class AbstractSourceContentRetriever(abc.ABC):
     define.
     """
 
-    @abc.abstractproperty
+    @abc.abstractmethod
     def get_content(self) -> str:
         """Return content string from the source."""
-        pass
 
 
 def get_log_content_from_source(
@@ -59,4 +58,13 @@ def get_log_content_from_source(
     # noqa: DAR402
 
     """
+    is_expected_type = isinstance(
+        source_content_retriever,
+        AbstractSourceContentRetriever,
+    )
+    if not is_expected_type:
+        raise TypeError(
+            "Expected {0}".format(AbstractSourceContentRetriever)
+            + " got {0}".format(type(source_content_retriever)),
+        )
     return source_content_retriever.get_content()

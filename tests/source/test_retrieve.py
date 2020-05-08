@@ -33,7 +33,40 @@ class TestGetLogContentFromSource(object):
 
         assert returned_content == log_content
 
-    # TEST: Retrievers that inherited from the abstract class are not accepted.
+    def test_passing_retriever_class_raises_type_error(self) -> None:
+        """
+        Passing retriever class (instead of instance) raises type error.
+
+        """
+        log_content = "Just some sting that represents the content of the log."
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+
+        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+            def get_content(self) -> str:
+                return log_content
+
+        from logtweet.source.retrieve import get_log_content_from_source
+
+        with pytest.raises(TypeError):
+            get_log_content_from_source(
+                MockSourceContentRetriever,  # type: ignore
+            )
+
+    def test_not_inherited_retrievers_raise_type_error(self) -> None:
+        """
+        Retrievers not inherited from the abstract class raise type error.
+
+        """
+        class MockSourceContentRetriever(object):
+            def get_content(self) -> str:
+                return "some string"
+        mock_source_content_retriever = MockSourceContentRetriever()
+        from logtweet.source.retrieve import get_log_content_from_source
+
+        with pytest.raises(TypeError):
+            get_log_content_from_source(
+                mock_source_content_retriever,  # type: ignore
+            )
 
     def test_exception_during_content_retrieval_not_caught(
         self,
