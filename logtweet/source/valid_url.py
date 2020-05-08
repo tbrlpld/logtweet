@@ -7,6 +7,7 @@ import validators  # type: ignore
 from logtweet._source.exceptions import NotAUrlError  # noqa: WPS436
 
 
+# TODO: (4) Implement ValidOnlineSource based on AbstractValidOnlineSource
 class ValidUrl(object):
     """Valid URL class."""
 

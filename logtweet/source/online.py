@@ -11,6 +11,10 @@ from logtweet._source.exceptions import (  # noqa: WPS436
 from logtweet._source.valid_url import ValidUrl  # noqa: WPS436
 
 
+
+# TODO: (1) Implement OnlineSourceRetriever based on AbstractSourceRetriever
+# TODO: (2) Require AbstractValidOnlineSurce as input
+# TODO: (3) Define AbstractValidOnlineSource based on AbstractValidSource
 class OnlineLogSource(object):
     """Valid online log source."""
 
@@ -65,7 +69,6 @@ class OnlineLogSource(object):
 
         """
         return self._content  # noqa: WPS110
-
 
 def get_content_from_url(valid_url: ValidUrl) -> str:
     """
