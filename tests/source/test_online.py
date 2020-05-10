@@ -1,62 +1,80 @@
 # -*- coding: utf-8 -*-
 
-"""Tests for the OnlineLogSource class."""
+"""Tests for the OnlineSourceRetriever class."""
 
 import pytest  # type: ignore
 
 
-# Tests for reaching an online source require a working online connection.
-# Or I need to mock the function that represents the availability of an online
-# source.
+# TEST: Mock actually available online server. So run an HTTP server for the
+#       test. Python comes with the simple `http.server` module that allows
+#       just that.
 
 
-class TestInitialization(object):
-    """Test the initialization of ``OnlineLogSource``."""
+class TestOnlineSourceRetriever(object):
+    """Test the initialization of ``OnlineSourceRetriever``."""
 
-    def test_valid_url_creates_instance(
-        self,
-        page_content,
-        monkeypatch,
-        valid_url,
-    ):
-        from logtweet._source import online
-        def returns_page_content(*args, **kwargs):
-            return page_content
-        monkeypatch.setattr(
-            online,
-            "get_content_from_url",
-            returns_page_content,
-        )
+    def test_subclass(self):
+        """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
+        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.online import OnlineSourceContentRetriever
 
-        instance = online.OnlineLogSource(valid_url)
+        assert issubclass(OnlineSourceContentRetriever, AbstractSourceContentRetriever)
 
-        assert isinstance(instance, online.OnlineLogSource)
+    def test_type_error_if_init_input_wrong_type(self):
+        """Raise TypeError if init input parameter not right type."""
+        class NotTheRightType(object):
+            pass
+        wrong_type_input = NotTheRightType()
+        from logtweet.source.online import OnlineSourceRetriever
 
-    def test_valid_url_makes_content_available(
-        self,
-        page_content,
-        monkeypatch,
-        valid_url,
-    ):
-        from logtweet._source import online
-        def returns_page_content(*args, **kwargs):
-            return page_content
-        monkeypatch.setattr(
-            online,
-            "get_content_from_url",
-            returns_page_content,
-        )
+        with pytest.raises(TypeError):
+            OnlineSourceRetriever(wrong_type_input)
 
-        online_obj = online.OnlineLogSource(valid_url)
 
-        assert online_obj.content == page_content
+    # def test_valid_url_creates_instance(
+    #     self,
+    #     page_content,
+    #     monkeypatch,
+    #     valid_url,
+    # ):
+    #     from logtweet._source import online
+    #     def returns_page_content(*args, **kwargs):
+    #         return page_content
+    #     monkeypatch.setattr(
+    #         online,
+    #         "get_content_from_url",
+    #         returns_page_content,
+    #     )
 
-    def test_invalid_url_raises_exception(self, invalid_url):
-        from logtweet._source.online import OnlineLogSource
-        from logtweet._source.exceptions import NotAUrlError
+    #     instance = online.OnlineLogSource(valid_url)
 
-        with pytest.raises(NotAUrlError):
-            OnlineLogSource(invalid_url)
+    #     assert isinstance(instance, online.OnlineLogSource)
+
+    # def test_valid_url_makes_content_available(
+    #     self,
+    #     page_content,
+    #     monkeypatch,
+    #     valid_url,
+    # ):
+    #     from logtweet._source import online
+    #     def returns_page_content(*args, **kwargs):
+    #         return page_content
+    #     monkeypatch.setattr(
+    #         online,
+    #         "get_content_from_url",
+    #         returns_page_content,
+    #     )
+
+    #     online_obj = online.OnlineLogSource(valid_url)
+
+    #     assert online_obj.content == page_content
+
+    # def test_invalid_url_raises_exception(self, invalid_url):
+    #     from logtweet._source.online import OnlineLogSource
+    #     from logtweet._source.exceptions import NotAUrlError
+
+    #     with pytest.raises(NotAUrlError):
+    #         OnlineLogSource(invalid_url)
 
 
 class TestGetContentFromOnlineSource(object):
