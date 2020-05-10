@@ -8,7 +8,6 @@ from logtweet._source.exceptions import (  # noqa: WPS436
     HTTPStatusError,
     RequestError,
 )
-from logtweet._source.valid_url import ValidUrl  # noqa: WPS436
 
 
 
