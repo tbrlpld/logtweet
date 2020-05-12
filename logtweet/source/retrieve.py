@@ -101,7 +101,7 @@ class AbstractSourceContentRetriever(abc.ABC):
         if not isinstance(valid_source, self.valid_source_type):
             raise TypeError(
                 "Expected {0}".format(self.valid_source_type)
-                + " got {0}".format(type(valid_source)),
+                + ", got {0}".format(type(valid_source)),
             )
         self.valid_source = valid_source
 

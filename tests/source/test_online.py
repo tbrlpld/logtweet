@@ -9,12 +9,24 @@ import pytest  # type: ignore
 #       test. Python comes with the simple `http.server` module that allows
 #       just that.
 
+class TestAbstractValidOnlineSource(object):
+    """Tests for `AbstractValidOnlineSource` class."""
+
+    def test_subclass(self) -> None:
+        """Is subclass of `AbstractValidSource`."""
+        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.online import AbstractValidOnlineSource
+
+        assert issubclass(
+            AbstractValidOnlineSource,
+            AbstractValidSource,
+        )
 
 
 class TestOnlineSourceRetrieverClass(object):
     """Tests for the ``OnlineSourceRetriever`` class."""
 
-    def test_subclass(self):
+    def test_subclass(self) -> None:
         """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
         from logtweet.source.retrieve import AbstractSourceContentRetriever
         from logtweet.source.online import OnlineSourceContentRetriever
@@ -28,7 +40,7 @@ class TestOnlineSourceRetrieverClass(object):
 class TestOnlineSourceRetrieverInit(object):
     """Test the `init` method of the `OnlineSourceContentRetriever`."""
 
-    def test_type_error_if_init_input_wrong_type(self):
+    def test_type_error_if_init_input_wrong_type(self) -> None:
         """Raise TypeError if init input parameter not right type."""
         class NotTheRightType(object):
             pass
@@ -39,7 +51,31 @@ class TestOnlineSourceRetrieverInit(object):
             TypeError,
             match=r"Expected .*, got .*",
         ):
-            OnlineSourceContentRetriever(wrong_type_input)
+            OnlineSourceContentRetriever(wrong_type_input)  # type: ignore
+
+    def test_type_error_if_input_not_specific_enough(self) -> None:
+        """
+        Type error if input not specific enough.
+
+        If the input is subclass of `AbstractValidSource` but not of
+        `AbstractValidOnlineSource` the type error is also thrown.
+
+        """
+        from logtweet.source.retrieve import AbstractValidSource
+        class NotSpecificEnoughSource(AbstractValidSource):
+            @staticmethod
+            def is_valid(_: str) -> bool:
+                return True
+        not_specific_enough_source = NotSpecificEnoughSource("stuff")
+        from logtweet.source.online import OnlineSourceContentRetriever
+
+        with pytest.raises(
+            TypeError,
+            match=r"Expected .*, got .*",
+        ):
+            OnlineSourceContentRetriever(
+                not_specific_enough_source,
+            )
 
 
     # def test_valid_url_creates_instance(
