@@ -79,6 +79,8 @@ class AbstractSourceContentRetriever(abc.ABC):
 
     """
 
+    valid_source_type = AbstractValidSource
+
     def __init__(self, valid_source: AbstractValidSource) -> None:
         """
         Initialize AbstractSourceContentRetriever.
@@ -96,9 +98,9 @@ class AbstractSourceContentRetriever(abc.ABC):
             `AbstractValidSource`.
 
         """
-        if not isinstance(valid_source, AbstractValidSource):
+        if not isinstance(valid_source, self.valid_source_type):
             raise TypeError(
-                "Expected {0}".format(AbstractValidSource)
+                "Expected {0}".format(self.valid_source_type)
                 + " got {0}".format(type(valid_source)),
             )
         self.valid_source = valid_source
