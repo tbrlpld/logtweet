@@ -112,54 +112,56 @@ class TestOnlineSourceRetrieverInit(object):
             match=r"Expected .*, got .*",
         ):
             OnlineSourceContentRetriever(
-                not_specific_enough_source,
+                not_specific_enough_source,  # type: ignore
             )
 
+    from logtweet.source.online import AbstractValidOnlineSource
+    @pytest.fixture  # type: ignore
+    def valid_test_online_source(self) -> AbstractValidOnlineSource:
+        from logtweet.source.online import AbstractValidOnlineSource
+        class ValidTestOnlineSource(AbstractValidOnlineSource):
+            @staticmethod
+            def is_valid(_: str) -> bool:
+                return True
+        return ValidTestOnlineSource("not important")
 
-    # def test_valid_url_creates_instance(
-    #     self,
-    #     page_content,
-    #     monkeypatch,
-    #     valid_url,
-    # ):
-    #     from logtweet._source import online
-    #     def returns_page_content(*args, **kwargs):
-    #         return page_content
-    #     monkeypatch.setattr(
-    #         online,
-    #         "get_content_from_url",
-    #         returns_page_content,
-    #     )
+    def test_init_success(
+        self,
+        valid_test_online_source: AbstractValidOnlineSource,
+    ) -> None:
+        """
+        Successful init without error.
 
-    #     instance = online.OnlineLogSource(valid_url)
+        Passing an instance of a `AbstractValidOnlineSource` subclass leads
+        to successful init of `OnlineSourceContentRetriever`.
 
-    #     assert isinstance(instance, online.OnlineLogSource)
+        """
+        from logtweet.source.online import OnlineSourceContentRetriever
 
-    # def test_valid_url_makes_content_available(
-    #     self,
-    #     page_content,
-    #     monkeypatch,
-    #     valid_url,
-    # ):
-    #     from logtweet._source import online
-    #     def returns_page_content(*args, **kwargs):
-    #         return page_content
-    #     monkeypatch.setattr(
-    #         online,
-    #         "get_content_from_url",
-    #         returns_page_content,
-    #     )
+        OnlineSourceContentRetriever(valid_test_online_source)
 
-    #     online_obj = online.OnlineLogSource(valid_url)
+    def test_valid_source_avaliable_on_instance(
+        self,
+        valid_test_online_source: AbstractValidOnlineSource,
+    ) -> None:
+        """Passed valid source object is available on the instance."""
+        from logtweet.source.online import OnlineSourceContentRetriever
 
-    #     assert online_obj.content == page_content
+        instance = OnlineSourceContentRetriever(valid_test_online_source)
 
-    # def test_invalid_url_raises_exception(self, invalid_url):
-    #     from logtweet._source.online import OnlineLogSource
-    #     from logtweet._source.exceptions import NotAUrlError
+        assert instance.valid_source == valid_test_online_source
 
-    #     with pytest.raises(NotAUrlError):
-    #         OnlineLogSource(invalid_url)
+    def test_valid_source_has_url_property(
+        self,
+        valid_test_online_source: AbstractValidOnlineSource,
+    ) -> None:
+        """Valid source on instance has `url` property."""
+        from logtweet.source.online import OnlineSourceContentRetriever
+        instance = OnlineSourceContentRetriever(valid_test_online_source)
+
+        url = instance.valid_source.url
+
+        assert url == "not important"
 
 
 # class TestGetContentFromOnlineSource(object):

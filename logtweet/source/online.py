@@ -19,6 +19,7 @@ class AbstractValidOnlineSource(AbstractValidSource):
     This abstraction adds the `url` property.
 
     """
+
     @property
     def url(self) -> str:
         """
@@ -38,10 +39,14 @@ class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
 
     valid_source_type = AbstractValidOnlineSource
 
+    def __init__(self, valid_source: AbstractValidOnlineSource) -> None:
+        """Override for type annotation only."""
+        self.valid_source: AbstractValidOnlineSource
+        super().__init__(valid_source)
+
     # TODO: (1) Implement concrete method to retrieve online source content
     def get_content():
         pass
-
 
 
 def get_content_from_url(valid_url: str) -> str:
