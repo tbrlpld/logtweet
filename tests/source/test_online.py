@@ -2,10 +2,13 @@
 
 """Tests for the OnlineSourceRetriever class."""
 
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TYPE_CHECKING
 
 import pytest  # type: ignore
-import requests
+
+if TYPE_CHECKING:
+    from logtweet.source.online import AbstractValidOnlineSource
+    import requests
 
 
 class TestAbstractValidOnlineSourceClass(object):
@@ -74,32 +77,9 @@ class TestOnlineSourceRetrieverClass(object):
         )
 
 
-from logtweet.source.online import AbstractValidOnlineSource
-
-
-@pytest.fixture  # type: ignore
-def valid_online_source_factory(
-) -> Callable[[str], AbstractValidOnlineSource]:
-    """
-    Create function that creates `ValidOnlineSource` implementation.
-
-    The returned function accepts a `source_string` parameter. This value will
-    be available on the object returned by the function in the `url` property.
-
-    """
-
-    def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
-        class ValidTestOnlineSource(AbstractValidOnlineSource):
-            @staticmethod
-            def is_valid(_: str) -> bool:
-                return True
-        return ValidTestOnlineSource(source_string)
-
-    return valid_online_source
-
-
 class TestOnlineSourceRetrieverInit(object):
     """Test the `init` method of the `OnlineSourceContentRetriever`."""
+
 
     def test_type_error_if_init_input_wrong_type(self) -> None:
         """Raise TypeError if init input parameter not right type."""
@@ -140,7 +120,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_init_success(
         self,
-        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
+        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
     ) -> None:
         """
         Successful init without error.
@@ -156,7 +136,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_valid_source_avaliable_on_instance(
         self,
-        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
+        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
     ) -> None:
         """Passed valid source object is available on the instance."""
         valid_online_source = valid_online_source_factory("not important")
@@ -168,7 +148,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_valid_source_has_url_property(
         self,
-        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
+        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
     ) -> None:
         """Valid source on instance has `url` property."""
         source_string = "not important"
@@ -200,7 +180,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def mock_get_factory(
         status_code: int,
         page_content: str = "",
-    ) -> Callable[[Any], requests.Response]:
+    ) -> Callable[[Any], "requests.Response"]:
         """
         Return a mock function to replace `requests.get()`.
 
@@ -225,6 +205,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             given `status_code` and `page_content`.
 
         """
+        import requests
 
         def mock_get(*_args: Any, **_kwargs: Any) -> requests.Response:
             """
@@ -256,13 +237,14 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         return mock_get
 
-    from logtweet.source.online import OnlineSourceContentRetriever
+    if TYPE_CHECKING:
+        from logtweet.source.online import OnlineSourceContentRetriever
 
     @pytest.fixture  # type: ignore
     def online_source_content_retriever(
         self,
-        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
-    ) -> OnlineSourceContentRetriever:
+        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+    ) -> "OnlineSourceContentRetriever":
         """
         Create an `OnlineSourceContentRetriever` object.
 
@@ -272,7 +254,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         Parameters
         ----------
-        valid_online_source_factory : Callable[[str], AbstractValidOnlineSource]
+        valid_online_source_factory : Callable[[str], "AbstractValidOnlineSource"]
             Factory function fixture to create a valid online source instance
             from a given source string.
 
@@ -286,16 +268,18 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         """
         from logtweet.source.online import OnlineSourceContentRetriever
+
         valid_online_source = valid_online_source_factory("not important")
         online_source_content_retirever = OnlineSourceContentRetriever(
             valid_online_source,
         )
+
         return online_source_content_retirever
 
     def test_returns_page_content_from_mocked_requests_response_object(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: OnlineSourceContentRetriever,
+        online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Return the content from mocked response object."""
         defined_content = "Some content"
@@ -317,7 +301,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raises_error_for_requests_connection_error(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: OnlineSourceContentRetriever,
+        online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
         from logtweet.source.online import requests  # type: ignore
@@ -338,7 +322,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raised_error_for_requests_connection_error_shows_url(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: OnlineSourceContentRetriever,
+        online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
         from logtweet.source.online import requests  # type: ignore
@@ -362,7 +346,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raises_error_for_bad_status_code(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: OnlineSourceContentRetriever,
+        online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raise `SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
@@ -385,7 +369,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raised_error_for_bad_status_code_shows_code(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: OnlineSourceContentRetriever,
+        online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raise `SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
