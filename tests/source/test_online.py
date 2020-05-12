@@ -2,9 +2,10 @@
 
 """Tests for the OnlineSourceRetriever class."""
 
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 import pytest  # type: ignore
+import requests
 
 
 class TestAbstractValidOnlineSourceClass(object):
@@ -77,10 +78,8 @@ from logtweet.source.online import AbstractValidOnlineSource
 
 
 @pytest.fixture  # type: ignore
-def valid_online_source_factory() -> Callable[
-    [str],
-    AbstractValidOnlineSource,
-]:
+def valid_online_source_factory(
+) -> Callable[[str], AbstractValidOnlineSource]:
     """
     Create function that creates `ValidOnlineSource` implementation.
 
@@ -88,12 +87,14 @@ def valid_online_source_factory() -> Callable[
     be available on the object returned by the function in the `url` property.
 
     """
+
     def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
         class ValidTestOnlineSource(AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
                 return True
         return ValidTestOnlineSource(source_string)
+
     return valid_online_source
 
 
@@ -196,13 +197,61 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     }
 
     @staticmethod
-    def mock_get_factory(status_code: int, page_content: str = "") -> Any:
-        import requests
+    def mock_get_factory(
+        status_code: int,
+        page_content: str = "",
+    ) -> Callable[[Any], requests.Response]:
+        """
+        Return a mock function to replace `requests.get()`.
 
-        def mock_get(*args: Any, **kwargs: Any) -> requests.Response:
+        The mock get function will return a `requests.Response` object with
+        the given `status_code` and `page_content`. The `page_content` string
+        will be available as `Response.text`.
+
+        Parameters
+        ----------
+        status_code : int
+            Status code of the response object that the mock get function
+            returns.
+        page_content : str
+            Page content that is available as the `text` property on the
+            response object that the mock function returns.
+
+        Returns
+        -------
+        Callable[[Any], requests.Response]
+            Mock function to replace `requests.get`. Takes any arguments and
+            ignores them. It returns a `requests.Response` object with the
+            given `status_code` and `page_content`.
+
+        """
+
+        def mock_get(*_args: Any, **_kwargs: Any) -> requests.Response:
+            """
+            Mock get function.
+
+            Use this function to mock out `requests.get`. It returns a
+            `requests.Response` object, just like the real function.
+
+            All parameters passed to this function are ignored.
+
+            Parameters
+            ----------
+            _args : Any
+                All  positional parameters passed to this function are ignored.
+            _kwargs : Any
+                All keyword parameters passed to this function are ignored.
+
+            Returns
+            -------
+            requests.Response
+                Response object with `status_code` and `text`.
+
+            """
             mock_resp = requests.Response()
             mock_resp.status_code = status_code
             mock_resp._content = bytes(page_content, encoding="utf-8")  # type: ignore
+
             return mock_resp
 
         return mock_get
@@ -214,6 +263,28 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
         self,
         valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
     ) -> OnlineSourceContentRetriever:
+        """
+        Create an `OnlineSourceContentRetriever` object.
+
+        This is a convenience fixture to instantiate an
+        `OnlineSourceContentRetriever` object from a meaningless valid online
+        source. The source is not actually validated.
+
+        Parameters
+        ----------
+        valid_online_source_factory : Callable[[str], AbstractValidOnlineSource]
+            Factory function fixture to create a valid online source instance
+            from a given source string.
+
+        Returns
+        -------
+        OnlineSourceContentRetriever
+            The `OnlineSourceContentRetriever` object is instantiated with a
+            valid online source, that is created with the
+            `valid_online_source_factory`. The valid source is created with a
+            meaningless string passed to it.
+
+        """
         from logtweet.source.online import OnlineSourceContentRetriever
         valid_online_source = valid_online_source_factory("not important")
         online_source_content_retirever = OnlineSourceContentRetriever(
