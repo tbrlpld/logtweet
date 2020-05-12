@@ -18,9 +18,10 @@ class RequestError(SourceContentRetrievalError):
         """
         Initialize ``RequestError``.
 
-        Arguments:
-            url (str): URL that the request was sent to when the error
-                occurred.
+        Parameters
+        ----------
+        url : str
+            URL that the request was sent to when the error occurred.
 
         """
         self.url = url
@@ -51,7 +52,7 @@ class HTTPStatusError(SourceContentRetrievalError):
 
         self.message = "Response from '{0}' failed with status: {1}!".format(
             self.url,
-            self.status_code
+            self.status_code,
         )
         super().__init__(self.message)
 
