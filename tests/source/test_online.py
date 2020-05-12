@@ -184,7 +184,7 @@ class TestOnlineSourceRetrieverInit(object):
 #       test. Python comes with the simple `http.server` module that allows
 #       just that.
 
-class TestOnlineSourceRetrieverGetContentWhiteBoxTests(object):
+class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     """
     Tests for the `get_content` method of the `OnlineSourceRetriever`.
 
@@ -230,13 +230,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBoxTests(object):
         monkeypatch: Any,
         online_source_content_retriever: OnlineSourceContentRetriever,
     ) -> None:
-        """
-        Return the content from mocked response object.
-
-        This a white box tests, and requires the use of `requests.get`.
-        If implementation changes, this test has to change.
-
-        """
+        """Return the content from mocked response object."""
         defined_content = "Some content"
         mock_get = self.mock_get_factory(
             self.status_codes["success"],
@@ -253,161 +247,95 @@ class TestOnlineSourceRetrieverGetContentWhiteBoxTests(object):
 
         assert actual_content == defined_content
 
+    def test_raises_error_for_requests_connection_error(
+        self,
+        monkeypatch: Any,
+        online_source_content_retriever: OnlineSourceContentRetriever,
+    ) -> None:
+        """Raises SourceContentRetrievalError when connection error. """
+        from logtweet.source.online import requests  # type: ignore
+        # Create mock function for `requests.get`
+        def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
+            raise requests.ConnectionError
+        # Activate the mock for `requests.get`
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get_raises_connection_error,
+        )
+        from logtweet.source.retrieve import SourceContentRetrievalError
 
-    # def test_raises_error_for_requests_connection_error(
-    #     self,
-    #     monkeypatch: Any,
-    #     valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
-    # ) -> None:
-    #     """
-    #     Raises SourceContentRetrievalError when connection error.
+        with pytest.raises(SourceContentRetrievalError):
+            online_source_content_retriever.get_content()
 
-    #     This test is based on the implementation with the `requests` library.
-    #     Mocking needs to be adjusted if implementation changes.
+    def test_raised_error_for_requests_connection_error_shows_url(
+        self,
+        monkeypatch: Any,
+        online_source_content_retriever: OnlineSourceContentRetriever,
+    ) -> None:
+        """Raises SourceContentRetrievalError when connection error. """
+        from logtweet.source.online import requests  # type: ignore
+        # Create mock function for `requests.get`
+        def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
+            raise requests.ConnectionError
+        # Activate the mock for `requests.get`
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get_raises_connection_error,
+        )
+        from logtweet.source.retrieve import SourceContentRetrievalError
 
-    #     This test only checks that the original error source of the
-    #     implementation is hidden.
+        with pytest.raises(
+            SourceContentRetrievalError,
+            match=r".*{0}.*".format(online_source_content_retriever.valid_source.url)
+        ):
+            online_source_content_retriever.get_content()
 
-    #     """
-    #     from logtweet.source.online import requests
-    #     # Create mock function for `requests.get`
-    #     def mock_get_raises_connection_error(*args, **kwargs):
-    #         raise requests.ConnectionError
-    #     # Activate the mock for `requests.get`
-    #     monkeypatch.setattr(
-    #         requests,
-    #         "get",
-    #         mock_get_raises_connection_error,
-    #     )
-    #     valid_online_source = valid_online_source_factory("not important")
-    #     from logtweet.source.online import OnlineSourceContentRetriever
-    #     online_source_content_retirever = OnlineSourceContentRetriever(
-    #         valid_online_source,
-    #     )
-    #     from logtweet.source.retrieve import SourceContentRetrievalError
-
-    #     with pytest.raises(SourceContentRetrievalError):
-    #         online_source_content_retirever.get_content()
-
-    # def test_raised_error_for_connection_error_shows_url(
-    #     self,
-    #     monkeypatch,
-    #     valid_url,
-    #     valid_url_obj,
-    # ):
-    #     from logtweet._source.online import requests
-    #     def mock_get_raises_connection_error(*args, **kwargs):
-    #         raise requests.ConnectionError
-    #     monkeypatch.setattr(
-    #         requests,
-    #         "get",
-    #         mock_get_raises_connection_error,
-    #     )
-    #     from logtweet._source.exceptions import RequestError
-    #     from logtweet._source.online import get_content_from_url
-
-    #     with pytest.raises(
-    #         RequestError,
-    #         match=r".*{0}.*".format(valid_url),
-    #     ):
-    #         get_content_from_url(valid_url_obj)
+    def test_raises_error_for_bad_status_code(
+        self,
+        monkeypatch: Any,
+        online_source_content_retriever: OnlineSourceContentRetriever,
+    ) -> None:
+        """Raise `SourceContentRetrievalError` when bad HTTP status code."""
+        defined_content = "Some content"
+        mock_get = self.mock_get_factory(
+            self.status_codes["not_found"],
+            defined_content,
+        )
+        from logtweet.source.online import requests  # type: ignore
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get,
+        )
+        from logtweet.source.retrieve import SourceContentRetrievalError
 
 
-# class TestGetContentFromOnlineSource(object):
-#     """Test `get_content_from_online_source` static method."""
+        with pytest.raises(SourceContentRetrievalError):
+            online_source_content_retriever.get_content()
 
+    def test_raised_error_for_bad_status_code_shows_code(
+        self,
+        monkeypatch: Any,
+        online_source_content_retriever: OnlineSourceContentRetriever,
+    ) -> None:
+        """Raise `SourceContentRetrievalError` when bad HTTP status code."""
+        defined_content = "Some content"
+        mock_get = self.mock_get_factory(
+            self.status_codes["not_found"],
+            defined_content,
+        )
+        from logtweet.source.online import requests  # type: ignore
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get,
+        )
+        from logtweet.source.retrieve import SourceContentRetrievalError
 
-#     def test_returns_page_content_from_passed_source_string(
-#         self,
-#         monkeypatch,
-#         valid_url_obj,
-#     ):
-#         mock_page_content = "<html><body>The content</body></html>"
-#         from logtweet._source.online import requests
-#         monkeypatch.setattr(
-#             requests,
-#             "get",
-#             self.mock_get_factory(200, mock_page_content),
-#         )
-#         from logtweet._source.online import get_content_from_url
-
-#         returned_page_content = get_content_from_url(
-#             valid_url_obj,
-#         )
-
-#         assert returned_page_content == mock_page_content
-
-#     def test_raises_error_for_404(
-#         self,
-#         monkeypatch,
-#         valid_url_obj,
-#     ):
-#         mock_page_content = "<html><body>The content</body></html>"
-#         from logtweet._source.online import requests
-#         monkeypatch.setattr(
-#             requests,
-#             "get",
-#             self.mock_get_factory(404, mock_page_content),
-#         )
-#         from logtweet._source.exceptions import HTTPStatusError
-#         from logtweet._source.online import get_content_from_url
-
-#         with pytest.raises(HTTPStatusError):
-#             get_content_from_url(valid_url_obj)
-
-#     def test_error_for_404_shows_status_code(
-#         self,
-#         monkeypatch,
-#         valid_url_obj,
-#     ):
-#         mock_page_content = "<html><body>The content</body></html>"
-#         from logtweet._source.online import requests
-#         monkeypatch.setattr(
-#             requests,
-#             "get",
-#             self.mock_get_factory(404, mock_page_content),
-#         )
-#         from logtweet._source.exceptions import HTTPStatusError
-#         from logtweet._source.online import get_content_from_url
-
-#         with pytest.raises(HTTPStatusError, match=r".*404.*"):
-#             get_content_from_url(valid_url_obj)
-
-#     def test_raises_error_for_connection_error(self, monkeypatch, valid_url_obj):
-#         from logtweet._source.online import requests
-#         def mock_get_raises_connection_error(*args, **kwargs):
-#             raise requests.ConnectionError
-#         monkeypatch.setattr(
-#             requests,
-#             "get",
-#             mock_get_raises_connection_error,
-#         )
-#         from logtweet._source.exceptions import RequestError
-#         from logtweet._source.online import get_content_from_url
-
-#         with pytest.raises(RequestError):
-#             get_content_from_url(valid_url_obj)
-
-#     def test_raised_error_for_connection_error_shows_url(
-#         self,
-#         monkeypatch,
-#         valid_url,
-#         valid_url_obj,
-#     ):
-#         from logtweet._source.online import requests
-#         def mock_get_raises_connection_error(*args, **kwargs):
-#             raise requests.ConnectionError
-#         monkeypatch.setattr(
-#             requests,
-#             "get",
-#             mock_get_raises_connection_error,
-#         )
-#         from logtweet._source.exceptions import RequestError
-#         from logtweet._source.online import get_content_from_url
-
-#         with pytest.raises(
-#             RequestError,
-#             match=r".*{0}.*".format(valid_url),
-#         ):
-#             get_content_from_url(valid_url_obj)
-
+        with pytest.raises(
+            SourceContentRetrievalError,
+            match=r".*404.*",
+        ):
+            online_source_content_retriever.get_content()
