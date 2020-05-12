@@ -2,14 +2,12 @@
 
 """Tests for the OnlineSourceRetriever class."""
 
+from typing import Callable
+
 import pytest  # type: ignore
 
 
-# TEST: Mock actually available online server. So run an HTTP server for the
-#       test. Python comes with the simple `http.server` module that allows
-#       just that.
-
-class TestAbstractValidOnlineSource(object):
+class TestAbstractValidOnlineSourceClass(object):
     """Tests for `AbstractValidOnlineSource` class."""
 
     def test_subclass(self) -> None:
@@ -75,6 +73,23 @@ class TestOnlineSourceRetrieverClass(object):
         )
 
 
+from logtweet.source.online import AbstractValidOnlineSource
+
+
+@pytest.fixture  # type: ignore
+def valid_online_source_factory() -> Callable[
+    [str],
+    AbstractValidOnlineSource,
+]:
+    def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
+        class ValidTestOnlineSource(AbstractValidOnlineSource):
+            @staticmethod
+            def is_valid(_: str) -> bool:
+                return True
+        return ValidTestOnlineSource(source_string)
+    return valid_online_source
+
+
 class TestOnlineSourceRetrieverInit(object):
     """Test the `init` method of the `OnlineSourceContentRetriever`."""
 
@@ -115,19 +130,9 @@ class TestOnlineSourceRetrieverInit(object):
                 not_specific_enough_source,  # type: ignore
             )
 
-    from logtweet.source.online import AbstractValidOnlineSource
-    @pytest.fixture  # type: ignore
-    def valid_test_online_source(self) -> AbstractValidOnlineSource:
-        from logtweet.source.online import AbstractValidOnlineSource
-        class ValidTestOnlineSource(AbstractValidOnlineSource):
-            @staticmethod
-            def is_valid(_: str) -> bool:
-                return True
-        return ValidTestOnlineSource("not important")
-
     def test_init_success(
         self,
-        valid_test_online_source: AbstractValidOnlineSource,
+        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
     ) -> None:
         """
         Successful init without error.
@@ -136,33 +141,41 @@ class TestOnlineSourceRetrieverInit(object):
         to successful init of `OnlineSourceContentRetriever`.
 
         """
+        valid_online_source = valid_online_source_factory("not important")
         from logtweet.source.online import OnlineSourceContentRetriever
 
-        OnlineSourceContentRetriever(valid_test_online_source)
+        OnlineSourceContentRetriever(valid_online_source)
 
     def test_valid_source_avaliable_on_instance(
         self,
-        valid_test_online_source: AbstractValidOnlineSource,
+        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
     ) -> None:
         """Passed valid source object is available on the instance."""
+        valid_online_source = valid_online_source_factory("not important")
         from logtweet.source.online import OnlineSourceContentRetriever
 
-        instance = OnlineSourceContentRetriever(valid_test_online_source)
+        instance = OnlineSourceContentRetriever(valid_online_source)
 
-        assert instance.valid_source == valid_test_online_source
+        assert instance.valid_source == valid_online_source
 
     def test_valid_source_has_url_property(
         self,
-        valid_test_online_source: AbstractValidOnlineSource,
+        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
     ) -> None:
         """Valid source on instance has `url` property."""
+        source_string = "not important"
+        valid_online_source = valid_online_source_factory(source_string)
         from logtweet.source.online import OnlineSourceContentRetriever
-        instance = OnlineSourceContentRetriever(valid_test_online_source)
+        instance = OnlineSourceContentRetriever(valid_online_source)
 
         url = instance.valid_source.url
 
-        assert url == "not important"
+        assert url == source_string
 
+
+# TEST: Mock actually available online server. So run an HTTP server for the
+#       test. Python comes with the simple `http.server` module that allows
+#       just that.
 
 # class TestGetContentFromOnlineSource(object):
 #     """Test `get_content_from_online_source` static method."""
