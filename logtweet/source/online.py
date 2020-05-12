@@ -7,14 +7,25 @@ import requests
 from logtweet.source.retrieve import AbstractSourceContentRetriever
 
 
+class AbstractValidOnlineSource():
+    pass
+
 # TODO: (1) Implement OnlineSourceRetriever based on AbstractSourceRetriever
-# TODO: (2) Require AbstractValidOnlineSurce as input
+# TODO: (2) Require AbstractValidOnlineSource as input
 # TODO: (3) Define AbstractValidOnlineSource based on AbstractValidSource
 class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
     """Valid online log source."""
-    pass
 
+    def __init__(self, valid_online_source: AbstractValidOnlineSource) -> None:
+        """Initialize OnlineSourceContentRetriever."""
+        if not isinstance(valid_online_source, AbstractValidOnlineSource):
+            raise TypeError(
+                "Expected AbstractValidOnlineSource,"
+                + " got {0}".format(type(valid_online_source)),
+            )
 
+    def get_content():
+        pass
 
 def get_content_from_url(valid_url: str) -> str:
     """
