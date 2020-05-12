@@ -2,7 +2,7 @@
 
 """Tests for the OnlineSourceRetriever class."""
 
-from typing import Callable
+from typing import Any, Callable
 
 import pytest  # type: ignore
 
@@ -81,6 +81,13 @@ def valid_online_source_factory() -> Callable[
     [str],
     AbstractValidOnlineSource,
 ]:
+    """
+    Create function that creates `ValidOnlineSource` implementation.
+
+    The returned function accepts a `source_string` parameter. This value will
+    be available on the object returned by the function in the `url` property.
+
+    """
     def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
         class ValidTestOnlineSource(AbstractValidOnlineSource):
             @staticmethod
@@ -177,18 +184,138 @@ class TestOnlineSourceRetrieverInit(object):
 #       test. Python comes with the simple `http.server` module that allows
 #       just that.
 
+class TestOnlineSourceRetrieverGetContentWhiteBoxTests(object):
+    """
+    Tests for the `get_content` method of the `OnlineSourceRetriever`.
+
+    These are white box tests, that heavily rely on mocking out the used
+    `requests` library and specifically its `get` method. When the
+    implementation changes, then these tests have to be changed.
+
+    """
+
+    status_codes = {
+        "success": 200,
+        "not_found": 404,
+    }
+
+    @staticmethod
+    def mock_get_factory(status_code: int, page_content: str = "") -> Any:
+        import requests
+
+        def mock_get(*args: Any, **kwargs: Any) -> requests.Response:
+            mock_resp = requests.Response()
+            mock_resp.status_code = status_code
+            mock_resp._content = bytes(page_content, encoding="utf-8")  # type: ignore
+            return mock_resp
+
+        return mock_get
+
+    from logtweet.source.online import OnlineSourceContentRetriever
+
+    @pytest.fixture  # type: ignore
+    def online_source_content_retriever(
+        self,
+        valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
+    ) -> OnlineSourceContentRetriever:
+        from logtweet.source.online import OnlineSourceContentRetriever
+        valid_online_source = valid_online_source_factory("not important")
+        online_source_content_retirever = OnlineSourceContentRetriever(
+            valid_online_source,
+        )
+        return online_source_content_retirever
+
+    def test_returns_page_content_from_mocked_requests_response_object(
+        self,
+        monkeypatch: Any,
+        online_source_content_retriever: OnlineSourceContentRetriever,
+    ) -> None:
+        """
+        Return the content from mocked response object.
+
+        This a white box tests, and requires the use of `requests.get`.
+        If implementation changes, this test has to change.
+
+        """
+        defined_content = "Some content"
+        mock_get = self.mock_get_factory(
+            self.status_codes["success"],
+            defined_content,
+        )
+        from logtweet.source.online import requests  # type: ignore
+        monkeypatch.setattr(
+            requests,
+            "get",
+            mock_get,
+        )
+
+        actual_content = online_source_content_retriever.get_content()
+
+        assert actual_content == defined_content
+
+
+    # def test_raises_error_for_requests_connection_error(
+    #     self,
+    #     monkeypatch: Any,
+    #     valid_online_source_factory: Callable[[str], AbstractValidOnlineSource],
+    # ) -> None:
+    #     """
+    #     Raises SourceContentRetrievalError when connection error.
+
+    #     This test is based on the implementation with the `requests` library.
+    #     Mocking needs to be adjusted if implementation changes.
+
+    #     This test only checks that the original error source of the
+    #     implementation is hidden.
+
+    #     """
+    #     from logtweet.source.online import requests
+    #     # Create mock function for `requests.get`
+    #     def mock_get_raises_connection_error(*args, **kwargs):
+    #         raise requests.ConnectionError
+    #     # Activate the mock for `requests.get`
+    #     monkeypatch.setattr(
+    #         requests,
+    #         "get",
+    #         mock_get_raises_connection_error,
+    #     )
+    #     valid_online_source = valid_online_source_factory("not important")
+    #     from logtweet.source.online import OnlineSourceContentRetriever
+    #     online_source_content_retirever = OnlineSourceContentRetriever(
+    #         valid_online_source,
+    #     )
+    #     from logtweet.source.retrieve import SourceContentRetrievalError
+
+    #     with pytest.raises(SourceContentRetrievalError):
+    #         online_source_content_retirever.get_content()
+
+    # def test_raised_error_for_connection_error_shows_url(
+    #     self,
+    #     monkeypatch,
+    #     valid_url,
+    #     valid_url_obj,
+    # ):
+    #     from logtweet._source.online import requests
+    #     def mock_get_raises_connection_error(*args, **kwargs):
+    #         raise requests.ConnectionError
+    #     monkeypatch.setattr(
+    #         requests,
+    #         "get",
+    #         mock_get_raises_connection_error,
+    #     )
+    #     from logtweet._source.exceptions import RequestError
+    #     from logtweet._source.online import get_content_from_url
+
+    #     with pytest.raises(
+    #         RequestError,
+    #         match=r".*{0}.*".format(valid_url),
+    #     ):
+    #         get_content_from_url(valid_url_obj)
+
+
 # class TestGetContentFromOnlineSource(object):
 #     """Test `get_content_from_online_source` static method."""
 
-#     @staticmethod
-#     def mock_get_factory(status_code: int, page_content: str = ""):
-#         import requests
-#         def mock_get(*args, **kwargs):
-#             mock_resp = requests.Response()
-#             mock_resp.status_code = status_code
-#             mock_resp._content = bytes(page_content, encoding="utf-8")
-#             return mock_resp
-#         return mock_get
 
 #     def test_returns_page_content_from_passed_source_string(
 #         self,
@@ -283,22 +410,4 @@ class TestOnlineSourceRetrieverInit(object):
 #             match=r".*{0}.*".format(valid_url),
 #         ):
 #             get_content_from_url(valid_url_obj)
-
-#     def test_raises_type_error_if_input_not_valid_url_instance(
-#         self,
-#         valid_url,
-#     ):
-#         """
-#         Test raises type error if input is not instance of  ``ValidUrl``.
-
-#         E.g. if the input is of type string (even if this represents a valid
-#         URL) the type error is raised. The caller is expected to validate the
-#         URL by creating a corresponding object.
-
-#         """
-#         from logtweet._source.online import get_content_from_url
-#         assert isinstance(valid_url, str)
-
-#         with pytest.raises(TypeError):
-#             get_content_from_url(valid_url)
 

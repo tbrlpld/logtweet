@@ -45,8 +45,9 @@ class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
         super().__init__(valid_source)
 
     # TODO: (1) Implement concrete method to retrieve online source content
-    def get_content():
-        pass
+    def get_content(self) -> str:
+        response = requests.get(self.valid_source.url)
+        return response.text
 
 
 def get_content_from_url(valid_url: str) -> str:
