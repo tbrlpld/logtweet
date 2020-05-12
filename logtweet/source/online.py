@@ -11,7 +11,27 @@ from logtweet.source.retrieve import (
 
 
 class AbstractValidOnlineSource(AbstractValidSource):
-    pass
+    """
+    Abstract class representing a valid online source.
+
+    The validation method `is_valid` still needs to be implemented.
+
+    This abstraction adds the `url` property.
+
+    """
+    @property
+    def url(self) -> str:
+        """
+        URL of the validated online source.
+
+        Returns
+        -------
+        str
+            URL of the validated online source.
+
+        """
+        return self.source_string
+
 
 class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
     """Valid online log source."""

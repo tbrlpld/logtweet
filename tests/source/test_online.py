@@ -22,6 +22,44 @@ class TestAbstractValidOnlineSource(object):
             AbstractValidSource,
         )
 
+    def test_no_direct_instantiation(self) -> None:
+        """Can not be instantiated directly, because is abstract."""
+        from logtweet.source.online import AbstractValidOnlineSource
+
+        with pytest.raises(
+            TypeError,
+            match=r"Can't instantiate.*abstract.*",
+        ):
+            AbstractValidOnlineSource()  # type: ignore
+
+    def test_init_when_is_valid_defined(self) -> None:
+        """Subclass init works if `is_valid` is defined."""
+        from logtweet.source.online import AbstractValidOnlineSource
+        class ValidTestOnlineSource(AbstractValidOnlineSource):
+            @staticmethod
+            def is_valid(_: str) -> bool:
+                return True
+
+        ValidTestOnlineSource("not important")
+
+    def test_url_property_available_on_instance(self) -> None:
+        """
+        A subclass instance has the `url` property.
+
+        The `url` property should contain the string passed to the constructor.
+
+        """
+        from logtweet.source.online import AbstractValidOnlineSource
+        class ValidTestOnlineSource(AbstractValidOnlineSource):
+            @staticmethod
+            def is_valid(_: str) -> bool:
+                return True
+        string_to_validate = "Some string"
+
+        valid_test_online_source = ValidTestOnlineSource(string_to_validate)
+
+        assert valid_test_online_source.url == string_to_validate
+
 
 class TestOnlineSourceRetrieverClass(object):
     """Tests for the ``OnlineSourceRetriever`` class."""
