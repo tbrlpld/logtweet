@@ -180,10 +180,6 @@ class TestOnlineSourceRetrieverInit(object):
         assert url == source_string
 
 
-# TEST: (1) Mock actually available online server. So run an HTTP server for the
-#       test. Python comes with the simple `http.server` module that allows
-#       just that.
-
 class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     """
     Tests for the `get_content` method of the `OnlineSourceRetriever`.
