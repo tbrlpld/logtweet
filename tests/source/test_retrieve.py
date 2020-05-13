@@ -354,3 +354,6 @@ class TestGetLogContentFromSource(object):
             get_log_content_from_source(
                 mock_source_content_retriever,
             )
+
+
+# TEST: Create functional/integration test for the retrieval use case.

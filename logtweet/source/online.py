@@ -2,6 +2,8 @@
 
 """Defines class representing a valid online source for the log."""
 
+from typing import Optional
+
 import requests
 
 from logtweet.source.retrieve import (
@@ -14,7 +16,7 @@ from logtweet.source.retrieve import (
 class RequestError(SourceContentRetrievalError):
     """Raised when issue request to source."""
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, err: Optional[Exception] = None):
         """
         Initialize ``RequestError``.
 
@@ -22,13 +24,15 @@ class RequestError(SourceContentRetrievalError):
         ----------
         url : str
             URL that the request was sent to when the error occurred.
+        err : Exception
+            Original exception raised
 
         """
         self.url = url
 
-        self.message = "The request to '{0}' failed!".format(
-            self.url,
-        )
+        self.message = "The request to '{0}' failed!".format(self.url)
+        if err:
+            self.message += " The following error occurred:\n{0}".format(err)
         super().__init__(self.message)
 
 
@@ -119,8 +123,8 @@ class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
         """
         try:
             response = requests.get(self.valid_source.url)
-        except requests.exceptions.RequestException:
-            raise RequestError(self.valid_source.url)
+        except requests.exceptions.RequestException as err:
+            raise RequestError(self.valid_source.url, err)
 
         try:
             response.raise_for_status()
