@@ -7,7 +7,7 @@ import validators  # type: ignore
 from logtweet.source.retrieve import AbstractValidSource
 
 
-# TODO: (4) Implement ValidOnlineSource based on AbstractValidOnlineSource
+# TODO: (1) Implement ValidOnlineSource based on AbstractValidOnlineSource
 class ValidSourceURL(AbstractValidSource):
     """Valid URL class."""
 

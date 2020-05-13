@@ -356,4 +356,4 @@ class TestGetLogContentFromSource(object):
             )
 
 
-# TEST: Create functional/integration test for the retrieval use case.
+# TEST: (2) Create functional/integration test for the retrieval use case.
