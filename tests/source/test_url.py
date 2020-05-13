@@ -24,9 +24,19 @@ class TestIsValidStaticMethod(object):
         self,
         valid_url_string: str,
     ) -> None:
+        """Validates URL."""
         from logtweet.source.url import ValidSourceURL
 
         is_valid = ValidSourceURL.is_valid(valid_url_string)
+
+        assert is_valid is True
+
+    def test_localhost_is_valid(self) -> None:
+        """Localhost address with port is valid."""
+        url = "http://localhost:8000/"
+        from logtweet.source.url import ValidSourceURL
+
+        is_valid = ValidSourceURL.is_valid(url)
 
         assert is_valid is True
 
@@ -34,6 +44,7 @@ class TestIsValidStaticMethod(object):
         self,
         invalid_url_string: str,
     ) -> None:
+        """Fails on non-URL string."""
         from logtweet.source.url import ValidSourceURL
 
         is_valid = ValidSourceURL.is_valid(invalid_url_string)
@@ -44,35 +55,43 @@ class TestIsValidStaticMethod(object):
 class TestValidUrlInitialization(object):
     """Test initialization of ValidURL."""
 
-    def test_valid_url_string_creates_object(self, valid_url_string):
-        from logtweet._source.valid_url_string import ValidUrl
+    def test_valid_url_string_creates_object(
+        self,
+        valid_url_string: str,
+    ) -> None:
+        """Init succeeds with valid url."""
+        from logtweet.source.url import ValidSourceURL
 
-        url_obj = ValidUrl(valid_url_string)
+        url_obj = ValidSourceURL(valid_url_string)
 
-        assert isinstance(url_obj, ValidUrl)
+        assert isinstance(url_obj, ValidSourceURL)
 
-    def test_valid_object_has_url_property(self, valid_url_string):
-        from logtweet._source.valid_url_string import ValidUrl
+    def test_valid_object_has_url_property(
+        self,
+        valid_url_string: str,
+    ) -> None:
+        """Initialized object has `url` property."""
+        from logtweet.source.url import ValidSourceURL
 
-        url_obj = ValidUrl(valid_url_string)
+        url_obj = ValidSourceURL(valid_url_string)
 
         assert url_obj.url == valid_url_string
 
-    def test_invalid_url_string_raises_exception(self, invalid_url_string):
-        from logtweet._source.valid_url_string import ValidUrl
-        from logtweet._source.exceptions import NotAUrlError
+    def test_invalid_url_raises_exception(
+        self,
+        invalid_url_string: str,
+    ) -> None:
+        """
+        Init fails with exception on invalid URL.
 
-        with pytest.raises(NotAUrlError):
-            ValidUrl(invalid_url_string)
+        Exception contains passed string that is not a URL.
 
-    def test_invalid_url_string_shown_in_raised_exception(self, invalid_url_string):
-        from logtweet._source.valid_url_string import ValidUrl
-        from logtweet._source.exceptions import NotAUrlError
+        """
+        from logtweet.source.retrieve import SourceValidationError
+        from logtweet.source.url import ValidSourceURL
 
         with pytest.raises(
-            NotAUrlError,
-            match=r"^The given source string '{0}' is not a URL!".format(
-                invalid_url_string,
-            ),
+            SourceValidationError,
+            match=r".*{0}.*".format(invalid_url_string),
         ):
-            ValidUrl(invalid_url_string)
+            ValidSourceURL(invalid_url_string)
