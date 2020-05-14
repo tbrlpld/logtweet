@@ -9,7 +9,7 @@ from logtweet import conf, history, send, content
 from logtweet.source.controllers import retrieve as ctrlretrieve
 
 
-def main():
+def main() -> None:
     """
     Create a tweet based on today's log message.
 
@@ -49,7 +49,7 @@ def main():
         if tweeted_before:
             raise RuntimeError("Tweet with this content already exists!")
         # Send the tweet
-        send.send_tweet(tweet_content, config["Twitter"])
+        send.send_tweet(tweet_content, dict(config["Twitter"]))
         # Create history record of sent tweet for future lookup.
         history.add_tweet_to_history(tweet_content)
         # TODO: Add success message to user.

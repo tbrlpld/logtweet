@@ -2,6 +2,8 @@
 
 """Custom exceptions for use in relation to content handling."""
 
+import typing
+
 
 class LogtweetContentError(Exception):
     """Base exception class for use in this module."""
@@ -30,7 +32,11 @@ class EmptyProgressParagraphsError(LogtweetContentError):
 class FirstStringLongerThanMaxError(LogtweetContentError):
     """Raise when issue with joining strings."""
 
-    def __init__(self, strings, max_len) -> None:
+    def __init__(
+        self,
+        strings: typing.Union[typing.List[str], typing.Tuple[str, ...]],
+        max_len: int,
+    ) -> None:
         """Initialize `FirstStringLongerThanMaxError`."""
         self.message = (
             "First string in sequence longer than maximum length."

@@ -144,11 +144,11 @@ def get_first_link(day_heading: bs4.element.Tag) -> str:
             attribute.
 
     """
-    link_address = None
+    link_address = ""
     link_heading = get_day_subheading_by_text(day_heading, "Link(s)")
     try:
         link_address = (
-            link_heading.find_next_sibling(  # type: ignore
+            link_heading.find_next_sibling(
                 "ol",
             ).li.a.get("href")
         )

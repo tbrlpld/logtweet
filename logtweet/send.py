@@ -2,10 +2,12 @@
 
 """Functions related to sending a tweet."""
 
+import typing
+
 import tweepy  # type: ignore
 
 
-def send_tweet(tweet_content: str, twitter_config: dict) -> None:
+def send_tweet(tweet_content: str, twitter_config: typing.Dict[str, str]) -> None:
     """
     Send tweet with given content.
 

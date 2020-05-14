@@ -2,12 +2,15 @@
 
 """Functions related to shorten a link."""
 
-from typing import Optional
+import typing
 
 import requests
 
 
-def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
+def get_short_link(
+    long_link: str,
+    bitly_api_key: typing.Optional[str] = None,
+) -> str:
     """
     Create short link.
 
@@ -42,4 +45,5 @@ def get_short_link(long_link: str, bitly_api_key: Optional[str] = None) -> str:
     payload = {"long_url": long_link}
     response = requests.post(shortener_url, json=payload, headers=headers)
     response.raise_for_status()
-    return response.json()[shortlink_key]
+    response_data: typing.Dict[str, str] = response.json()
+    return response_data[shortlink_key]
