@@ -6,14 +6,10 @@ from typing import Optional
 
 import requests
 
-from logtweet.source.retrieve import (
-    AbstractValidSource,
-    AbstractSourceContentRetriever,
-    SourceContentRetrievalError,
-)
+from logtweet.source.usecases import retrieve as ucretrieve
 
 
-class RequestError(SourceContentRetrievalError):
+class RequestError(ucretrieve.SourceContentRetrievalError):
     """Raised when issue request to source."""
 
     def __init__(self, url: str, err: Optional[Exception] = None):
@@ -36,7 +32,7 @@ class RequestError(SourceContentRetrievalError):
         super().__init__(self.message)
 
 
-class HTTPStatusError(SourceContentRetrievalError):
+class HTTPStatusError(ucretrieve.SourceContentRetrievalError):
     """Raised when response status code indicates error, e.g. 404."""
 
     def __init__(self, url: str, status_code: int):
@@ -61,7 +57,7 @@ class HTTPStatusError(SourceContentRetrievalError):
         super().__init__(self.message)
 
 
-class AbstractValidOnlineSource(AbstractValidSource):
+class AbstractValidOnlineSource(ucretrieve.AbstractValidSource):
     """
     Abstract class representing a valid online source.
 
@@ -85,7 +81,7 @@ class AbstractValidOnlineSource(AbstractValidSource):
         return self.source_string
 
 
-class OnlineSourceContentRetriever(AbstractSourceContentRetriever):
+class OnlineSourceContentRetriever(ucretrieve.AbstractSourceContentRetriever):
     """Valid online log source."""
 
     valid_source_type = AbstractValidOnlineSource

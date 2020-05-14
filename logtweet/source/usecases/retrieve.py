@@ -19,7 +19,23 @@ class AbstractValidSource(abc.ABC):
     """Abstract valid source class."""
 
     def __init__(self, source_string: str) -> None:
-        """Initialize AbstractValidSource."""
+        """
+        Initialize AbstractValidSource.
+
+        Parameters
+        ----------
+        source_string: str
+            Source string to validate.
+
+        Raises
+        ------
+        TypeError
+            Raised if the passed `source_string` is not of type `str`.
+        SourceValidationError
+            Raised if the source string does not pass the validation defined
+            through the `is_valid` method.
+
+        """
         if not isinstance(source_string, str):
             raise TypeError(
                 "Expected str, got {0}".format(type(source_string)),

@@ -4,11 +4,11 @@
 
 import validators  # type: ignore
 
-from logtweet.source.retrieve import SourceValidationError
-from logtweet.source.online import AbstractValidOnlineSource
+from logtweet.source.usecases import retrieve as ucretrieve
+from logtweet.source.adapters import onlineretriever as adaptonline
 
 
-class NotAUrlError(SourceValidationError):
+class NotAUrlError(ucretrieve.SourceValidationError):
     """Raised when a source string is expected to be a URL but is not."""
 
     def __init__(self, source_string: str = ""):
@@ -36,7 +36,7 @@ class NotAUrlError(SourceValidationError):
         super().__init__(self.message)
 
 
-class ValidSourceURL(AbstractValidOnlineSource):
+class ValidSourceURL(adaptonline.AbstractValidOnlineSource):
     """Valid URL class."""
 
     def __init__(self, url: str) -> None:
@@ -56,7 +56,7 @@ class ValidSourceURL(AbstractValidOnlineSource):
         """
         try:
             super().__init__(url)
-        except SourceValidationError:
+        except ucretrieve.SourceValidationError:
             raise NotAUrlError(url)
 
     @staticmethod

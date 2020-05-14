@@ -25,18 +25,18 @@ class TestIsValidStaticMethod(object):
         valid_url_string: str,
     ) -> None:
         """Validates URL."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters import validurl as adapturl
 
-        is_valid = ValidSourceURL.is_valid(valid_url_string)
+        is_valid = adapturl.ValidSourceURL.is_valid(valid_url_string)
 
         assert is_valid is True
 
     def test_localhost_is_valid(self) -> None:
         """Localhost address with port is valid."""
         url = "http://localhost:8000/"
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters import validurl as adapturl
 
-        is_valid = ValidSourceURL.is_valid(url)
+        is_valid = adapturl.ValidSourceURL.is_valid(url)
 
         assert is_valid is True
 
@@ -45,9 +45,9 @@ class TestIsValidStaticMethod(object):
         invalid_url_string: str,
     ) -> None:
         """Fails on non-URL string."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters import validurl as adapturl
 
-        is_valid = ValidSourceURL.is_valid(invalid_url_string)
+        is_valid = adapturl.ValidSourceURL.is_valid(invalid_url_string)
 
         assert is_valid is False
 
@@ -60,20 +60,20 @@ class TestValidUrlInitialization(object):
         valid_url_string: str,
     ) -> None:
         """Init succeeds with valid url."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters import validurl as adapturl
 
-        url_obj = ValidSourceURL(valid_url_string)
+        url_obj = adapturl.ValidSourceURL(valid_url_string)
 
-        assert isinstance(url_obj, ValidSourceURL)
+        assert isinstance(url_obj, adapturl.ValidSourceURL)
 
     def test_valid_object_has_url_property(
         self,
         valid_url_string: str,
     ) -> None:
         """Initialized object has `url` property."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters import validurl as adapturl
 
-        url_obj = ValidSourceURL(valid_url_string)
+        url_obj = adapturl.ValidSourceURL(valid_url_string)
 
         assert url_obj.url == valid_url_string
 
@@ -87,11 +87,11 @@ class TestValidUrlInitialization(object):
         Exception contains passed string that is not a URL.
 
         """
-        from logtweet.source.retrieve import SourceValidationError
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.usecases import retrieve as ucretrieve
+        from logtweet.source.adapters import validurl as adapturl
 
         with pytest.raises(
-            SourceValidationError,
+            ucretrieve.SourceValidationError,
             match=r".*{0}.*".format(invalid_url_string),
         ):
-            ValidSourceURL(invalid_url_string)
+            adapturl.ValidSourceURL(invalid_url_string)
