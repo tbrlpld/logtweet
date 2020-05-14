@@ -3,27 +3,27 @@ from typing import Callable, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+    from logtweet.source.adapters import onlineretriever as adaptonline
 
 
 @pytest.fixture  # type: ignore
 def valid_online_source_factory(
-) -> Callable[[str], "AbstractValidOnlineSource"]:
+) -> Callable[[str], "adaptonline.AbstractValidOnlineSource"]:
     """
-    Create factory function to create `AbstractValidOnlineSource` instance.
+    Create factory function to create `adaptonline.AbstractValidOnlineSource` instance.
 
     Returns
     -------
-    Callable[[str], "AbstractValidOnlineSource"]
+    Callable[[str], "adaptonline.AbstractValidOnlineSource"]
         Factory function to create instances of a subclass of
-        `AbstractValidOnlineSource`.
+        `adaptonline.AbstractValidOnlineSource`.
 
     """
-    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+    from logtweet.source.adapters import onlineretriever as adaptonline
 
-    def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
+    def valid_online_source(source_string: str) -> adaptonline.AbstractValidOnlineSource:
         """
-        Create instance of `AbstractValidOnlineSource` subclass.
+        Create instance of `adaptonline.AbstractValidOnlineSource` subclass.
 
         Accepts a `source_string` parameter and returns an instance of subclass
         of `AbstractVaildOnlineSource`.
@@ -38,18 +38,18 @@ def valid_online_source_factory(
         ----------
         source_string : str
             Source string to assign to the `url` property of the returned
-            instance of the `AbstractValidOnlineSource` subclass.
+            instance of the `adaptonline.AbstractValidOnlineSource` subclass.
 
         Returns
         -------
-        AbstractValidOnlineSource
-            Instance of an internal subclass of `AbstractValidOnlineSource`.
+        adaptonline.AbstractValidOnlineSource
+            Instance of an internal subclass of `adaptonline.AbstractValidOnlineSource`.
             The object will have the given `source_string` available as its
             `url` property.
 
         """
 
-        class ValidOnlineSourceForTest(AbstractValidOnlineSource):
+        class ValidOnlineSourceForTest(adaptonline.AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
                 return True

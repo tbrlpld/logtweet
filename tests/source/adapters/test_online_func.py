@@ -16,7 +16,7 @@ from typing import Callable, Optional, Tuple, Type, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+    from logtweet.source.adapters import onlineretriever as adaptonline
 
 
 @pytest.fixture  # type: ignore
@@ -182,7 +182,7 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         self,
         request_get_handler_class_factory: Callable[[int, str], Type[BaseHTTPRequestHandler]],
         mock_server_factory: Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]],
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Content from mock server is returned."""
         defined_content = "The content"
@@ -195,8 +195,8 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         source_string = "http://{0}:{1}/".format(mock_server[0], mock_server[1])
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
-        online_source_content_retriever = OnlineSourceContentRetriever(
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        online_source_content_retriever = adaptonline.OnlineSourceContentRetriever(
             valid_online_source,
         )
 
@@ -208,7 +208,7 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         self,
         request_get_handler_class_factory: Callable[[int, str], Type[BaseHTTPRequestHandler]],
         mock_server_factory: Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]],
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Raises exception when server responds with 404 status."""
         defined_status_code = 404
@@ -219,29 +219,29 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         source_string = "http://{0}:{1}/".format(mock_server[0], mock_server[1])
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
-        online_source_content_retriever = OnlineSourceContentRetriever(
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        online_source_content_retriever = adaptonline.OnlineSourceContentRetriever(
             valid_online_source,
         )
-        from logtweet.source.adapters.onlineretriever import HTTPStatusError
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
-        with pytest.raises(HTTPStatusError):
+        with pytest.raises(adaptonline.HTTPStatusError):
             online_source_content_retriever.get_content()
 
     def test_expection_if_server_not_avilable(
         self,
         free_port: int,
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Raises exception if server is not available."""
         source_string = "http://localhost:{0}/".format(free_port)
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
-        online_source_content_retriever = OnlineSourceContentRetriever(
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        online_source_content_retriever = adaptonline.OnlineSourceContentRetriever(
             valid_online_source,
         )
-        from logtweet.source.adapters.onlineretriever import RequestError
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
-        with pytest.raises(RequestError):
+        with pytest.raises(adaptonline.RequestError):
             online_source_content_retriever.get_content()

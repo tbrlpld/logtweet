@@ -7,37 +7,37 @@ from typing import Any, Callable, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+    from logtweet.source.adapters import onlineretriever as adaptonline
     import requests
 
 
 class TestAbstractValidOnlineSourceClass(object):
-    """Tests for `AbstractValidOnlineSource` class."""
+    """Tests for `adaptonline.AbstractValidOnlineSource` class."""
 
     def test_subclass(self) -> None:
         """Is subclass of `AbstractValidSource`."""
         from logtweet.source.usecases.retrieve import AbstractValidSource
-        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         assert issubclass(
-            AbstractValidOnlineSource,
+            adaptonline.AbstractValidOnlineSource,
             AbstractValidSource,
         )
 
     def test_no_direct_instantiation(self) -> None:
         """Can not be instantiated directly, because is abstract."""
-        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         with pytest.raises(
             TypeError,
             match=r"Can't instantiate.*abstract.*",
         ):
-            AbstractValidOnlineSource()  # type: ignore
+            adaptonline.AbstractValidOnlineSource()  # type: ignore
 
     def test_init_when_is_valid_defined(self) -> None:
         """Subclass init works if `is_valid` is defined."""
-        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
-        class ValidTestOnlineSource(AbstractValidOnlineSource):
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        class ValidTestOnlineSource(adaptonline.AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
                 return True
@@ -51,8 +51,8 @@ class TestAbstractValidOnlineSourceClass(object):
         The `url` property should contain the string passed to the constructor.
 
         """
-        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
-        class ValidTestOnlineSource(AbstractValidOnlineSource):
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        class ValidTestOnlineSource(adaptonline.AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
                 return True
@@ -69,16 +69,16 @@ class TestOnlineSourceRetrieverClass(object):
     def test_subclass(self) -> None:
         """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
         from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         assert issubclass(
-            OnlineSourceContentRetriever,
+            adaptonline.OnlineSourceContentRetriever,
             AbstractSourceContentRetriever,
         )
 
 
 class TestOnlineSourceRetrieverInit(object):
-    """Test the `init` method of the `OnlineSourceContentRetriever`."""
+    """Test the `init` method of the `adaptonline.OnlineSourceContentRetriever`."""
 
 
     def test_type_error_if_init_input_wrong_type(self) -> None:
@@ -86,20 +86,20 @@ class TestOnlineSourceRetrieverInit(object):
         class NotTheRightType(object):
             pass
         wrong_type_input = NotTheRightType()
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         with pytest.raises(
             TypeError,
             match=r"Expected .*, got .*",
         ):
-            OnlineSourceContentRetriever(wrong_type_input)  # type: ignore
+            adaptonline.OnlineSourceContentRetriever(wrong_type_input)  # type: ignore
 
     def test_type_error_if_input_not_specific_enough(self) -> None:
         """
         Type error if input not specific enough.
 
         If the input is subclass of `AbstractValidSource` but not of
-        `AbstractValidOnlineSource` the type error is also thrown.
+        `adaptonline.AbstractValidOnlineSource` the type error is also thrown.
 
         """
         from logtweet.source.usecases.retrieve import AbstractValidSource
@@ -108,53 +108,53 @@ class TestOnlineSourceRetrieverInit(object):
             def is_valid(_: str) -> bool:
                 return True
         not_specific_enough_source = NotSpecificEnoughSource("stuff")
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         with pytest.raises(
             TypeError,
             match=r"Expected .*, got .*",
         ):
-            OnlineSourceContentRetriever(
+            adaptonline.OnlineSourceContentRetriever(
                 not_specific_enough_source,  # type: ignore
             )
 
     def test_init_success(
         self,
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """
         Successful init without error.
 
-        Passing an instance of a `AbstractValidOnlineSource` subclass leads
-        to successful init of `OnlineSourceContentRetriever`.
+        Passing an instance of a `adaptonline.AbstractValidOnlineSource` subclass leads
+        to successful init of `adaptonline.OnlineSourceContentRetriever`.
 
         """
         valid_online_source = valid_online_source_factory("not important")
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
-        OnlineSourceContentRetriever(valid_online_source)
+        adaptonline.OnlineSourceContentRetriever(valid_online_source)
 
     def test_valid_source_avaliable_on_instance(
         self,
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Passed valid source object is available on the instance."""
         valid_online_source = valid_online_source_factory("not important")
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
-        instance = OnlineSourceContentRetriever(valid_online_source)
+        instance = adaptonline.OnlineSourceContentRetriever(valid_online_source)
 
         assert instance.valid_source == valid_online_source
 
     def test_valid_source_has_url_property(
         self,
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Valid source on instance has `url` property."""
         source_string = "not important"
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
-        instance = OnlineSourceContentRetriever(valid_online_source)
+        from logtweet.source.adapters import onlineretriever as adaptonline
+        instance = adaptonline.OnlineSourceContentRetriever(valid_online_source)
 
         url = instance.valid_source.url
 
@@ -238,39 +238,39 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
         return mock_get
 
     if TYPE_CHECKING:
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
     @pytest.fixture  # type: ignore
     def online_source_content_retriever(
         self,
-        valid_online_source_factory: Callable[[str], "AbstractValidOnlineSource"],
-    ) -> "OnlineSourceContentRetriever":
+        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+    ) -> "adaptonline.OnlineSourceContentRetriever":
         """
-        Create an `OnlineSourceContentRetriever` object.
+        Create an `adaptonline.OnlineSourceContentRetriever` object.
 
         This is a convenience fixture to instantiate an
-        `OnlineSourceContentRetriever` object from a meaningless valid online
+        `adaptonline.OnlineSourceContentRetriever` object from a meaningless valid online
         source. The source is not actually validated.
 
         Parameters
         ----------
-        valid_online_source_factory : Callable[[str], "AbstractValidOnlineSource"]
+        valid_online_source_factory : Callable[[str], "adaptonline.AbstractValidOnlineSource"]
             Factory function fixture to create a valid online source instance
             from a given source string.
 
         Returns
         -------
-        OnlineSourceContentRetriever
-            The `OnlineSourceContentRetriever` object is instantiated with a
+        adaptonline.OnlineSourceContentRetriever
+            The `adaptonline.OnlineSourceContentRetriever` object is instantiated with a
             valid online source, that is created with the
             `valid_online_source_factory`. The valid source is created with a
             meaningless string passed to it.
 
         """
-        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
+        from logtweet.source.adapters import onlineretriever as adaptonline
 
         valid_online_source = valid_online_source_factory("not important")
-        online_source_content_retirever = OnlineSourceContentRetriever(
+        online_source_content_retirever = adaptonline.OnlineSourceContentRetriever(
             valid_online_source,
         )
 
@@ -279,7 +279,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_returns_page_content_from_mocked_requests_response_object(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: "OnlineSourceContentRetriever",
+        online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Return the content from mocked response object."""
         defined_content = "Some content"
@@ -301,7 +301,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raises_error_for_requests_connection_error(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: "OnlineSourceContentRetriever",
+        online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
         from logtweet.source.adapters.onlineretriever import requests  # type: ignore
@@ -322,7 +322,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raised_error_for_requests_connection_error_shows_url(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: "OnlineSourceContentRetriever",
+        online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
         from logtweet.source.adapters.onlineretriever import requests  # type: ignore
@@ -346,7 +346,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raises_error_for_bad_status_code(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: "OnlineSourceContentRetriever",
+        online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Raise `SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
@@ -369,7 +369,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def test_raised_error_for_bad_status_code_shows_code(
         self,
         monkeypatch: Any,
-        online_source_content_retriever: "OnlineSourceContentRetriever",
+        online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Raise `SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
