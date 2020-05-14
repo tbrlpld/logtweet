@@ -180,8 +180,6 @@ class TestAbstactSourceContentRetriever(object):
 
         assert source_content_retriever.valid_source == valid_test_source
 
-    # TEST: SourceContentRetrivalError is available to be raised in `get_content` implementation
-
     def test_instantiaing_child_fails_if_not_passed_valid_source_type(
         self,
     ) -> None:
@@ -354,6 +352,3 @@ class TestGetLogContentFromSource(object):
             get_log_content_from_source(
                 mock_source_content_retriever,
             )
-
-
-# TEST: (2) Create functional/integration test for the retrieval use case.
