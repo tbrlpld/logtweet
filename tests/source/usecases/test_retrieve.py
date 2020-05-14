@@ -17,7 +17,7 @@ class TestAbstractValidSource(object):
         of the valid source will succeed.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class Child(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
@@ -28,7 +28,7 @@ class TestAbstractValidSource(object):
     def test_source_string_property_on_instance(self) -> None:
         """Source string available on initialized child."""
         source_string = "some source string"
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class Child(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
@@ -40,7 +40,7 @@ class TestAbstractValidSource(object):
 
     def test_raise_validation_error_if_not_is_valid(self) -> None:
         """Raise SourceValidationError if `is_valid` returns False."""
-        from logtweet.source.retrieve import (
+        from logtweet.source.usecases.retrieve import (
             AbstractValidSource,
             SourceValidationError,
         )
@@ -63,7 +63,7 @@ class TestAbstractValidSource(object):
             pass
         wrong_typed_argument = WrongType()
 
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class Child(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
@@ -82,7 +82,7 @@ class TestAbstractValidSource(object):
         If the argument is not passed, an exception is raised.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class Child(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
@@ -101,7 +101,7 @@ class TestAbstractValidSource(object):
         If the argument is not passed, an exception is raised.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
 
         with pytest.raises(
             TypeError,
@@ -116,7 +116,7 @@ class TestAbstractValidSource(object):
         `is_valid` is the one abstract method that is required.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class Child(AbstractValidSource):
             def __init__(self) -> None:
                 pass
@@ -129,7 +129,7 @@ class TestAbstractValidSource(object):
 
     def test_direct_init_fails(self) -> None:
         """Direct init fails."""
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
 
         with pytest.raises(
             TypeError,
@@ -143,13 +143,13 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_instantiation_succeeds(self) -> None:
         """Successful instantiation."""
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class ValidTestSource(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
         valid_test_source = ValidTestSource("some string")
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         class SourceContentRetrieverImplementation(
             AbstractSourceContentRetriever,
         ):
@@ -162,13 +162,13 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_source_property_available_on_instance(self) -> None:
         """Source property available on instance."""
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class ValidTestSource(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
         valid_test_source = ValidTestSource("some string")
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         class SourceContentRetrieverImplementation(
             AbstractSourceContentRetriever,
         ):
@@ -194,7 +194,7 @@ class TestAbstactSourceContentRetriever(object):
         """
         class NotValidSourceType(object):
             pass
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         class Child(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return ""
@@ -209,7 +209,7 @@ class TestAbstactSourceContentRetriever(object):
         self,
     ) -> None:
         """Instantiation of child requires validated source instance."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
 
         class Child(AbstractSourceContentRetriever):
             def get_content(self) -> str:
@@ -225,7 +225,7 @@ class TestAbstactSourceContentRetriever(object):
         self,
     ) -> None:
         """Instantiation of child fails if not implements `get_content`."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
 
         class Child(AbstractSourceContentRetriever):
             pass
@@ -238,7 +238,7 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_direct_instantiation_fails(self) -> None:
         """Direct instantiation fails."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
 
         with pytest.raises(
             TypeError,
@@ -251,7 +251,7 @@ class TestGetLogContentFromSource(object):
     """Test the `get_log_content_from_source` function."""
 
     # Import for type annotations
-    from logtweet.source.retrieve import AbstractValidSource
+    from logtweet.source.usecases.retrieve import AbstractValidSource
 
     @pytest.fixture  # type: ignore
     def mock_valid_source(
@@ -264,7 +264,7 @@ class TestGetLogContentFromSource(object):
         actually validating the source.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class MockValidSource(AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
@@ -282,7 +282,7 @@ class TestGetLogContentFromSource(object):
 
         """
         log_content = "Just some sting that represents the content of the log."
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         class MockSourceContentRetriever(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return log_content
@@ -290,7 +290,7 @@ class TestGetLogContentFromSource(object):
             mock_valid_source,
         )
 
-        from logtweet.source.retrieve import get_log_content_from_source
+        from logtweet.source.usecases.retrieve import get_log_content_from_source
 
         returned_content = get_log_content_from_source(
             mock_source_content_retriever,
@@ -304,13 +304,13 @@ class TestGetLogContentFromSource(object):
 
         """
         log_content = "Just some sting that represents the content of the log."
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
 
         class MockSourceContentRetriever(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return log_content
 
-        from logtweet.source.retrieve import get_log_content_from_source
+        from logtweet.source.usecases.retrieve import get_log_content_from_source
 
         with pytest.raises(TypeError):
             get_log_content_from_source(
@@ -326,7 +326,7 @@ class TestGetLogContentFromSource(object):
             def get_content(self) -> str:
                 return "some string"
         mock_source_content_retriever = MockSourceContentRetriever()
-        from logtweet.source.retrieve import get_log_content_from_source
+        from logtweet.source.usecases.retrieve import get_log_content_from_source
 
         with pytest.raises(TypeError):
             get_log_content_from_source(
@@ -341,14 +341,14 @@ class TestGetLogContentFromSource(object):
         class TestExceptionError(Exception):
             pass
 
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         class MockSourceContentRetriever(AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 raise TestExceptionError
         mock_source_content_retriever = MockSourceContentRetriever(
             mock_valid_source,
         )
-        from logtweet.source.retrieve import get_log_content_from_source
+        from logtweet.source.usecases.retrieve import get_log_content_from_source
 
         with pytest.raises(TestExceptionError):
             get_log_content_from_source(

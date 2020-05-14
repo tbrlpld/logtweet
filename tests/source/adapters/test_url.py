@@ -87,7 +87,7 @@ class TestValidUrlInitialization(object):
         Exception contains passed string that is not a URL.
 
         """
-        from logtweet.source.retrieve import SourceValidationError
+        from logtweet.source.usecases.retrieve import SourceValidationError
         from logtweet.source.url import ValidSourceURL
 
         with pytest.raises(

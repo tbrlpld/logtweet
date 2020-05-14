@@ -6,7 +6,7 @@ from typing import Optional
 
 import requests
 
-from logtweet.source.retrieve import (
+from logtweet.source.usecases.retrieve import (
     AbstractValidSource,
     AbstractSourceContentRetriever,
     SourceContentRetrievalError,

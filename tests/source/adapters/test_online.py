@@ -16,7 +16,7 @@ class TestAbstractValidOnlineSourceClass(object):
 
     def test_subclass(self) -> None:
         """Is subclass of `AbstractValidSource`."""
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         from logtweet.source.online import AbstractValidOnlineSource
 
         assert issubclass(
@@ -68,7 +68,7 @@ class TestOnlineSourceRetrieverClass(object):
 
     def test_subclass(self) -> None:
         """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
-        from logtweet.source.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
         from logtweet.source.online import OnlineSourceContentRetriever
 
         assert issubclass(
@@ -102,7 +102,7 @@ class TestOnlineSourceRetrieverInit(object):
         `AbstractValidOnlineSource` the type error is also thrown.
 
         """
-        from logtweet.source.retrieve import AbstractValidSource
+        from logtweet.source.usecases.retrieve import AbstractValidSource
         class NotSpecificEnoughSource(AbstractValidSource):
             @staticmethod
             def is_valid(_: str) -> bool:
@@ -314,7 +314,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get_raises_connection_error,
         )
-        from logtweet.source.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
 
         with pytest.raises(SourceContentRetrievalError):
             online_source_content_retriever.get_content()
@@ -335,7 +335,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get_raises_connection_error,
         )
-        from logtweet.source.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
 
         with pytest.raises(
             SourceContentRetrievalError,
@@ -360,7 +360,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get,
         )
-        from logtweet.source.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
 
 
         with pytest.raises(SourceContentRetrievalError):
@@ -383,7 +383,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get,
         )
-        from logtweet.source.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
 
         with pytest.raises(
             SourceContentRetrievalError,

@@ -4,7 +4,7 @@
 
 import validators  # type: ignore
 
-from logtweet.source.retrieve import SourceValidationError
+from logtweet.source.usecases.retrieve import SourceValidationError
 from logtweet.source.online import AbstractValidOnlineSource
 
 
