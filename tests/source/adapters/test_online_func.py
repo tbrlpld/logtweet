@@ -8,26 +8,26 @@ https://realpython.com/testing-third-party-apis-with-mock-servers/#testing-the-m
 
 """
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http import server as httpserver
 import socket
-from threading import Thread
-from typing import Callable, Optional, Tuple, Type, TYPE_CHECKING
+import threading
+import typing
 
 import pytest  # type: ignore
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from logtweet.source.adapters import onlineretriever as adaptonline
 
 
 @pytest.fixture  # type: ignore
 def request_get_handler_class_factory(
-) -> Callable[[int, str], Type[BaseHTTPRequestHandler]]:
+) -> typing.Callable[[int, str], typing.Type[httpserver.BaseHTTPRequestHandler]]:
     """
     Return factory function to create get request handlers.
 
     Returns
     -------
-    Callable[[int, str], Type[BaseHTTPRequestHandler]]
+    typing.Callable[[int, str], typing.Type[httpserver.BaseHTTPRequestHandler]]
         Factory function to create get request handlers.
 
     """
@@ -35,7 +35,7 @@ def request_get_handler_class_factory(
     def concrete_get_handler_class_factory(
         status_code: int,
         body: str = "",
-    ) -> Type[BaseHTTPRequestHandler]:
+    ) -> typing.Type[httpserver.BaseHTTPRequestHandler]:
         """
         Create get request handler.
 
@@ -48,12 +48,12 @@ def request_get_handler_class_factory(
 
         Returns
         -------
-        BaseHTTPRequestHandler
-            Subclass of the `BaseHTTPRequestHandler` which responds with the
+        httpserver.BaseHTTPRequestHandler
+            Subclass of the `httpserver.BaseHTTPRequestHandler` which responds with the
             defined status code and body.
 
         """
-        class MockServerRequestHandler(BaseHTTPRequestHandler):
+        class MockServerRequestHandler(httpserver.BaseHTTPRequestHandler):
             """Mock request handler for the mock server."""
 
             def do_GET(self) -> None:
@@ -90,7 +90,7 @@ def free_port() -> int:
 @pytest.fixture  # type: ignore
 def mock_server_factory(
     free_port: int,
-) -> Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]]:
+) -> typing.Callable[[typing.Type[httpserver.BaseHTTPRequestHandler]], typing.Tuple[str, int]]:
     """
     Return factory func that creates a web server with a given request handler.
 
@@ -102,14 +102,14 @@ def mock_server_factory(
 
     Returns
     -------
-    Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]]
+    typing.Callable[[typing.Type[httpserver.BaseHTTPRequestHandler]], typing.Tuple[str, int]]
         Factory function to create a web server from a given request handler.
 
     """
 
     def concrete_server_factory(
-        request_handler_class: Type[BaseHTTPRequestHandler],
-    ) -> Tuple[str, int]:
+        request_handler_class: typing.Type[httpserver.BaseHTTPRequestHandler],
+    ) -> typing.Tuple[str, int]:
         """
         Create web server with given request handler.
 
@@ -118,24 +118,24 @@ def mock_server_factory(
 
         Parameters
         ----------
-        request_handler_class: Type[BaseHTTPRequestHandler]
+        request_handler_class: typing.Type[httpserver.BaseHTTPRequestHandler]
             Request handler which handles the requests send to the web server.
 
         Returns
         -------
-        Tuple[str, int]
-            Tuple containing the servers domain ("localhost") and the port it
+        typing.Tuple[str, int]
+            typing.Tuple containing the servers domain ("localhost") and the port it
             is listening on.
 
         """
         mock_server_domain = "localhost"
         mock_server_port = free_port
-        mock_server = HTTPServer(
+        mock_server = httpserver.HTTPServer(
             (mock_server_domain, mock_server_port),
             request_handler_class,
         )
 
-        mock_server_thread = Thread(target=mock_server.serve_forever)
+        mock_server_thread = threading.Thread(target=mock_server.serve_forever)
         mock_server_thread.setDaemon(True)
         mock_server_thread.start()
 
@@ -149,8 +149,8 @@ class TestMockServer(object):
 
     def test_mock_server(
         self,
-        request_get_handler_class_factory: Callable[[int, str], Type[BaseHTTPRequestHandler]],
-        mock_server_factory: Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]],
+        request_get_handler_class_factory: typing.Callable[[int, str], typing.Type[httpserver.BaseHTTPRequestHandler]],
+        mock_server_factory: typing.Callable[[typing.Type[httpserver.BaseHTTPRequestHandler]], typing.Tuple[str, int]],
     ) -> None:
         """Verify that defined test server works."""
         defined_content = "The content"
@@ -180,9 +180,9 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
 
     def test_sucessful_content_retrieval(
         self,
-        request_get_handler_class_factory: Callable[[int, str], Type[BaseHTTPRequestHandler]],
-        mock_server_factory: Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]],
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        request_get_handler_class_factory: typing.Callable[[int, str], typing.Type[httpserver.BaseHTTPRequestHandler]],
+        mock_server_factory: typing.Callable[[typing.Type[httpserver.BaseHTTPRequestHandler]], typing.Tuple[str, int]],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Content from mock server is returned."""
         defined_content = "The content"
@@ -206,9 +206,9 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
 
     def test_exception_if_404_response(
         self,
-        request_get_handler_class_factory: Callable[[int, str], Type[BaseHTTPRequestHandler]],
-        mock_server_factory: Callable[[Type[BaseHTTPRequestHandler]], Tuple[str, int]],
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        request_get_handler_class_factory: typing.Callable[[int, str], typing.Type[httpserver.BaseHTTPRequestHandler]],
+        mock_server_factory: typing.Callable[[typing.Type[httpserver.BaseHTTPRequestHandler]], typing.Tuple[str, int]],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Raises exception when server responds with 404 status."""
         defined_status_code = 404
@@ -231,7 +231,7 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
     def test_expection_if_server_not_avilable(
         self,
         free_port: int,
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Raises exception if server is not available."""
         source_string = "http://localhost:{0}/".format(free_port)
