@@ -109,6 +109,7 @@ class TestGetLogContentFromOnlineSource(object):
         self,
         online_source_retriever_for_mock_server_factory: typing.Callable[[int, str], "adaptonline.OnlineSourceContentRetriever"],
     ) -> None:
+        """Raises exception when online source responds with 404."""
         defined_status_code = 404
         defined_page_content = "This is the content"
         online_source_retriever = online_source_retriever_for_mock_server_factory(
@@ -127,6 +128,7 @@ class TestGetLogContentFromOnlineSource(object):
         self,
         free_port: int,
     ) -> None:
+        """Raises exception when online source not available."""
         url = "http://localhost:{0}".format(free_port)
         from logtweet.source.adapters import validurl as adapturl
         from logtweet.source.adapters import onlineretriever as adaptonline
