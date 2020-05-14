@@ -2,11 +2,11 @@
 
 """Tests for the OnlineSourceRetriever class."""
 
-from typing import Any, Callable, TYPE_CHECKING
+import typing
 
 import pytest  # type: ignore
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from logtweet.source.adapters import onlineretriever as adaptonline
     import requests
 
@@ -120,7 +120,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_init_success(
         self,
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """
         Successful init without error.
@@ -136,7 +136,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_valid_source_avaliable_on_instance(
         self,
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Passed valid source object is available on the instance."""
         valid_online_source = valid_online_source_factory("not important")
@@ -148,7 +148,7 @@ class TestOnlineSourceRetrieverInit(object):
 
     def test_valid_source_has_url_property(
         self,
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> None:
         """Valid source on instance has `url` property."""
         source_string = "not important"
@@ -180,7 +180,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
     def mock_get_factory(
         status_code: int,
         page_content: str = "",
-    ) -> Callable[[Any], "requests.Response"]:
+    ) -> typing.Callable[[typing.Any], "requests.Response"]:
         """
         Return a mock function to replace `requests.get()`.
 
@@ -199,15 +199,15 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         Returns
         -------
-        Callable[[Any], requests.Response]
-            Mock function to replace `requests.get`. Takes any arguments and
+        typing.Callable[[typing.Any], requests.Response]
+            Mock function to replace `requests.get`. Takes typing.Any arguments and
             ignores them. It returns a `requests.Response` object with the
             given `status_code` and `page_content`.
 
         """
         import requests
 
-        def mock_get(*_args: Any, **_kwargs: Any) -> requests.Response:
+        def mock_get(*_args: typing.Any, **_kwargs: typing.Any) -> requests.Response:
             """
             Mock get function.
 
@@ -218,9 +218,9 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
             Parameters
             ----------
-            _args : Any
+            _args : typing.Any
                 All  positional parameters passed to this function are ignored.
-            _kwargs : Any
+            _kwargs : typing.Any
                 All keyword parameters passed to this function are ignored.
 
             Returns
@@ -237,13 +237,13 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         return mock_get
 
-    if TYPE_CHECKING:
+    if typing.TYPE_CHECKING:
         from logtweet.source.adapters import onlineretriever as adaptonline
 
     @pytest.fixture  # type: ignore
     def online_source_content_retriever(
         self,
-        valid_online_source_factory: Callable[[str], "adaptonline.AbstractValidOnlineSource"],
+        valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
     ) -> "adaptonline.OnlineSourceContentRetriever":
         """
         Create an `adaptonline.OnlineSourceContentRetriever` object.
@@ -254,7 +254,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
         Parameters
         ----------
-        valid_online_source_factory : Callable[[str], "adaptonline.AbstractValidOnlineSource"]
+        valid_online_source_factory : typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"]
             Factory function fixture to create a valid online source instance
             from a given source string.
 
@@ -278,7 +278,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
     def test_returns_page_content_from_mocked_requests_response_object(
         self,
-        monkeypatch: Any,
+        monkeypatch: typing.Any,
         online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
         """Return the content from mocked response object."""
@@ -300,13 +300,13 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
 
     def test_raises_error_for_requests_connection_error(
         self,
-        monkeypatch: Any,
+        monkeypatch: typing.Any,
         online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
-        """Raises SourceContentRetrievalError when connection error. """
+        """Raises ucretrieve.SourceContentRetrievalError when connection error. """
         from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         # Create mock function for `requests.get`
-        def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
+        def mock_get_raises_connection_error(*args: typing.Any, **kwargs: typing.Any) -> None:
             raise requests.ConnectionError
         # Activate the mock for `requests.get`
         monkeypatch.setattr(
@@ -314,20 +314,20 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get_raises_connection_error,
         )
-        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases import retrieve as ucretrieve
 
-        with pytest.raises(SourceContentRetrievalError):
+        with pytest.raises(ucretrieve.SourceContentRetrievalError):
             online_source_content_retriever.get_content()
 
     def test_raised_error_for_requests_connection_error_shows_url(
         self,
-        monkeypatch: Any,
+        monkeypatch: typing.Any,
         online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
-        """Raises SourceContentRetrievalError when connection error. """
+        """Raises ucretrieve.SourceContentRetrievalError when connection error. """
         from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         # Create mock function for `requests.get`
-        def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
+        def mock_get_raises_connection_error(*args: typing.Any, **kwargs: typing.Any) -> None:
             raise requests.ConnectionError
         # Activate the mock for `requests.get`
         monkeypatch.setattr(
@@ -335,20 +335,20 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get_raises_connection_error,
         )
-        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases import retrieve as ucretrieve
 
         with pytest.raises(
-            SourceContentRetrievalError,
+            ucretrieve.SourceContentRetrievalError,
             match=r".*{0}.*".format(online_source_content_retriever.valid_source.url)
         ):
             online_source_content_retriever.get_content()
 
     def test_raises_error_for_bad_status_code(
         self,
-        monkeypatch: Any,
+        monkeypatch: typing.Any,
         online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
-        """Raise `SourceContentRetrievalError` when bad HTTP status code."""
+        """Raise `ucretrieve.SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
         mock_get = self.mock_get_factory(
             self.status_codes["not_found"],
@@ -360,18 +360,18 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get,
         )
-        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases import retrieve as ucretrieve
 
 
-        with pytest.raises(SourceContentRetrievalError):
+        with pytest.raises(ucretrieve.SourceContentRetrievalError):
             online_source_content_retriever.get_content()
 
     def test_raised_error_for_bad_status_code_shows_code(
         self,
-        monkeypatch: Any,
+        monkeypatch: typing.Any,
         online_source_content_retriever: "adaptonline.OnlineSourceContentRetriever",
     ) -> None:
-        """Raise `SourceContentRetrievalError` when bad HTTP status code."""
+        """Raise `ucretrieve.SourceContentRetrievalError` when bad HTTP status code."""
         defined_content = "Some content"
         mock_get = self.mock_get_factory(
             self.status_codes["not_found"],
@@ -383,10 +383,10 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             "get",
             mock_get,
         )
-        from logtweet.source.usecases.retrieve import SourceContentRetrievalError
+        from logtweet.source.usecases import retrieve as ucretrieve
 
         with pytest.raises(
-            SourceContentRetrievalError,
+            ucretrieve.SourceContentRetrievalError,
             match=r".*404.*",
         ):
             online_source_content_retriever.get_content()
