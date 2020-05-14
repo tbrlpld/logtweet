@@ -8,6 +8,7 @@ import pytest  # type: ignore
 
 if typing.TYPE_CHECKING:
     from http import server as httpserver
+    from logtweet.source.adapters import validurl as adapturl
     from logtweet.source.adapters import onlineretriever as adaptonline
 
 
@@ -15,7 +16,6 @@ if typing.TYPE_CHECKING:
 def online_source_retriever_for_mock_server_factory(
     request_get_handler_class_factory: typing.Callable[[int, str], typing.Type["httpserver.BaseHTTPRequestHandler"]],
     mock_server_factory: typing.Callable[[typing.Type["httpserver.BaseHTTPRequestHandler"]], typing.Tuple[str, int]],
-    valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
 ) -> typing.Callable[[int, str], "adaptonline.OnlineSourceContentRetriever"]:
     """
     Return factory function for valid online source object for running mock server.
@@ -28,9 +28,6 @@ def online_source_retriever_for_mock_server_factory(
         Fixture returning a factory function to create simple request handlers.
     mock_server_factory: typing.Callable[[typing.Type["httpserver.BaseHTTPRequestHandler"]], typing.Tuple[str, int]],
         Fixture returning a factory function to create a running webserver.
-    valid_online_source_factory: typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"],
-        Fixture returning a factory function to create a valid online source
-        object for a given `url`.
 
     Returns
     -------
@@ -40,6 +37,7 @@ def online_source_retriever_for_mock_server_factory(
         returned object in the `url` property.
 
     """
+    from logtweet.source.adapters import validurl as adapturl
     from logtweet.source.adapters import onlineretriever as adaptonline
 
     def actual_factory(
@@ -74,18 +72,35 @@ def online_source_retriever_for_mock_server_factory(
         )
         mock_server = mock_server_factory(request_get_handler)
         url = "http://{0}:{1}/".format(mock_server[0], mock_server[1])
-        valid_online_source = valid_online_source_factory(url)
-        return adaptonline.OnlineSourceContentRetriever(valid_online_source)
+        validurl = adapturl.ValidSourceURL(url)
+        return adaptonline.OnlineSourceContentRetriever(validurl)
 
     return actual_factory
 
 
 class TestGetLogContentFromSource(object):
+    """
+    Functional tests for usecase `get_log_contente_from_source`.
+
+    Is this really functional testing? I am not sure. I pass a completely
+    mocked object into the usecase. And I have tested else where, that
+    the online source retriever works with the mock server.
+
+    How many more tests do I really need here. I guess only one test per type
+    of source should be fine.
+
+    I guess I would not need the fixture since I am only using it once.
+    But, it does clean up the test nicely.
+
+    """
 
     def test_returns_content_from_online_source(
         self,
         online_source_retriever_for_mock_server_factory: typing.Callable[[int, str], "adaptonline.OnlineSourceContentRetriever"],
     ) -> None:
+        """
+        Returns page content for online source retriever.
+        """
         defined_status_code = 200
         defined_page_content = "This is the content"
         online_source_retriever = online_source_retriever_for_mock_server_factory(
@@ -94,6 +109,8 @@ class TestGetLogContentFromSource(object):
         )
         from logtweet.source.usecases import retrieve as ucretrieve
 
-        returned_content = ucretrieve.get_log_content_from_source(online_source_retriever)
+        returned_content = ucretrieve.get_log_content_from_source(
+            online_source_retriever,
+        )
 
         assert returned_content == defined_page_content
