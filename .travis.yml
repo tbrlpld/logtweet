@@ -7,3 +7,4 @@ install:
   - python -m pip install -e ".[develop]"
 script:
   - pytest
+  - mypy .
