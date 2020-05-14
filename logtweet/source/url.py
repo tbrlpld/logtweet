@@ -5,7 +5,7 @@
 import validators  # type: ignore
 
 from logtweet.source.usecases.retrieve import SourceValidationError
-from logtweet.source.online import AbstractValidOnlineSource
+from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
 
 class NotAUrlError(SourceValidationError):

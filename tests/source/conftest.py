@@ -3,7 +3,7 @@ from typing import Callable, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.online import AbstractValidOnlineSource
+    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
 
 @pytest.fixture  # type: ignore
@@ -19,7 +19,7 @@ def valid_online_source_factory(
         `AbstractValidOnlineSource`.
 
     """
-    from logtweet.source.online import AbstractValidOnlineSource
+    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
     def valid_online_source(source_string: str) -> AbstractValidOnlineSource:
         """

@@ -7,7 +7,7 @@ from typing import Any, Callable, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.online import AbstractValidOnlineSource
+    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
     import requests
 
 
@@ -17,7 +17,7 @@ class TestAbstractValidOnlineSourceClass(object):
     def test_subclass(self) -> None:
         """Is subclass of `AbstractValidSource`."""
         from logtweet.source.usecases.retrieve import AbstractValidSource
-        from logtweet.source.online import AbstractValidOnlineSource
+        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
         assert issubclass(
             AbstractValidOnlineSource,
@@ -26,7 +26,7 @@ class TestAbstractValidOnlineSourceClass(object):
 
     def test_no_direct_instantiation(self) -> None:
         """Can not be instantiated directly, because is abstract."""
-        from logtweet.source.online import AbstractValidOnlineSource
+        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
         with pytest.raises(
             TypeError,
@@ -36,7 +36,7 @@ class TestAbstractValidOnlineSourceClass(object):
 
     def test_init_when_is_valid_defined(self) -> None:
         """Subclass init works if `is_valid` is defined."""
-        from logtweet.source.online import AbstractValidOnlineSource
+        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
         class ValidTestOnlineSource(AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
@@ -51,7 +51,7 @@ class TestAbstractValidOnlineSourceClass(object):
         The `url` property should contain the string passed to the constructor.
 
         """
-        from logtweet.source.online import AbstractValidOnlineSource
+        from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
         class ValidTestOnlineSource(AbstractValidOnlineSource):
             @staticmethod
             def is_valid(_: str) -> bool:
@@ -69,7 +69,7 @@ class TestOnlineSourceRetrieverClass(object):
     def test_subclass(self) -> None:
         """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
         from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         assert issubclass(
             OnlineSourceContentRetriever,
@@ -86,7 +86,7 @@ class TestOnlineSourceRetrieverInit(object):
         class NotTheRightType(object):
             pass
         wrong_type_input = NotTheRightType()
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         with pytest.raises(
             TypeError,
@@ -108,7 +108,7 @@ class TestOnlineSourceRetrieverInit(object):
             def is_valid(_: str) -> bool:
                 return True
         not_specific_enough_source = NotSpecificEnoughSource("stuff")
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         with pytest.raises(
             TypeError,
@@ -130,7 +130,7 @@ class TestOnlineSourceRetrieverInit(object):
 
         """
         valid_online_source = valid_online_source_factory("not important")
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         OnlineSourceContentRetriever(valid_online_source)
 
@@ -140,7 +140,7 @@ class TestOnlineSourceRetrieverInit(object):
     ) -> None:
         """Passed valid source object is available on the instance."""
         valid_online_source = valid_online_source_factory("not important")
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         instance = OnlineSourceContentRetriever(valid_online_source)
 
@@ -153,7 +153,7 @@ class TestOnlineSourceRetrieverInit(object):
         """Valid source on instance has `url` property."""
         source_string = "not important"
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
         instance = OnlineSourceContentRetriever(valid_online_source)
 
         url = instance.valid_source.url
@@ -238,7 +238,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
         return mock_get
 
     if TYPE_CHECKING:
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
     @pytest.fixture  # type: ignore
     def online_source_content_retriever(
@@ -267,7 +267,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             meaningless string passed to it.
 
         """
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
 
         valid_online_source = valid_online_source_factory("not important")
         online_source_content_retirever = OnlineSourceContentRetriever(
@@ -287,7 +287,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             self.status_codes["success"],
             defined_content,
         )
-        from logtweet.source.online import requests  # type: ignore
+        from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         monkeypatch.setattr(
             requests,
             "get",
@@ -304,7 +304,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
         online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
-        from logtweet.source.online import requests  # type: ignore
+        from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         # Create mock function for `requests.get`
         def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
             raise requests.ConnectionError
@@ -325,7 +325,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
         online_source_content_retriever: "OnlineSourceContentRetriever",
     ) -> None:
         """Raises SourceContentRetrievalError when connection error. """
-        from logtweet.source.online import requests  # type: ignore
+        from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         # Create mock function for `requests.get`
         def mock_get_raises_connection_error(*args: Any, **kwargs: Any) -> None:
             raise requests.ConnectionError
@@ -354,7 +354,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             self.status_codes["not_found"],
             defined_content,
         )
-        from logtweet.source.online import requests  # type: ignore
+        from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         monkeypatch.setattr(
             requests,
             "get",
@@ -377,7 +377,7 @@ class TestOnlineSourceRetrieverGetContentWhiteBox(object):
             self.status_codes["not_found"],
             defined_content,
         )
-        from logtweet.source.online import requests  # type: ignore
+        from logtweet.source.adapters.onlineretriever import requests  # type: ignore
         monkeypatch.setattr(
             requests,
             "get",

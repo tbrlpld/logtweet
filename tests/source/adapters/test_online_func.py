@@ -16,7 +16,7 @@ from typing import Callable, Optional, Tuple, Type, TYPE_CHECKING
 import pytest  # type: ignore
 
 if TYPE_CHECKING:
-    from logtweet.source.online import AbstractValidOnlineSource
+    from logtweet.source.adapters.onlineretriever import AbstractValidOnlineSource
 
 
 @pytest.fixture  # type: ignore
@@ -195,7 +195,7 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         source_string = "http://{0}:{1}/".format(mock_server[0], mock_server[1])
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
         online_source_content_retriever = OnlineSourceContentRetriever(
             valid_online_source,
         )
@@ -219,11 +219,11 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         source_string = "http://{0}:{1}/".format(mock_server[0], mock_server[1])
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
         online_source_content_retriever = OnlineSourceContentRetriever(
             valid_online_source,
         )
-        from logtweet.source.online import HTTPStatusError
+        from logtweet.source.adapters.onlineretriever import HTTPStatusError
 
         with pytest.raises(HTTPStatusError):
             online_source_content_retriever.get_content()
@@ -237,11 +237,11 @@ class TestOnlineSourceContentRetrieverGetContentFunctional(object):
         source_string = "http://localhost:{0}/".format(free_port)
         # Create a valid online source without actually validating
         valid_online_source = valid_online_source_factory(source_string)
-        from logtweet.source.online import OnlineSourceContentRetriever
+        from logtweet.source.adapters.onlineretriever import OnlineSourceContentRetriever
         online_source_content_retriever = OnlineSourceContentRetriever(
             valid_online_source,
         )
-        from logtweet.source.online import RequestError
+        from logtweet.source.adapters.onlineretriever import RequestError
 
         with pytest.raises(RequestError):
             online_source_content_retriever.get_content()
