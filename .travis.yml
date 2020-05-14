@@ -1,14 +1,19 @@
 language: python
 python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
+- '3.6'
+- '3.7'
+- '3.8'
 install:
-  - python -m pip install -e ".[develop]"
+- python -m pip install -e ".[develop]"
 script:
-  - pytest
-  - mypy .
+- pytest
+- mypy .
 notifications:
   email:
-    on_success: always # default: change
-    on_failure: always # default: always
+    recipients:
+      - LuMC/Fnn2ynT2NE8U4aVHJW2TAGMT7eZxY3MGn8odPCKt8/fHq3FzOUGCBbtH7lLwOCQZ9euMjFT25YLZdU+ZAUNndE9gzpmb877aYvQh6l9zqKX4dVFfNhgKiONCjf/LXOevb/kLJN9CLNCmcklWtcI98Tu1RFjD+dJ2/VE1QYz4L2tiAw+CST+yBm2QX7c2mremTTQOMuK9sZ3Q7EjOuksHb3byQxch1dQSpfRuCxr4Lcr77xNOIyWobGbSpa/WqnxMCENubevIku7+0HudE5Qkx8VKJtvRct0gWYeKi08quA4obWQvNFQ7qIOgm7I/v6a60gD6e83shz4DrxlEknlE8ENk46EY1w6ofUZUT7wsRPKjH35rjngtGfKtZLjx3qftGksKeUrscSd3RTfUW73XblRISvMN6cz3VVqskcHMhZPoxQGePbMmSO6ao3GJauHnwy3onNri9drZT+veRJbXFMjLJP+w6nGUi+x5v7WALFWfllmzmpPd3eri3c1q89ChxQCacqcaMtVZvF9bo4KyUMNMbAmbz47BlCAF/vS+JLN5hcG7rIS2OSo1erBX0hywoo0N5DuzcvA8Fikt912nwEUKK7wBCe4VhydHRap422lt7uMhF93p55lTNxrfPydssziLpIli9HHyI+RnzHAruoRfhZ+ElXZ3NXh4EA=
+    on_success: always
+    on_failure: always
+env:
+  global:
+    secure: LuMC/Fnn2ynT2NE8U4aVHJW2TAGMT7eZxY3MGn8odPCKt8/fHq3FzOUGCBbtH7lLwOCQZ9euMjFT25YLZdU+ZAUNndE9gzpmb877aYvQh6l9zqKX4dVFfNhgKiONCjf/LXOevb/kLJN9CLNCmcklWtcI98Tu1RFjD+dJ2/VE1QYz4L2tiAw+CST+yBm2QX7c2mremTTQOMuK9sZ3Q7EjOuksHb3byQxch1dQSpfRuCxr4Lcr77xNOIyWobGbSpa/WqnxMCENubevIku7+0HudE5Qkx8VKJtvRct0gWYeKi08quA4obWQvNFQ7qIOgm7I/v6a60gD6e83shz4DrxlEknlE8ENk46EY1w6ofUZUT7wsRPKjH35rjngtGfKtZLjx3qftGksKeUrscSd3RTfUW73XblRISvMN6cz3VVqskcHMhZPoxQGePbMmSO6ao3GJauHnwy3onNri9drZT+veRJbXFMjLJP+w6nGUi+x5v7WALFWfllmzmpPd3eri3c1q89ChxQCacqcaMtVZvF9bo4KyUMNMbAmbz47BlCAF/vS+JLN5hcG7rIS2OSo1erBX0hywoo0N5DuzcvA8Fikt912nwEUKK7wBCe4VhydHRap422lt7uMhF93p55lTNxrfPydssziLpIli9HHyI+RnzHAruoRfhZ+ElXZ3NXh4EA=
