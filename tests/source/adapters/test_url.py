@@ -25,7 +25,7 @@ class TestIsValidStaticMethod(object):
         valid_url_string: str,
     ) -> None:
         """Validates URL."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         is_valid = ValidSourceURL.is_valid(valid_url_string)
 
@@ -34,7 +34,7 @@ class TestIsValidStaticMethod(object):
     def test_localhost_is_valid(self) -> None:
         """Localhost address with port is valid."""
         url = "http://localhost:8000/"
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         is_valid = ValidSourceURL.is_valid(url)
 
@@ -45,7 +45,7 @@ class TestIsValidStaticMethod(object):
         invalid_url_string: str,
     ) -> None:
         """Fails on non-URL string."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         is_valid = ValidSourceURL.is_valid(invalid_url_string)
 
@@ -60,7 +60,7 @@ class TestValidUrlInitialization(object):
         valid_url_string: str,
     ) -> None:
         """Init succeeds with valid url."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         url_obj = ValidSourceURL(valid_url_string)
 
@@ -71,7 +71,7 @@ class TestValidUrlInitialization(object):
         valid_url_string: str,
     ) -> None:
         """Initialized object has `url` property."""
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         url_obj = ValidSourceURL(valid_url_string)
 
@@ -88,7 +88,7 @@ class TestValidUrlInitialization(object):
 
         """
         from logtweet.source.usecases.retrieve import SourceValidationError
-        from logtweet.source.url import ValidSourceURL
+        from logtweet.source.adapters.validurl import ValidSourceURL
 
         with pytest.raises(
             SourceValidationError,
