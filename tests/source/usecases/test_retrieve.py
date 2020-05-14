@@ -149,9 +149,9 @@ class TestAbstactSourceContentRetriever(object):
             def is_valid(source_string: str) -> bool:
                 return True
         valid_test_source = ValidTestSource("some string")
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
         class SourceContentRetrieverImplementation(
-            AbstractSourceContentRetriever,
+            ucretrieve.AbstractSourceContentRetriever,
         ):
             def get_content(self) -> str:
                 return ""
@@ -168,9 +168,9 @@ class TestAbstactSourceContentRetriever(object):
             def is_valid(source_string: str) -> bool:
                 return True
         valid_test_source = ValidTestSource("some string")
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
         class SourceContentRetrieverImplementation(
-            AbstractSourceContentRetriever,
+            ucretrieve.AbstractSourceContentRetriever,
         ):
             def get_content(self) -> str:
                 return ""
@@ -194,8 +194,8 @@ class TestAbstactSourceContentRetriever(object):
         """
         class NotValidSourceType(object):
             pass
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
-        class Child(AbstractSourceContentRetriever):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return ""
 
@@ -209,9 +209,9 @@ class TestAbstactSourceContentRetriever(object):
         self,
     ) -> None:
         """Instantiation of child requires validated source instance."""
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
 
-        class Child(AbstractSourceContentRetriever):
+        class Child(ucretrieve.AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return ""
 
@@ -225,9 +225,9 @@ class TestAbstactSourceContentRetriever(object):
         self,
     ) -> None:
         """Instantiation of child fails if not implements `get_content`."""
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
 
-        class Child(AbstractSourceContentRetriever):
+        class Child(ucretrieve.AbstractSourceContentRetriever):
             pass
 
         with pytest.raises(
@@ -238,13 +238,13 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_direct_instantiation_fails(self) -> None:
         """Direct instantiation fails."""
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
 
         with pytest.raises(
             TypeError,
             match=r"Can't instantiate",
         ):
-            AbstractSourceContentRetriever()  # type: ignore
+            ucretrieve.AbstractSourceContentRetriever()  # type: ignore
 
 
 class TestGetLogContentFromSource(object):
@@ -282,8 +282,8 @@ class TestGetLogContentFromSource(object):
 
         """
         log_content = "Just some sting that represents the content of the log."
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
-        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class MockSourceContentRetriever(ucretrieve.AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return log_content
         mock_source_content_retriever = MockSourceContentRetriever(
@@ -304,9 +304,9 @@ class TestGetLogContentFromSource(object):
 
         """
         log_content = "Just some sting that represents the content of the log."
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
 
-        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+        class MockSourceContentRetriever(ucretrieve.AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 return log_content
 
@@ -341,8 +341,8 @@ class TestGetLogContentFromSource(object):
         class TestExceptionError(Exception):
             pass
 
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
-        class MockSourceContentRetriever(AbstractSourceContentRetriever):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class MockSourceContentRetriever(ucretrieve.AbstractSourceContentRetriever):
             def get_content(self) -> str:
                 raise TestExceptionError
         mock_source_content_retriever = MockSourceContentRetriever(

@@ -15,13 +15,13 @@ class TestAbstractValidOnlineSourceClass(object):
     """Tests for `adaptonline.AbstractValidOnlineSource` class."""
 
     def test_subclass(self) -> None:
-        """Is subclass of `AbstractValidSource`."""
-        from logtweet.source.usecases.retrieve import AbstractValidSource
+        """Is subclass of `ucretrieve.AbstractValidSource`."""
+        from logtweet.source.usecases import retrieve as ucretrieve
         from logtweet.source.adapters import onlineretriever as adaptonline
 
         assert issubclass(
             adaptonline.AbstractValidOnlineSource,
-            AbstractValidSource,
+            ucretrieve.AbstractValidSource,
         )
 
     def test_no_direct_instantiation(self) -> None:
@@ -68,12 +68,12 @@ class TestOnlineSourceRetrieverClass(object):
 
     def test_subclass(self) -> None:
         """OnlineSourceRetriever is subclass of AbstractSourceRetriever."""
-        from logtweet.source.usecases.retrieve import AbstractSourceContentRetriever
+        from logtweet.source.usecases import retrieve as ucretrieve
         from logtweet.source.adapters import onlineretriever as adaptonline
 
         assert issubclass(
             adaptonline.OnlineSourceContentRetriever,
-            AbstractSourceContentRetriever,
+            ucretrieve.AbstractSourceContentRetriever,
         )
 
 
@@ -98,12 +98,12 @@ class TestOnlineSourceRetrieverInit(object):
         """
         Type error if input not specific enough.
 
-        If the input is subclass of `AbstractValidSource` but not of
+        If the input is subclass of `ucretrieve.AbstractValidSource` but not of
         `adaptonline.AbstractValidOnlineSource` the type error is also thrown.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class NotSpecificEnoughSource(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class NotSpecificEnoughSource(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(_: str) -> bool:
                 return True
