@@ -29,6 +29,10 @@ def get_log_content_from_source(source_string: str) -> str:
         Content string retrieved from the source.
 
     """
+    # TODO: Allow source to be local file. Handle the two possible types.
+    #       To allow the two source types, detect source type, then create the
+    #       appropriate retriever object and call the use case with the
+    #       created retriever.
     validurl = adapturl.ValidSourceURL(source_string)
     retriever = adaptonline.OnlineSourceContentRetriever(validurl)
     return ucretrieve.get_log_content_from_source(retriever)

@@ -5,7 +5,8 @@
 import argparse
 from datetime import date, timedelta
 
-from logtweet import conf, history, send, content, source
+from logtweet import conf, history, send, content
+from logtweet.source.controllers import retrieve as ctrlretrieve
 
 
 def main():
@@ -32,10 +33,7 @@ def main():
         fallback=None,
     )
 
-    # TODO: Detect source type
-    # TODO: Create retriever object
-    # TODO: Allow source to be local file. Handle the two possible types.
-    log_content = source.get_log_content_from_source(source_string)
+    log_content = ctrlretrieve.get_log_content_from_source(source_string)
 
     tweet_content = content.get_tweet_content(
         log_content,
