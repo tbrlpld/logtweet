@@ -2,12 +2,13 @@
 
 """Tests for the content retrieval use case "get log content from source"."""
 
+import typing
 
 import pytest  # type: ignore
 
 
 class TestAbstractValidSource(object):
-    """Test `AbstractValidSource` class."""
+    """Test `ucretrieve.AbstractValidSource` class."""
 
     def test_child_init_succeeds_if_is_valid(self) -> None:
         """
@@ -17,8 +18,8 @@ class TestAbstractValidSource(object):
         of the valid source will succeed.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class Child(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -28,8 +29,8 @@ class TestAbstractValidSource(object):
     def test_source_string_property_on_instance(self) -> None:
         """Source string available on initialized child."""
         source_string = "some source string"
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class Child(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -39,17 +40,15 @@ class TestAbstractValidSource(object):
         assert child_instance.source_string == source_string
 
     def test_raise_validation_error_if_not_is_valid(self) -> None:
-        """Raise SourceValidationError if `is_valid` returns False."""
-        from logtweet.source.usecases.retrieve import (
-            AbstractValidSource,
-            SourceValidationError,
-        )
-        class Child(AbstractValidSource):
+        """Raise ucretrieve.SourceValidationError if `is_valid` returns False."""
+        from logtweet.source.usecases import retrieve as ucretrieve
+
+        class Child(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return False
 
-        with pytest.raises(SourceValidationError):
+        with pytest.raises(ucretrieve.SourceValidationError):
             Child("some_string")
 
     def test_child_init_argument_is_string(self) -> None:
@@ -63,8 +62,8 @@ class TestAbstractValidSource(object):
             pass
         wrong_typed_argument = WrongType()
 
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class Child(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -82,8 +81,8 @@ class TestAbstractValidSource(object):
         If the argument is not passed, an exception is raised.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class Child(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -101,13 +100,13 @@ class TestAbstractValidSource(object):
         If the argument is not passed, an exception is raised.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
+        from logtweet.source.usecases import retrieve as ucretrieve
 
         with pytest.raises(
             TypeError,
             match=r".*missing.*argument",
         ):
-            AbstractValidSource.is_valid()  # type: ignore
+            ucretrieve.AbstractValidSource.is_valid()  # type: ignore
 
     def test_child_init_fails_if_is_valid_not_implemented(self) -> None:
         """
@@ -116,8 +115,8 @@ class TestAbstractValidSource(object):
         `is_valid` is the one abstract method that is required.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class Child(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class Child(ucretrieve.AbstractValidSource):
             def __init__(self) -> None:
                 pass
 
@@ -129,13 +128,13 @@ class TestAbstractValidSource(object):
 
     def test_direct_init_fails(self) -> None:
         """Direct init fails."""
-        from logtweet.source.usecases.retrieve import AbstractValidSource
+        from logtweet.source.usecases import retrieve as ucretrieve
 
         with pytest.raises(
             TypeError,
             match=r"Can't instantiate.*abstract",
         ):
-            AbstractValidSource()  # type: ignore
+            ucretrieve.AbstractValidSource()  # type: ignore
 
 
 class TestAbstactSourceContentRetriever(object):
@@ -143,8 +142,8 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_instantiation_succeeds(self) -> None:
         """Successful instantiation."""
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class ValidTestSource(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class ValidTestSource(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -162,8 +161,8 @@ class TestAbstactSourceContentRetriever(object):
 
     def test_source_property_available_on_instance(self) -> None:
         """Source property available on instance."""
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class ValidTestSource(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class ValidTestSource(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -189,7 +188,7 @@ class TestAbstactSourceContentRetriever(object):
         """
         Instantiating child fails if source argument not correct type.
 
-        Only instances of subclasses of `AbstractValidSource` are accepted.
+        Only instances of subclasses of `ucretrieve.AbstractValidSource` are accepted.
 
         """
         class NotValidSourceType(object):
@@ -251,21 +250,22 @@ class TestGetLogContentFromSource(object):
     """Test the `get_log_content_from_source` function."""
 
     # Import for type annotations
-    from logtweet.source.usecases.retrieve import AbstractValidSource
+    if typing.TYPE_CHECKING:
+        from logtweet.source.usecases import retrieve as ucretrieve
 
     @pytest.fixture  # type: ignore
     def mock_valid_source(
         self,
-    ) -> AbstractValidSource:
+    ) -> "ucretrieve.AbstractValidSource":
         """
-        Return a mock instance of an AbstractValidSource subclass.
+        Return a mock instance of an ucretrieve.AbstractValidSource subclass.
 
         This is helpful when you want to invoke SourceContentRetrievers without
         actually validating the source.
 
         """
-        from logtweet.source.usecases.retrieve import AbstractValidSource
-        class MockValidSource(AbstractValidSource):
+        from logtweet.source.usecases import retrieve as ucretrieve
+        class MockValidSource(ucretrieve.AbstractValidSource):
             @staticmethod
             def is_valid(source_string: str) -> bool:
                 return True
@@ -273,7 +273,7 @@ class TestGetLogContentFromSource(object):
 
     def test_return_content_from_mock_source_content_retriever(
         self,
-        mock_valid_source: AbstractValidSource,
+        mock_valid_source: "ucretrieve.AbstractValidSource",
     ) -> None:
         """
         Use case returns content from source instance.
@@ -335,7 +335,7 @@ class TestGetLogContentFromSource(object):
 
     def test_exception_during_content_retrieval_not_caught(
         self,
-        mock_valid_source: AbstractValidSource,
+        mock_valid_source: "ucretrieve.AbstractValidSource",
     ) -> None:
         """An exception raised during content retrieval is not caught."""
         class TestExceptionError(Exception):

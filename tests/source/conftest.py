@@ -1,20 +1,20 @@
-from typing import Callable, TYPE_CHECKING
+import typing
 
 import pytest  # type: ignore
 
-if TYPE_CHECKING:
+if typing.TYPE_CHECKING:
     from logtweet.source.adapters import onlineretriever as adaptonline
 
 
 @pytest.fixture  # type: ignore
 def valid_online_source_factory(
-) -> Callable[[str], "adaptonline.AbstractValidOnlineSource"]:
+) -> typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"]:
     """
     Create factory function to create `adaptonline.AbstractValidOnlineSource` instance.
 
     Returns
     -------
-    Callable[[str], "adaptonline.AbstractValidOnlineSource"]
+    typing.Callable[[str], "adaptonline.AbstractValidOnlineSource"]
         Factory function to create instances of a subclass of
         `adaptonline.AbstractValidOnlineSource`.
 
