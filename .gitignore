@@ -36,3 +36,6 @@ venv/
 # Testing
 htmlcov
 .coverage
+
+# OS
+.DS_Store
