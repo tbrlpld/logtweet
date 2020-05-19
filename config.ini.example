@@ -1,5 +1,5 @@
 [LogTweet]
-url = https://www.example.com
+source = https://www.example.com
 
 [Twitter]
 api_key = xyz

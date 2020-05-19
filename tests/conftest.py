@@ -4,8 +4,29 @@
 
 from datetime import date
 
-from bs4 import BeautifulSoup
-import pytest
+from bs4 import BeautifulSoup  # type: ignore
+import pytest  # type: ignore
+
+
+@pytest.fixture
+def valid_url():
+    return "https://example.com"
+
+
+@pytest.fixture
+def invalid_url():
+    return "not a url, just a string"
+
+
+@pytest.fixture
+def valid_url_obj(valid_url):
+    from logtweet._source.valid_url import ValidUrl
+    return ValidUrl(valid_url)
+
+
+@pytest.fixture
+def page_content():
+    return "<html><body>The content</body></html>"
 
 
 @pytest.fixture
@@ -53,13 +74,6 @@ def example_soup():
 </body>
 </html>"""
     return BeautifulSoup(page_content, "html.parser")
-
-
-@pytest.fixture
-def day_1_heading(example_soup):
-    from logtweet import get_day_heading
-    return get_day_heading(example_soup, date(2019, 10, 16))
-
 
 @pytest.fixture
 def test_file(tmp_path):

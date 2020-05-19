@@ -2,7 +2,7 @@
 
 """Setup script."""
 
-from setuptools import setup
+from setuptools import setup  # type: ignore
 
 with open("README.md", "r") as f:
     long_description = f.read()
@@ -11,6 +11,7 @@ requires = [
     "bs4",
     "requests",
     "tweepy",
+    "validators",
 ]
 
 develop_requires = [
@@ -19,6 +20,7 @@ develop_requires = [
     # See: https://packaging.python.org/tutorials/packaging-projects/
     "twine",
     "pytest",
+    "pytest-cov",
     "wemake-python-styleguide",
     "mypy",
 ]
@@ -40,7 +42,7 @@ setup(
     packages=["logtweet"],
     entry_points={
         "console_scripts": [
-            "logtweet = logtweet:main",
+            "logtweet = logtweet.app:main",
         ],
     },
     include_package_data=True,  # To copy the files listen in MANIFEST.in

@@ -2,7 +2,8 @@
 
 """Script to post tweet based on today's #100DaysOfCode log."""
 
-import logtweet
+from logtweet.app import main
+
 
 if __name__ == "__main__":
-    logtweet.main()
+    main()

@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
-# TODO: Rename this and the actual module from "tweet_logging" to "history".
-#       The fact that I am using the logging module is an implementation
-#       detail. This should be hidden. Also "tweet_logging" is a little
-#       confusing because the tweet is generated from a "log".
-
-import pytest  # type: ignore
 
 
-class TestCreateTweetLoggingMsg(object):
-    """Tests for ``create_tweet_logging_msg`` function."""
+class TestCreateTweetHistoryMsg(object):
+    """Tests for ``create_tweet_history_msg`` function."""
 
-    def test_turn_multiline_tweet_into_single_line_logging_msg(self):
+    def test_turn_multiline_tweet_into_single_line_history_msg(self):
         tweet_content = "This is a\n\nmultiline\n\ntweet."
         expected_msg = "This is a  multiline  tweet."
-        from logtweet import create_tweet_logging_msg
+        from logtweet.history import create_tweet_history_msg
 
-        actual_msg = create_tweet_logging_msg(tweet_content)
+        actual_msg = create_tweet_history_msg(tweet_content)
 
         assert actual_msg == expected_msg
 
@@ -29,7 +23,7 @@ class TestIsStringInFile(object):
 {search_string}
 This is something else."""
         test_file.write_text(file_content)
-        from logtweet import is_string_in_filelines
+        from logtweet.history import is_string_in_filelines
 
         found = is_string_in_filelines(
             search_string,
@@ -44,7 +38,7 @@ This is something else."""
 Here is something, but '{search_string}' is in this line too.
 This is something else."""
         test_file.write_text(file_content)
-        from logtweet import is_string_in_filelines
+        from logtweet.history import is_string_in_filelines
 
         found = is_string_in_filelines(
             search_string,
@@ -59,7 +53,7 @@ This is something else."""
 This is NOT what I am looking for.
 This is something else."""
         test_file.write_text(file_content)
-        from logtweet import is_string_in_filelines
+        from logtweet.history import is_string_in_filelines
 
         found = is_string_in_filelines(
             search_string,
@@ -80,12 +74,12 @@ class TestAddTweetToHistory(object):
         test_filepath = str(test_file.as_posix())
         tweet_content = "This is a\n\nmultiline\n\ntweet."
 
-        from logtweet import add_tweet_to_history
+        from logtweet.history import add_tweet_to_history
         add_tweet_to_history(tweet_content, history_filepath=test_filepath)
 
-        # Can be tested with ``create_tweet_logging_msg`` and ``is_string_in_filelines``
-        from logtweet import create_tweet_logging_msg, is_string_in_filelines
-        tweet_history_msg = create_tweet_logging_msg(tweet_content)
+        # Can be tested with ``create_tweet_history_msg`` and ``is_string_in_filelines``
+        from logtweet.history import create_tweet_history_msg, is_string_in_filelines
+        tweet_history_msg = create_tweet_history_msg(tweet_content)
         assert is_string_in_filelines(tweet_history_msg, filepath=test_filepath)
 
     def test_after_multiple_execution_all_tweets_in_history(
@@ -96,14 +90,14 @@ class TestAddTweetToHistory(object):
         tweet1_content = "This is a\n\nmultiline\n\ntweet."
         tweet2_content = "This is another tweet."
 
-        from logtweet import add_tweet_to_history
+        from logtweet.history import add_tweet_to_history
         add_tweet_to_history(tweet1_content, history_filepath=test_filepath)
         add_tweet_to_history(tweet2_content, history_filepath=test_filepath)
 
-        # Can be tested with ``create_tweet_logging_msg`` and ``is_string_in_filelines``
-        from logtweet import create_tweet_logging_msg, is_string_in_filelines
-        tweet1_history_msg = create_tweet_logging_msg(tweet1_content)
-        tweet2_history_msg = create_tweet_logging_msg(tweet2_content)
+        # Can be tested with ``create_tweet_history_msg`` and ``is_string_in_filelines``
+        from logtweet.history import create_tweet_history_msg, is_string_in_filelines
+        tweet1_history_msg = create_tweet_history_msg(tweet1_content)
+        tweet2_history_msg = create_tweet_history_msg(tweet2_content)
         assert is_string_in_filelines(tweet1_history_msg, filepath=test_filepath)
         assert is_string_in_filelines(tweet2_history_msg, filepath=test_filepath)
 
@@ -121,7 +115,7 @@ class TestAddTweetToHistory(object):
         tweet1_content = "This is a\n\nmultiline\n\ntweet."
         tweet2_content = "This is another tweet."
 
-        from logtweet import add_tweet_to_history
+        from logtweet.history import add_tweet_to_history
         add_tweet_to_history(tweet1_content, history_filepath=test_filepath)
         add_tweet_to_history(tweet2_content, history_filepath=test_filepath)
 
@@ -138,20 +132,20 @@ class TestIsTweetInHistory(object):
         test_file,
     ):
         tweet_content = "This is a\n\nmultiline\n\ntweet."
-        from logtweet import create_tweet_logging_msg
-        tweet_logging_msg = create_tweet_logging_msg(tweet_content)
+        from logtweet.history import create_tweet_history_msg
+        tweet_history_msg = create_tweet_history_msg(tweet_content)
         test_file_content = f"""This is something.
-{tweet_logging_msg}
+{tweet_history_msg}
 This is some more."""
         test_file.write_text(test_file_content)
-        from logtweet import is_tweet_in_history
+        from logtweet.history import is_tweet_in_history
 
         found = is_tweet_in_history(
             tweet_content,
             history_filepath=test_file.as_posix(),
         )
 
-        assert found == True
+        assert found is True
 
     def test_finds_tweet_if_in_history_with_prefix(
         self,
@@ -159,38 +153,35 @@ This is some more."""
     ):
         """Test history message with prefix in file."""
         tweet_content = "This is a\n\nmultiline\n\ntweet."
-        from logtweet import create_tweet_logging_msg
-        tweet_logging_msg = create_tweet_logging_msg(tweet_content)
+        from logtweet.history import create_tweet_history_msg
+        tweet_history_msg = create_tweet_history_msg(tweet_content)
         test_file_content = f"""This is something.
-Here is something. But '{tweet_logging_msg}' is here too.
+Here is something. But '{tweet_history_msg}' is here too.
 This is some more."""
         test_file.write_text(test_file_content)
-        from logtweet import is_tweet_in_history
+        from logtweet.history import is_tweet_in_history
 
         found = is_tweet_in_history(
             tweet_content,
             history_filepath=test_file.as_posix(),
         )
 
-        assert found == True
+        assert found is True
 
     def test_false_if_tweet_not_in_history(
         self,
         test_file,
-        monkeypatch,
     ):
         """Test false if no history message in file."""
         tweet_content = "This is a\n\nmultiline\n\ntweet."
-        from logtweet import create_tweet_logging_msg
-        tweet_logging_msg = create_tweet_logging_msg(tweet_content)
         test_file_content = f"""This is something.
 This is some more."""
         test_file.write_text(test_file_content)
-        from logtweet import is_tweet_in_history
+        from logtweet.history import is_tweet_in_history
 
         found = is_tweet_in_history(
             tweet_content,
             history_filepath=test_file.as_posix(),
         )
 
-        assert found == False
+        assert found is False
